@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             lostBorderPanel1 = new ReaLTaiizor.Controls.LostBorderPanel();
+            AppendConsoleBtn = new ReaLTaiizor.Controls.Button();
             OpenAviFileBtn = new ReaLTaiizor.Controls.Button();
             HideBtn = new ReaLTaiizor.Controls.Button();
             UnlockAllBtn = new ReaLTaiizor.Controls.Button();
@@ -42,7 +43,8 @@
             RestartBtn = new ReaLTaiizor.Controls.Button();
             ResetAvatarBtn = new ReaLTaiizor.Controls.Button();
             UnlockBtn = new ReaLTaiizor.Controls.Button();
-            AppendConsoleBtn = new ReaLTaiizor.Controls.Button();
+            ClearCfgBtn = new ReaLTaiizor.Controls.Button();
+            DeleteCfgBtn = new ReaLTaiizor.Controls.Button();
             lostBorderPanel1.SuspendLayout();
             lostBorderPanel2.SuspendLayout();
             SuspendLayout();
@@ -70,6 +72,26 @@
             lostBorderPanel1.Size = new Size(860, 537);
             lostBorderPanel1.TabIndex = 0;
             lostBorderPanel1.Text = "lostBorderPanel1";
+            // 
+            // AppendConsoleBtn
+            // 
+            AppendConsoleBtn.BackColor = Color.Transparent;
+            AppendConsoleBtn.BorderColor = Color.FromArgb(32, 32, 32);
+            AppendConsoleBtn.EnteredBorderColor = Color.FromArgb(157, 59, 255);
+            AppendConsoleBtn.EnteredColor = Color.FromArgb(34, 34, 34);
+            AppendConsoleBtn.Font = new Font("Microsoft Sans Serif", 12F);
+            AppendConsoleBtn.Image = null;
+            AppendConsoleBtn.ImageAlign = ContentAlignment.MiddleLeft;
+            AppendConsoleBtn.InactiveColor = Color.FromArgb(22, 22, 22);
+            AppendConsoleBtn.Location = new Point(591, 454);
+            AppendConsoleBtn.Name = "AppendConsoleBtn";
+            AppendConsoleBtn.PressedBorderColor = Color.White;
+            AppendConsoleBtn.PressedColor = Color.MediumSlateBlue;
+            AppendConsoleBtn.Size = new Size(79, 74);
+            AppendConsoleBtn.TabIndex = 10;
+            AppendConsoleBtn.Text = "Append Console";
+            AppendConsoleBtn.TextAlignment = StringAlignment.Center;
+            AppendConsoleBtn.Click += AppendConsoleBtn_Click;
             // 
             // OpenAviFileBtn
             // 
@@ -156,6 +178,8 @@
             // 
             lostBorderPanel2.BackColor = Color.FromArgb(34, 34, 34);
             lostBorderPanel2.BorderColor = Color.FromArgb(157, 59, 255);
+            lostBorderPanel2.Controls.Add(DeleteCfgBtn);
+            lostBorderPanel2.Controls.Add(ClearCfgBtn);
             lostBorderPanel2.Controls.Add(AvatarIDLabel);
             lostBorderPanel2.Controls.Add(AvatarIDTextBox);
             lostBorderPanel2.Controls.Add(UserIDLabel);
@@ -181,7 +205,8 @@
             // 
             // AvatarIDTextBox
             // 
-            AvatarIDTextBox.BackColor = Color.FromArgb(69, 73, 74);
+            AvatarIDTextBox.BackColor = Color.FromArgb(40, 40, 40);
+            AvatarIDTextBox.BaseColor = Color.FromArgb(44, 55, 66);
             AvatarIDTextBox.BorderColorA = Color.FromArgb(157, 59, 255);
             AvatarIDTextBox.BorderColorB = Color.FromArgb(157, 59, 255);
             AvatarIDTextBox.Font = new Font("Segoe UI", 12F);
@@ -201,7 +226,7 @@
             AvatarIDTextBox.TabStop = false;
             AvatarIDTextBox.Text = "avtr_XXXXXXXXXXXXXXXXXXXX";
             AvatarIDTextBox.UseSystemPasswordChar = false;
-            AvatarIDTextBox.TextChanged += new EventHandler(AvatarIDTextBox_TextChanged);
+            AvatarIDTextBox.TextChanged += AvatarIDTextBox_TextChanged;
             // 
             // UserIDLabel
             // 
@@ -214,14 +239,14 @@
             // 
             // UserIDTextBox
             // 
-            UserIDTextBox.BackColor = Color.Black;
-            UserIDTextBox.BaseColor = Color.FromArgb(157, 59, 255);
+            UserIDTextBox.BackColor = Color.FromArgb(40, 40, 40);
+            UserIDTextBox.BaseColor = Color.FromArgb(44, 55, 66);
             UserIDTextBox.BorderColorA = Color.FromArgb(157, 59, 255);
             UserIDTextBox.BorderColorB = Color.FromArgb(157, 59, 255);
             UserIDTextBox.Font = new Font("Segoe UI", 12F);
             UserIDTextBox.ForeColor = Color.White;
             UserIDTextBox.Hint = "";
-            UserIDTextBox.Location = new Point(12, 33);
+            UserIDTextBox.Location = new Point(12, 32);
             UserIDTextBox.MaxLength = 32767;
             UserIDTextBox.Multiline = false;
             UserIDTextBox.Name = "UserIDTextBox";
@@ -231,11 +256,11 @@
             UserIDTextBox.SelectionLength = 0;
             UserIDTextBox.SelectionStart = 0;
             UserIDTextBox.Size = new Size(426, 38);
-            UserIDTextBox.TabIndex = 4;
+            UserIDTextBox.TabIndex = 5;
             UserIDTextBox.TabStop = false;
             UserIDTextBox.Text = "usr_XXXXXXXXXXXXXXXXXXXX";
             UserIDTextBox.UseSystemPasswordChar = false;
-            UserIDTextBox.TextChanged += new EventHandler(UserIDTextBox_TextChanged);
+            UserIDTextBox.TextChanged += UserIDTextBox_TextChanged;
             // 
             // AutoRestartCheckBox
             // 
@@ -318,25 +343,45 @@
             UnlockBtn.TextAlignment = StringAlignment.Center;
             UnlockBtn.Click += UnlockBtn_Click;
             // 
-            // AppendConsoleBtn
+            // ClearCfgBtn
             // 
-            AppendConsoleBtn.BackColor = Color.Transparent;
-            AppendConsoleBtn.BorderColor = Color.FromArgb(32, 32, 32);
-            AppendConsoleBtn.EnteredBorderColor = Color.FromArgb(157, 59, 255);
-            AppendConsoleBtn.EnteredColor = Color.FromArgb(34, 34, 34);
-            AppendConsoleBtn.Font = new Font("Microsoft Sans Serif", 12F);
-            AppendConsoleBtn.Image = null;
-            AppendConsoleBtn.ImageAlign = ContentAlignment.MiddleLeft;
-            AppendConsoleBtn.InactiveColor = Color.FromArgb(22, 22, 22);
-            AppendConsoleBtn.Location = new Point(591, 454);
-            AppendConsoleBtn.Name = "AppendConsoleBtn";
-            AppendConsoleBtn.PressedBorderColor = Color.White;
-            AppendConsoleBtn.PressedColor = Color.MediumSlateBlue;
-            AppendConsoleBtn.Size = new Size(79, 74);
-            AppendConsoleBtn.TabIndex = 10;
-            AppendConsoleBtn.Text = "Append Console";
-            AppendConsoleBtn.TextAlignment = StringAlignment.Center;
-            AppendConsoleBtn.Click += AppendConsoleBtn_Click;
+            ClearCfgBtn.BackColor = Color.Transparent;
+            ClearCfgBtn.BorderColor = Color.FromArgb(32, 32, 32);
+            ClearCfgBtn.EnteredBorderColor = Color.FromArgb(157, 59, 255);
+            ClearCfgBtn.EnteredColor = Color.FromArgb(34, 34, 34);
+            ClearCfgBtn.Font = new Font("Microsoft Sans Serif", 12F);
+            ClearCfgBtn.Image = null;
+            ClearCfgBtn.ImageAlign = ContentAlignment.MiddleLeft;
+            ClearCfgBtn.InactiveColor = Color.FromArgb(22, 22, 22);
+            ClearCfgBtn.Location = new Point(578, 341);
+            ClearCfgBtn.Name = "ClearCfgBtn";
+            ClearCfgBtn.PressedBorderColor = Color.White;
+            ClearCfgBtn.PressedColor = Color.MediumSlateBlue;
+            ClearCfgBtn.Size = new Size(120, 40);
+            ClearCfgBtn.TabIndex = 11;
+            ClearCfgBtn.Text = "Clear Saves";
+            ClearCfgBtn.TextAlignment = StringAlignment.Center;
+            ClearCfgBtn.Click += ClearCfgBtn_Click;
+            // 
+            // DeleteCfgBtn
+            // 
+            DeleteCfgBtn.BackColor = Color.Transparent;
+            DeleteCfgBtn.BorderColor = Color.FromArgb(32, 32, 32);
+            DeleteCfgBtn.EnteredBorderColor = Color.FromArgb(157, 59, 255);
+            DeleteCfgBtn.EnteredColor = Color.FromArgb(34, 34, 34);
+            DeleteCfgBtn.Font = new Font("Microsoft Sans Serif", 12F);
+            DeleteCfgBtn.Image = null;
+            DeleteCfgBtn.ImageAlign = ContentAlignment.MiddleLeft;
+            DeleteCfgBtn.InactiveColor = Color.FromArgb(22, 22, 22);
+            DeleteCfgBtn.Location = new Point(704, 341);
+            DeleteCfgBtn.Name = "DeleteCfgBtn";
+            DeleteCfgBtn.PressedBorderColor = Color.White;
+            DeleteCfgBtn.PressedColor = Color.MediumSlateBlue;
+            DeleteCfgBtn.Size = new Size(127, 40);
+            DeleteCfgBtn.TabIndex = 12;
+            DeleteCfgBtn.Text = "Delete Saves";
+            DeleteCfgBtn.TextAlignment = StringAlignment.Center;
+            DeleteCfgBtn.Click += DeleteCfgBtn_Click;
             // 
             // MainForm
             // 
@@ -379,5 +424,7 @@
         private ReaLTaiizor.Controls.Button HideBtn;
         private ReaLTaiizor.Controls.Button OpenAviFileBtn;
         private ReaLTaiizor.Controls.Button AppendConsoleBtn;
+        private ReaLTaiizor.Controls.Button DeleteCfgBtn;
+        private ReaLTaiizor.Controls.Button ClearCfgBtn;
     }
 }

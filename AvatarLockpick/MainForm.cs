@@ -60,25 +60,35 @@ namespace AvatarLockpick
         private bool hasConsole = false;
 
         private Config _config;
+        private bool _isLoading = false;
 
         public MainForm()
         {
             InitializeComponent();
             UseImmersiveDarkMode(Handle, true);
-            
-            // Load config
+
+            // First load config
+            _isLoading = true;
             _config = Config.Load();
-            
-            // Apply loaded config
-            UserIDTextBox.Text = _config.UserId;
-            AvatarIDTextBox.Text = _config.AvatarId;
+
+            // Then apply loaded config
+            UserIDTextBox.Text = _config.UserId ?? "usr_XXXXXXXXXXXXXXXXXXXX";
+            AvatarIDTextBox.Text = _config.AvatarId ?? "avtr_XXXXXXXXXXXXXXXXXXXX";
             HideUserIDCheckBox.Checked = _config.HideUserId;
             AutoRestartCheckBox.Checked = _config.AutoRestart;
             AutoRestartTog = _config.AutoRestart;
+
+            // Finally wire up event handlers
+            UserIDTextBox.TextChanged += UserIDTextBox_TextChanged;
+            AvatarIDTextBox.TextChanged += AvatarIDTextBox_TextChanged;
+            _isLoading = false;
         }
 
         private void SaveConfig()
         {
+            if (_isLoading) return;  // Don't save while loading initial values
+
+            Console.WriteLine($"Saving config - UserID: {UserIDTextBox.Text}, AvatarID: {AvatarIDTextBox.Text}");
             _config.UserId = UserIDTextBox.Text;
             _config.AvatarId = AvatarIDTextBox.Text;
             _config.HideUserId = HideUserIDCheckBox.Checked;
@@ -86,12 +96,12 @@ namespace AvatarLockpick
             _config.Save();
         }
 
-        private void UserIDTextBox_TextChanged(object sender, EventArgs e)
+        private void UserIDTextBox_TextChanged(object? sender, EventArgs e)
         {
             SaveConfig();
         }
 
-        private void AvatarIDTextBox_TextChanged(object sender, EventArgs e)
+        private void AvatarIDTextBox_TextChanged(object? sender, EventArgs e)
         {
             SaveConfig();
         }
@@ -104,7 +114,7 @@ namespace AvatarLockpick
 
         private void UnlockBtn_Click(object sender, EventArgs e)
         {
-            if(string.IsNullOrEmpty(UserIDTextBox.Text) || string.IsNullOrEmpty(AvatarIDTextBox.Text))
+            if (string.IsNullOrEmpty(UserIDTextBox.Text) || string.IsNullOrEmpty(AvatarIDTextBox.Text))
             {
                 MsgBoxUtils.ShowError("Please enter a User ID and Avatar ID!", "Error");
                 return;
@@ -207,6 +217,16 @@ namespace AvatarLockpick
                 FreeConsole();
                 hasConsole = false;
             }
+        }
+
+        private void ClearCfgBtn_Click(object sender, EventArgs e)
+        { 
+            _config.Clear();
+        }
+
+        private void DeleteCfgBtn_Click(object sender, EventArgs e)
+        {
+            Config.ClearConfig();
         }
     }
 }

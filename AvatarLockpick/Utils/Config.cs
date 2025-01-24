@@ -23,14 +23,19 @@ namespace AvatarLockpick.Utils
             {
                 if (File.Exists(ConfigPath))
                 {
+                    Console.WriteLine($"Loading config from: {ConfigPath}");
                     string json = File.ReadAllText(ConfigPath);
-                    return JsonConvert.DeserializeObject<Config>(json) ?? new Config();
+                    Console.WriteLine($"Loaded config content: {json}");
+                    var config = JsonConvert.DeserializeObject<Config>(json) ?? new Config();
+                    Console.WriteLine($"Deserialized config - UserId: {config.UserId}, AvatarId: {config.AvatarId}");
+                    return config;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // If there's any error reading the config, return default
+                Console.WriteLine($"Error loading config: {ex.Message}");
             }
+            Console.WriteLine("Creating new config");
             return new Config();
         }
 
@@ -41,16 +46,46 @@ namespace AvatarLockpick.Utils
                 string dirPath = Path.GetDirectoryName(ConfigPath)!;
                 if (!Directory.Exists(dirPath))
                 {
+                    Console.WriteLine($"Creating config directory: {dirPath}");
                     Directory.CreateDirectory(dirPath);
                 }
 
                 string json = JsonConvert.SerializeObject(this, Formatting.Indented);
+                Console.WriteLine($"Saving config to {ConfigPath}");
+                Console.WriteLine($"Config content: {json}");
                 File.WriteAllText(ConfigPath, json);
+                Console.WriteLine("Config saved successfully");
             }
-            catch
+            catch (Exception ex)
             {
-                // Silently fail if we can't save the config
+                Console.WriteLine($"Error saving config: {ex.Message}");
             }
+        }
+
+        public static void ClearConfig()
+        {
+            try
+            {
+                if (File.Exists(ConfigPath))
+                {
+                    Console.WriteLine($"Deleting config file: {ConfigPath}");
+                    File.Delete(ConfigPath);
+                    Console.WriteLine("Config file deleted successfully");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting config: {ex.Message}");
+            }
+        }
+
+        public void Clear()
+        {
+            UserId = null;
+            AvatarId = null;
+            HideUserId = false;
+            AutoRestart = false;
+            Save();
         }
     }
 } 
