@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace AvatarLockpick.Utils
 {
@@ -63,9 +64,9 @@ namespace AvatarLockpick.Utils
                 string avatarPath = GetVRChatAvatarPath(userId);
                 string fullAvatarPath = Path.Combine(avatarPath, avatarFileName);
 
-                // Debug logging
                 AppendToConsole($"Looking for avatar at path: {fullAvatarPath}");
                 AppendToConsole($"Directory exists: {Directory.Exists(avatarPath)}");
+                
                 if (Directory.Exists(avatarPath))
                 {
                     AppendToConsole("Files in directory:");
@@ -81,33 +82,145 @@ namespace AvatarLockpick.Utils
                 }
 
                 string jsonContent = File.ReadAllText(fullAvatarPath);
-                var jsonObj = JObject.Parse(jsonContent);
-
-                // Find properties that end with "locked" regardless of Unicode characters
-                var properties = jsonObj.Descendants()
-                    .OfType<JProperty>()
-                    .Where(p => p.Name.EndsWith("locked"));
+                AppendToConsole("Successfully read file content");
+                AppendToConsole($"Raw JSON content: {jsonContent}");
 
                 bool wasUnlocked = false;
-                foreach (var prop in properties)
+                
+                try
                 {
-                    if (prop.Value.Type == JTokenType.Integer && prop.Value.Value<int>() == 1)
+                    // First try to parse as a single object
+                    JObject jsonObj = JObject.Parse(jsonContent);
+                    AppendToConsole("Successfully parsed JSON as object");
+                    
+                    // Get the animationParameters array
+                    var animParams = jsonObj["animationParameters"] as JArray;
+                    if (animParams != null)
                     {
-                        prop.Value = new JValue(0);
-                        wasUnlocked = true;
+                        AppendToConsole("Found animationParameters array");
+                        foreach (JObject param in animParams)
+                        {
+                            var nameProperty = param["name"]?.ToString();
+                            if (string.IsNullOrEmpty(nameProperty)) continue;
+
+                            // Remove ALL Unicode characters
+                            string normalizedName = Regex.Replace(nameProperty, @"[^\u0000-\u007F]+", "", RegexOptions.None);
+                            normalizedName = normalizedName.Trim(); // Also trim any remaining whitespace
+                            
+                            AppendToConsole($"Checking parameter: {nameProperty} (normalized: {normalizedName})");
+                            
+                            if (normalizedName.Equals("locked", StringComparison.OrdinalIgnoreCase))
+                            {
+                                AppendToConsole($"Found locked parameter with name: {nameProperty}");
+                                var valueToken = param["value"];
+                                
+                                if (valueToken != null)
+                                {
+                                    AppendToConsole($"Current value: {valueToken}");
+                                    if (valueToken.Type == JTokenType.Integer && valueToken.Value<int>() == 1)
+                                    {
+                                        param["value"] = new JValue(0);
+                                        wasUnlocked = true;
+                                        AppendToConsole("Changed value to 0");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        AppendToConsole("No animationParameters array found in JSON");
+                    }
+
+                    if (wasUnlocked)
+                    {
+                        AppendToConsole("Writing changes back to file...");
+                        File.WriteAllText(fullAvatarPath, jsonObj.ToString(Newtonsoft.Json.Formatting.None));
+                        AppendToConsole("Successfully saved changes");
+                        return true;
+                    }
+                }
+                catch (JsonReaderException)
+                {
+                    // If it's not a single object, try parsing as array
+                    try
+                    {
+                        JArray jsonArray = JArray.Parse(jsonContent);
+                        AppendToConsole("Successfully parsed JSON as array");
+                        
+                        foreach (JObject item in jsonArray.Children<JObject>())
+                        {
+                            var nameProperty = item["name"]?.ToString();
+                            if (string.IsNullOrEmpty(nameProperty)) continue;
+
+                            string normalizedName = Regex.Replace(nameProperty, @"[^\u0000-\u007F]+", "", RegexOptions.None);
+                            
+                            if (normalizedName.Equals("locked", StringComparison.OrdinalIgnoreCase))
+                            {
+                                AppendToConsole($"Found locked property with name: {nameProperty}");
+                                var valueToken = item["value"];
+                                
+                                if (valueToken != null)
+                                {
+                                    AppendToConsole($"Current value: {valueToken}");
+                                    
+                                    if (valueToken.Type == JTokenType.Integer && valueToken.Value<int>() != 0)
+                                    {
+                                        item["value"] = new JValue(0);
+                                        wasUnlocked = true;
+                                        AppendToConsole("Changed integer value to 0");
+                                    }
+                                    else if (valueToken.Type == JTokenType.Boolean && valueToken.Value<bool>() == true)
+                                    {
+                                        item["value"] = new JValue(false);
+                                        wasUnlocked = true;
+                                        AppendToConsole("Changed boolean value to false");
+                                    }
+                                    else if (valueToken.Type == JTokenType.String)
+                                    {
+                                        string? strValue = valueToken.Value<string>();
+                                        if (!string.IsNullOrEmpty(strValue) &&
+                                            (strValue.Equals("1") || strValue.Equals("true", StringComparison.OrdinalIgnoreCase)))
+                                        {
+                                            item["value"] = new JValue("0");
+                                            wasUnlocked = true;
+                                            AppendToConsole("Changed string value to '0'");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (wasUnlocked)
+                        {
+                            AppendToConsole("Writing changes back to file...");
+                            File.WriteAllText(fullAvatarPath, jsonArray.ToString(Newtonsoft.Json.Formatting.None));
+                            AppendToConsole("Successfully saved changes");
+                            return true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        AppendToConsole($"Error parsing JSON as array: {ex.Message}");
+                        throw;
                     }
                 }
 
                 if (wasUnlocked)
                 {
-                    File.WriteAllText(fullAvatarPath, jsonObj.ToString(Newtonsoft.Json.Formatting.None));
-                    return true;
+                    AppendToConsole("No locked properties found or all properties were already unlocked");
+                    return false;
                 }
-
-                return false;
+                else
+                {
+                    AppendToConsole("No locked properties found or all properties were already unlocked");
+                    return false;
+                }
             }
             catch (Exception ex)
             {
+                AppendToConsole($"Error: {ex.Message}");
+                AppendToConsole($"Stack trace: {ex.StackTrace}");
                 throw new Exception($"Error unlocking avatar {avatarFileName}: {ex.Message}", ex);
             }
         }

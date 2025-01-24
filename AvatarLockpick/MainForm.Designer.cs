@@ -181,8 +181,7 @@
             // 
             // AvatarIDTextBox
             // 
-            AvatarIDTextBox.BackColor = Color.Black;
-            AvatarIDTextBox.BaseColor = Color.FromArgb(157, 59, 255);
+            AvatarIDTextBox.BackColor = Color.FromArgb(69, 73, 74);
             AvatarIDTextBox.BorderColorA = Color.FromArgb(157, 59, 255);
             AvatarIDTextBox.BorderColorB = Color.FromArgb(157, 59, 255);
             AvatarIDTextBox.Font = new Font("Segoe UI", 12F);
@@ -202,6 +201,7 @@
             AvatarIDTextBox.TabStop = false;
             AvatarIDTextBox.Text = "avtr_XXXXXXXXXXXXXXXXXXXX";
             AvatarIDTextBox.UseSystemPasswordChar = false;
+            AvatarIDTextBox.TextChanged += new EventHandler(AvatarIDTextBox_TextChanged);
             // 
             // UserIDLabel
             // 
@@ -235,6 +235,7 @@
             UserIDTextBox.TabStop = false;
             UserIDTextBox.Text = "usr_XXXXXXXXXXXXXXXXXXXX";
             UserIDTextBox.UseSystemPasswordChar = false;
+            UserIDTextBox.TextChanged += new EventHandler(UserIDTextBox_TextChanged);
             // 
             // AutoRestartCheckBox
             // 

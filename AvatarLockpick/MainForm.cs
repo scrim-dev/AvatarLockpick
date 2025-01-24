@@ -59,10 +59,41 @@ namespace AvatarLockpick
 
         private bool hasConsole = false;
 
+        private Config _config;
+
         public MainForm()
         {
             InitializeComponent();
             UseImmersiveDarkMode(Handle, true);
+            
+            // Load config
+            _config = Config.Load();
+            
+            // Apply loaded config
+            UserIDTextBox.Text = _config.UserId;
+            AvatarIDTextBox.Text = _config.AvatarId;
+            HideUserIDCheckBox.Checked = _config.HideUserId;
+            AutoRestartCheckBox.Checked = _config.AutoRestart;
+            AutoRestartTog = _config.AutoRestart;
+        }
+
+        private void SaveConfig()
+        {
+            _config.UserId = UserIDTextBox.Text;
+            _config.AvatarId = AvatarIDTextBox.Text;
+            _config.HideUserId = HideUserIDCheckBox.Checked;
+            _config.AutoRestart = AutoRestartCheckBox.Checked;
+            _config.Save();
+        }
+
+        private void UserIDTextBox_TextChanged(object sender, EventArgs e)
+        {
+            SaveConfig();
+        }
+
+        private void AvatarIDTextBox_TextChanged(object sender, EventArgs e)
+        {
+            SaveConfig();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -123,26 +154,14 @@ namespace AvatarLockpick
 
         private void AutoRestartCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            if (AutoRestartCheckBox.Checked)
-            {
-                AutoRestartTog = true;
-            }
-            else
-            {
-                AutoRestartTog = false;
-            }
+            AutoRestartTog = AutoRestartCheckBox.Checked;
+            SaveConfig();
         }
 
         private void HideUserIDCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            if (HideUserIDCheckBox.Checked)
-            {
-                UserIDTextBox.UseSystemPasswordChar = true;
-            }
-            else
-            {
-                UserIDTextBox.UseSystemPasswordChar = false;
-            }
+            UserIDTextBox.UseSystemPasswordChar = HideUserIDCheckBox.Checked;
+            SaveConfig();
         }
 
         private void UnlockAllBtn_Click(object sender, EventArgs e)
