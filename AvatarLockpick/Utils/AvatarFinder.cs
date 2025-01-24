@@ -43,8 +43,15 @@ namespace AvatarLockpick.Utils
         //Unlocks all avatars for a user
         public static string GetVRChatAvatarPath(string userId)
         {
-            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string vrchatPath = Path.Combine(localAppData, "LocalLow", "VRChat", "VRChat", "LocalAvatarData", userId);
+            // Get the path to AppData
+            string appDataPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                "AppData",
+                "LocalLow"
+            );
+            
+            string vrchatPath = Path.Combine(appDataPath, "VRChat", "VRChat", "LocalAvatarData", userId);
+            AppendToConsole($"Checking VRChat path: {vrchatPath}");
             return vrchatPath;
         }
 
