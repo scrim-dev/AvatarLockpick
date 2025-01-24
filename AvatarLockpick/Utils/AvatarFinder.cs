@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 
 namespace AvatarLockpick.Utils
@@ -118,6 +119,27 @@ namespace AvatarLockpick.Utils
             catch (Exception ex)
             {
                 throw new Exception($"Error unlocking avatars: {ex.Message}", ex);
+            }
+        }
+
+        public static bool OpenAvatarInNotepad(string userId, string avatarFileName)
+        {
+            try
+            {
+                string avatarPath = GetVRChatAvatarPath(userId);
+                string fullAvatarPath = Path.Combine(avatarPath, avatarFileName);
+
+                if (!File.Exists(fullAvatarPath))
+                {
+                    throw new FileNotFoundException($"Avatar file not found: {avatarFileName}");
+                }
+
+                Process.Start("notepad.exe", fullAvatarPath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error opening avatar in Notepad {avatarFileName}: {ex.Message}", ex);
             }
         }
     }

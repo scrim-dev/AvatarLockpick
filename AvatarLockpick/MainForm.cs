@@ -125,5 +125,15 @@ namespace AvatarLockpick
                 MsgBoxUtils.ShowError("Failed to unlock all avatars!", "Error");
             }
         }
+
+        private void HideBtn_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Minimized;
+        }
+
+        private void OpenAviFileBtn_Click(object sender, EventArgs e)
+        {
+            AvatarFinder.OpenAvatarInNotepad(UserIDTextBox.Text, AvatarIDTextBox.Text);
+        }
     }
 }
