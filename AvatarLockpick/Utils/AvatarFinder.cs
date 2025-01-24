@@ -6,17 +6,45 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 
 namespace AvatarLockpick.Utils
 {
     internal class AvatarFinder
     {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr GetStdHandle(int nStdHandle);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        static extern bool WriteConsoleW(
+            IntPtr hConsoleOutput,
+            string lpBuffer,
+            uint nNumberOfCharsToWrite,
+            out uint lpNumberOfCharsWritten,
+            IntPtr lpReserved);
+
+        private const int STD_OUTPUT_HANDLE = -11;
+        private static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
+
+        private static void AppendToConsole(string message)
+        {
+            var handle = GetStdHandle(STD_OUTPUT_HANDLE);
+            if (handle != INVALID_HANDLE_VALUE)
+            {
+                WriteConsoleW(handle, $"[{DateTime.Now:HH:mm:ss}] {message}\n", (uint)message.Length + 14, out _, IntPtr.Zero);
+            }
+            else
+            {
+                Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {message}");
+            }
+        }
+
         //Unlocks all avatars for a user
         public static string GetVRChatAvatarPath(string userId)
         {
             string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string vrchatPath = Path.Combine(localAppData, "Low", "VRChat", "VRChat", "LocalAvatarData", userId);
+            string vrchatPath = Path.Combine(localAppData, "LocalLow", "VRChat", "VRChat", "LocalAvatarData", userId);
             return vrchatPath;
         }
 
@@ -27,6 +55,18 @@ namespace AvatarLockpick.Utils
             {
                 string avatarPath = GetVRChatAvatarPath(userId);
                 string fullAvatarPath = Path.Combine(avatarPath, avatarFileName);
+
+                // Debug logging
+                AppendToConsole($"Looking for avatar at path: {fullAvatarPath}");
+                AppendToConsole($"Directory exists: {Directory.Exists(avatarPath)}");
+                if (Directory.Exists(avatarPath))
+                {
+                    AppendToConsole("Files in directory:");
+                    foreach (string file in Directory.GetFiles(avatarPath))
+                    {
+                        AppendToConsole($"- {Path.GetFileName(file)}");
+                    }
+                }
 
                 if (!File.Exists(fullAvatarPath))
                 {

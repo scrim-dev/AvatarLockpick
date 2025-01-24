@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             lostBorderPanel1 = new ReaLTaiizor.Controls.LostBorderPanel();
+            OpenAviFileBtn = new ReaLTaiizor.Controls.Button();
             HideBtn = new ReaLTaiizor.Controls.Button();
             UnlockAllBtn = new ReaLTaiizor.Controls.Button();
             HideUserIDCheckBox = new ReaLTaiizor.Controls.HopeCheckBox();
@@ -41,7 +42,7 @@
             RestartBtn = new ReaLTaiizor.Controls.Button();
             ResetAvatarBtn = new ReaLTaiizor.Controls.Button();
             UnlockBtn = new ReaLTaiizor.Controls.Button();
-            OpenAviFileBtn = new ReaLTaiizor.Controls.Button();
+            AppendConsoleBtn = new ReaLTaiizor.Controls.Button();
             lostBorderPanel1.SuspendLayout();
             lostBorderPanel2.SuspendLayout();
             SuspendLayout();
@@ -50,6 +51,7 @@
             // 
             lostBorderPanel1.BackColor = Color.FromArgb(44, 44, 44);
             lostBorderPanel1.BorderColor = Color.FromArgb(157, 59, 255);
+            lostBorderPanel1.Controls.Add(AppendConsoleBtn);
             lostBorderPanel1.Controls.Add(OpenAviFileBtn);
             lostBorderPanel1.Controls.Add(HideBtn);
             lostBorderPanel1.Controls.Add(UnlockAllBtn);
@@ -68,6 +70,26 @@
             lostBorderPanel1.Size = new Size(860, 537);
             lostBorderPanel1.TabIndex = 0;
             lostBorderPanel1.Text = "lostBorderPanel1";
+            // 
+            // OpenAviFileBtn
+            // 
+            OpenAviFileBtn.BackColor = Color.Transparent;
+            OpenAviFileBtn.BorderColor = Color.FromArgb(32, 32, 32);
+            OpenAviFileBtn.EnteredBorderColor = Color.FromArgb(157, 59, 255);
+            OpenAviFileBtn.EnteredColor = Color.FromArgb(34, 34, 34);
+            OpenAviFileBtn.Font = new Font("Microsoft Sans Serif", 12F);
+            OpenAviFileBtn.Image = null;
+            OpenAviFileBtn.ImageAlign = ContentAlignment.MiddleLeft;
+            OpenAviFileBtn.InactiveColor = Color.FromArgb(22, 22, 22);
+            OpenAviFileBtn.Location = new Point(676, 494);
+            OpenAviFileBtn.Name = "OpenAviFileBtn";
+            OpenAviFileBtn.PressedBorderColor = Color.White;
+            OpenAviFileBtn.PressedColor = Color.MediumSlateBlue;
+            OpenAviFileBtn.Size = new Size(171, 34);
+            OpenAviFileBtn.TabIndex = 9;
+            OpenAviFileBtn.Text = "Open Avatar File";
+            OpenAviFileBtn.TextAlignment = StringAlignment.Center;
+            OpenAviFileBtn.Click += OpenAviFileBtn_Click;
             // 
             // HideBtn
             // 
@@ -295,25 +317,25 @@
             UnlockBtn.TextAlignment = StringAlignment.Center;
             UnlockBtn.Click += UnlockBtn_Click;
             // 
-            // OpenAviFileBtn
+            // AppendConsoleBtn
             // 
-            OpenAviFileBtn.BackColor = Color.Transparent;
-            OpenAviFileBtn.BorderColor = Color.FromArgb(32, 32, 32);
-            OpenAviFileBtn.EnteredBorderColor = Color.FromArgb(157, 59, 255);
-            OpenAviFileBtn.EnteredColor = Color.FromArgb(34, 34, 34);
-            OpenAviFileBtn.Font = new Font("Microsoft Sans Serif", 12F);
-            OpenAviFileBtn.Image = null;
-            OpenAviFileBtn.ImageAlign = ContentAlignment.MiddleLeft;
-            OpenAviFileBtn.InactiveColor = Color.FromArgb(22, 22, 22);
-            OpenAviFileBtn.Location = new Point(676, 494);
-            OpenAviFileBtn.Name = "OpenAviFileBtn";
-            OpenAviFileBtn.PressedBorderColor = Color.White;
-            OpenAviFileBtn.PressedColor = Color.MediumSlateBlue;
-            OpenAviFileBtn.Size = new Size(171, 34);
-            OpenAviFileBtn.TabIndex = 9;
-            OpenAviFileBtn.Text = "Open Avatar File";
-            OpenAviFileBtn.TextAlignment = StringAlignment.Center;
-            OpenAviFileBtn.Click += OpenAviFileBtn_Click;
+            AppendConsoleBtn.BackColor = Color.Transparent;
+            AppendConsoleBtn.BorderColor = Color.FromArgb(32, 32, 32);
+            AppendConsoleBtn.EnteredBorderColor = Color.FromArgb(157, 59, 255);
+            AppendConsoleBtn.EnteredColor = Color.FromArgb(34, 34, 34);
+            AppendConsoleBtn.Font = new Font("Microsoft Sans Serif", 12F);
+            AppendConsoleBtn.Image = null;
+            AppendConsoleBtn.ImageAlign = ContentAlignment.MiddleLeft;
+            AppendConsoleBtn.InactiveColor = Color.FromArgb(22, 22, 22);
+            AppendConsoleBtn.Location = new Point(591, 454);
+            AppendConsoleBtn.Name = "AppendConsoleBtn";
+            AppendConsoleBtn.PressedBorderColor = Color.White;
+            AppendConsoleBtn.PressedColor = Color.MediumSlateBlue;
+            AppendConsoleBtn.Size = new Size(79, 74);
+            AppendConsoleBtn.TabIndex = 10;
+            AppendConsoleBtn.Text = "Append Console";
+            AppendConsoleBtn.TextAlignment = StringAlignment.Center;
+            AppendConsoleBtn.Click += AppendConsoleBtn_Click;
             // 
             // MainForm
             // 
@@ -355,5 +377,6 @@
         private ReaLTaiizor.Controls.Button UnlockAllBtn;
         private ReaLTaiizor.Controls.Button HideBtn;
         private ReaLTaiizor.Controls.Button OpenAviFileBtn;
+        private ReaLTaiizor.Controls.Button AppendConsoleBtn;
     }
 }

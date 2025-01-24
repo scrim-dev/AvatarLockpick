@@ -1,13 +1,14 @@
+using System;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
 using Microsoft.VisualBasic;
 using AvatarLockpick.Utils;
+using System.Windows.Forms;
 
 namespace AvatarLockpick
 {
     public partial class MainForm : Form
     {
-
         [DllImport("dwmapi.dll")]
         private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
@@ -36,8 +37,27 @@ namespace AvatarLockpick
             return Environment.OSVersion.Version.Major >= 10 && Environment.OSVersion.Version.Build >= build;
         }
 
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        private const int SW_HIDE = 0;
+        private const int SW_SHOW = 5;
+
+        private bool isConsoleVisible = true;
+
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public static bool AutoRestartTog { get; set; } = false;
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern bool AllocConsole();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern bool FreeConsole();
+
+        private bool hasConsole = false;
 
         public MainForm()
         {
@@ -53,6 +73,12 @@ namespace AvatarLockpick
 
         private void UnlockBtn_Click(object sender, EventArgs e)
         {
+            if(string.IsNullOrEmpty(UserIDTextBox.Text) || string.IsNullOrEmpty(AvatarIDTextBox.Text))
+            {
+                MsgBoxUtils.ShowError("Please enter a User ID and Avatar ID!", "Error");
+                return;
+            }
+
             bool success = AvatarFinder.UnlockSpecificAvatar(UserIDTextBox.Text, AvatarIDTextBox.Text);
             if (AutoRestartTog)
             {
@@ -72,6 +98,12 @@ namespace AvatarLockpick
 
         private void ResetAvatarBtn_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(UserIDTextBox.Text) || string.IsNullOrEmpty(AvatarIDTextBox.Text))
+            {
+                MsgBoxUtils.ShowError("Please enter a User ID and Avatar ID!", "Error");
+                return;
+            }
+
             bool success = AvatarFinder.DeleteSpecificAvatar(UserIDTextBox.Text, AvatarIDTextBox.Text);
             if (success)
             {
@@ -115,6 +147,12 @@ namespace AvatarLockpick
 
         private void UnlockAllBtn_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(UserIDTextBox.Text))
+            {
+                MsgBoxUtils.ShowError("Please enter a User ID", "Error");
+                return;
+            }
+
             bool success = AvatarFinder.UnlockAvatars(UserIDTextBox.Text);
             if (success)
             {
@@ -134,6 +172,22 @@ namespace AvatarLockpick
         private void OpenAviFileBtn_Click(object sender, EventArgs e)
         {
             AvatarFinder.OpenAvatarInNotepad(UserIDTextBox.Text, AvatarIDTextBox.Text);
+        }
+
+        private void AppendConsoleBtn_Click(object sender, EventArgs e)
+        {
+            if (!hasConsole)
+            {
+                AllocConsole();
+                Console.Title = "AvatarLockpick Debug Console";
+                Console.WriteLine("Console initialized. Debug output will appear here.");
+                hasConsole = true;
+            }
+            else
+            {
+                FreeConsole();
+                hasConsole = false;
+            }
         }
     }
 }
