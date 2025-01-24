@@ -4,11 +4,19 @@ Ever wanted to use a VRChat avatar but it was locked? Well now you can unlock it
 ## What's this all about?
 AvatarLockpick is user friendly tool for unlocking VRChat avatars. It works by scanning through your VRChat cache and helps you access avatars that would otherwise be locked away. Pretty neat, right?
 
-## See it in action! (Also a how to video lol)
-<video width="100%" controls>
-  <source src="https://scrim.b-cdn.net/webfiles/MainShowcase.mp4" type="video/mp4">
-  Your browser does not support the video tag. Click the image below to watch the video:
-</video>
+## ⚠️ Important Note
+> **This tool is NOT associated with VRChat Inc. in any way.**
+> 
+> AvatarLockpick is completely safe to use as it:
+> - Only scans your local VRChat cache files
+> - Never modifies the game or its processes
+> - Runs entirely as an external application
+> - Does not interact with VRChat's runtime
+> 
+> Using this tool cannot result in a ban as it operates within VRChat's Terms of Service by only reading locally cached files.
+
+## See it in action! 🎮
+[<img src="https://img.shields.io/badge/▶️_Watch_Video_Tutorial-4c71f2?style=for-the-badge" />](https://scrim.b-cdn.net/webfiles/MainShowcase.mp4)
 
 ## Getting Started
 It's super easy to get started with AvatarLockpick! Here's what you need to do:
