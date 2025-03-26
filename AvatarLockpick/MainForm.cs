@@ -1,8 +1,9 @@
-using System;
-using System.Runtime.InteropServices;
-using System.ComponentModel;
-using Microsoft.VisualBasic;
 using AvatarLockpick.Utils;
+using Microsoft.VisualBasic;
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Windows.AI.MachineLearning;
 
@@ -109,11 +110,22 @@ namespace AvatarLockpick
         {
             MsgBoxUtils.ShowInfo("Welcome to AvatarLockpick! This tool is designed to help you unlock avatars in VRChat. " +
                 "Please make sure you have changed into the avatar you want to unlock before using this!", "Welcome");
-
             VERSIONTEXT.Text = Program.AppVersion;
         }
 
-        private void UnlockBtn_Click(object sender, EventArgs e)
+        private void AutoRestartCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            AutoRestartTog = AutoRestartCheckBox.Checked;
+            SaveConfig();
+        }
+
+        private void HideUserIDCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            UserIDTextBox.UseSystemPasswordChar = HideUserIDCheckBox.Checked;
+            SaveConfig();
+        }
+
+        private void UnlockButton_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(UserIDTextBox.Text) || string.IsNullOrEmpty(AvatarIDTextBox.Text))
             {
@@ -138,99 +150,7 @@ namespace AvatarLockpick
             }
         }
 
-        private void ResetAvatarBtn_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(UserIDTextBox.Text) || string.IsNullOrEmpty(AvatarIDTextBox.Text))
-            {
-                MsgBoxUtils.ShowError("Please enter a User ID and Avatar ID!", "Error");
-                return;
-            }
-
-            bool success = AvatarFinder.DeleteSpecificAvatar(UserIDTextBox.Text, AvatarIDTextBox.Text);
-            if (success)
-            {
-                MsgBoxUtils.ShowInfo("Avatar reset successfully!", "Success");
-            }
-            else
-            {
-                MsgBoxUtils.ShowError("Failed to reset avatar!", "Error");
-            }
-        }
-
-        private void RestartBtn_Click(object sender, EventArgs e)
-        {
-            VRCManager.CloseVRChat();
-            VRCManager.LaunchVRChat(RestartWithVRCheckBox.Checked);
-        }
-
-        private void AutoRestartCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            AutoRestartTog = AutoRestartCheckBox.Checked;
-            SaveConfig();
-        }
-
-        private void HideUserIDCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            UserIDTextBox.UseSystemPasswordChar = HideUserIDCheckBox.Checked;
-            SaveConfig();
-        }
-
-        private void UnlockAllBtn_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(UserIDTextBox.Text))
-            {
-                MsgBoxUtils.ShowError("Please enter a User ID", "Error");
-                return;
-            }
-
-            bool success = AvatarFinder.UnlockAvatars(UserIDTextBox.Text);
-            if (success)
-            {
-                MsgBoxUtils.ShowInfo("All avatars unlocked successfully!", "Success");
-            }
-            else
-            {
-                MsgBoxUtils.ShowError("Failed to unlock all avatars!", "Error");
-            }
-        }
-
-        private void HideBtn_Click(object sender, EventArgs e)
-        {
-            WindowState = FormWindowState.Minimized;
-        }
-
-        private void OpenAviFileBtn_Click(object sender, EventArgs e)
-        {
-            AvatarFinder.OpenAvatarInNotepad(UserIDTextBox.Text, AvatarIDTextBox.Text);
-        }
-
-        private void AppendConsoleBtn_Click(object sender, EventArgs e)
-        {
-            if (!hasConsole)
-            {
-                AllocConsole();
-                Console.Title = "AvatarLockpick Debug Console";
-                Console.WriteLine("Console initialized. Debug output will appear here.");
-                hasConsole = true;
-            }
-            else
-            {
-                FreeConsole();
-                hasConsole = false;
-            }
-        }
-
-        private void ClearCfgBtn_Click(object sender, EventArgs e)
-        {
-            _config.Clear();
-        }
-
-        private void DeleteCfgBtn_Click(object sender, EventArgs e)
-        {
-            Config.ClearConfig();
-        }
-
-        private void UnlockVRCFBtn_Click(object sender, EventArgs e)
+        private void UnlockVRCFuryButton_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(UserIDTextBox.Text) || string.IsNullOrEmpty(AvatarIDTextBox.Text))
             {
@@ -253,6 +173,119 @@ namespace AvatarLockpick
             {
                 MsgBoxUtils.ShowError("Failed to unlock avatar!", "Error");
             }
+        }
+
+        private void UnlockALLButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(UserIDTextBox.Text))
+            {
+                MsgBoxUtils.ShowError("Please enter a User ID", "Error");
+                return;
+            }
+
+            bool success = AvatarFinder.UnlockAvatars(UserIDTextBox.Text);
+            if (success)
+            {
+                MsgBoxUtils.ShowInfo("All avatars unlocked successfully!", "Success");
+            }
+            else
+            {
+                MsgBoxUtils.ShowError("Failed to unlock all avatars!", "Error");
+            }
+        }
+
+        private void ResetButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(UserIDTextBox.Text) || string.IsNullOrEmpty(AvatarIDTextBox.Text))
+            {
+                MsgBoxUtils.ShowError("Please enter a User ID and Avatar ID!", "Error");
+                return;
+            }
+
+            bool success = AvatarFinder.DeleteSpecificAvatar(UserIDTextBox.Text, AvatarIDTextBox.Text);
+            if (success)
+            {
+                MsgBoxUtils.ShowInfo("Avatar reset successfully!", "Success");
+            }
+            else
+            {
+                MsgBoxUtils.ShowError("Failed to reset avatar!", "Error");
+            }
+        }
+
+        private void OpenAvatarButton_Click(object sender, EventArgs e)
+        {
+            AvatarFinder.OpenAvatarInNotepad(UserIDTextBox.Text, AvatarIDTextBox.Text);
+        }
+
+        private void AppendConsoleButton_Click(object sender, EventArgs e)
+        {
+            if (!hasConsole)
+            {
+                AllocConsole();
+                Console.Title = "AvatarLockpick Debug Console";
+                Console.WriteLine("Console initialized. Debug output will appear here.");
+                hasConsole = true;
+            }
+            else
+            {
+                FreeConsole();
+                hasConsole = false;
+            }
+        }
+
+        private void RestartButton_Click(object sender, EventArgs e)
+        {
+            VRCManager.CloseVRChat();
+            VRCManager.LaunchVRChat(RestartWithVRCheckBox.Checked);
+        }
+
+        private void HideWindowButton_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Minimized;
+        }
+
+        private void DeleteSavesButton_Click(object sender, EventArgs e)
+        {
+            Config.ClearConfig();
+        }
+
+        private void ClearSavesButton_Click(object sender, EventArgs e)
+        {
+            _config.Clear();
+        }
+
+        private void HelpBtn_Click(object sender, EventArgs e)
+        {
+            OpenUrlInBrowser("https://github.com/scrim-dev/AvatarLockpick/blob/master/HELP.md");
+        }
+
+        private void GithubBtn_Click(object sender, EventArgs e)
+        {
+            OpenUrlInBrowser("https://github.com/scrim-dev");
+        }
+
+        private void WebsiteBtn_Click(object sender, EventArgs e)
+        {
+            OpenUrlInBrowser("https://github.com/scrim-dev/AvatarLockpick");
+        }
+
+        private void DiscordBtn_Click(object sender, EventArgs e)
+        {
+            OpenUrlInBrowser("https://discord.com/users/679060175440707605");
+        }
+
+        private static void OpenUrlInBrowser(string url)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+            }
+            catch { Console.WriteLine("Failed to open url."); }
         }
     }
 }
