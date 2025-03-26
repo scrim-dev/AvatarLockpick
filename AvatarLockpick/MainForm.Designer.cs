@@ -28,13 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             lostBorderPanel1 = new ReaLTaiizor.Controls.LostBorderPanel();
+            UnlockVRCFBtn = new ReaLTaiizor.Controls.Button();
             AppendConsoleBtn = new ReaLTaiizor.Controls.Button();
             OpenAviFileBtn = new ReaLTaiizor.Controls.Button();
             HideBtn = new ReaLTaiizor.Controls.Button();
             UnlockAllBtn = new ReaLTaiizor.Controls.Button();
             HideUserIDCheckBox = new ReaLTaiizor.Controls.HopeCheckBox();
             lostBorderPanel2 = new ReaLTaiizor.Controls.LostBorderPanel();
+            VERSIONTEXT = new Label();
+            VersionLabel = new Label();
+            DeleteCfgBtn = new ReaLTaiizor.Controls.Button();
+            ClearCfgBtn = new ReaLTaiizor.Controls.Button();
             AvatarIDLabel = new Label();
             AvatarIDTextBox = new ReaLTaiizor.Controls.HopeTextBox();
             UserIDLabel = new Label();
@@ -43,8 +49,7 @@
             RestartBtn = new ReaLTaiizor.Controls.Button();
             ResetAvatarBtn = new ReaLTaiizor.Controls.Button();
             UnlockBtn = new ReaLTaiizor.Controls.Button();
-            ClearCfgBtn = new ReaLTaiizor.Controls.Button();
-            DeleteCfgBtn = new ReaLTaiizor.Controls.Button();
+            RestartWithVRCheckBox = new ReaLTaiizor.Controls.HopeCheckBox();
             lostBorderPanel1.SuspendLayout();
             lostBorderPanel2.SuspendLayout();
             SuspendLayout();
@@ -53,6 +58,8 @@
             // 
             lostBorderPanel1.BackColor = Color.FromArgb(44, 44, 44);
             lostBorderPanel1.BorderColor = Color.FromArgb(157, 59, 255);
+            lostBorderPanel1.Controls.Add(RestartWithVRCheckBox);
+            lostBorderPanel1.Controls.Add(UnlockVRCFBtn);
             lostBorderPanel1.Controls.Add(AppendConsoleBtn);
             lostBorderPanel1.Controls.Add(OpenAviFileBtn);
             lostBorderPanel1.Controls.Add(HideBtn);
@@ -72,6 +79,26 @@
             lostBorderPanel1.Size = new Size(860, 537);
             lostBorderPanel1.TabIndex = 0;
             lostBorderPanel1.Text = "lostBorderPanel1";
+            // 
+            // UnlockVRCFBtn
+            // 
+            UnlockVRCFBtn.BackColor = Color.Transparent;
+            UnlockVRCFBtn.BorderColor = Color.FromArgb(32, 32, 32);
+            UnlockVRCFBtn.EnteredBorderColor = Color.FromArgb(157, 59, 255);
+            UnlockVRCFBtn.EnteredColor = Color.FromArgb(34, 34, 34);
+            UnlockVRCFBtn.Font = new Font("Microsoft Sans Serif", 12F);
+            UnlockVRCFBtn.Image = null;
+            UnlockVRCFBtn.ImageAlign = ContentAlignment.MiddleLeft;
+            UnlockVRCFBtn.InactiveColor = Color.FromArgb(22, 22, 22);
+            UnlockVRCFBtn.Location = new Point(145, 402);
+            UnlockVRCFBtn.Name = "UnlockVRCFBtn";
+            UnlockVRCFBtn.PressedBorderColor = Color.White;
+            UnlockVRCFBtn.PressedColor = Color.MediumSlateBlue;
+            UnlockVRCFBtn.Size = new Size(171, 40);
+            UnlockVRCFBtn.TabIndex = 11;
+            UnlockVRCFBtn.Text = "Unlock (VRCFury)";
+            UnlockVRCFBtn.TextAlignment = StringAlignment.Center;
+            UnlockVRCFBtn.Click += UnlockVRCFBtn_Click;
             // 
             // AppendConsoleBtn
             // 
@@ -147,7 +174,7 @@
             UnlockAllBtn.Name = "UnlockAllBtn";
             UnlockAllBtn.PressedBorderColor = Color.White;
             UnlockAllBtn.PressedColor = Color.MediumSlateBlue;
-            UnlockAllBtn.Size = new Size(332, 40);
+            UnlockAllBtn.Size = new Size(467, 40);
             UnlockAllBtn.TabIndex = 7;
             UnlockAllBtn.Text = "Unlock All (Buggy)";
             UnlockAllBtn.TextAlignment = StringAlignment.Center;
@@ -178,6 +205,8 @@
             // 
             lostBorderPanel2.BackColor = Color.FromArgb(34, 34, 34);
             lostBorderPanel2.BorderColor = Color.FromArgb(157, 59, 255);
+            lostBorderPanel2.Controls.Add(VERSIONTEXT);
+            lostBorderPanel2.Controls.Add(VersionLabel);
             lostBorderPanel2.Controls.Add(DeleteCfgBtn);
             lostBorderPanel2.Controls.Add(ClearCfgBtn);
             lostBorderPanel2.Controls.Add(AvatarIDLabel);
@@ -193,6 +222,65 @@
             lostBorderPanel2.Size = new Size(834, 384);
             lostBorderPanel2.TabIndex = 5;
             lostBorderPanel2.Text = "lostBorderPanel2";
+            // 
+            // VERSIONTEXT
+            // 
+            VERSIONTEXT.AutoSize = true;
+            VERSIONTEXT.ForeColor = Color.FromArgb(157, 59, 255);
+            VERSIONTEXT.Location = new Point(24, 360);
+            VERSIONTEXT.Name = "VERSIONTEXT";
+            VERSIONTEXT.Size = new Size(49, 21);
+            VERSIONTEXT.TabIndex = 14;
+            VERSIONTEXT.Text = "NULL";
+            // 
+            // VersionLabel
+            // 
+            VersionLabel.AutoSize = true;
+            VersionLabel.Location = new Point(3, 360);
+            VersionLabel.Name = "VersionLabel";
+            VersionLabel.Size = new Size(23, 21);
+            VersionLabel.TabIndex = 13;
+            VersionLabel.Text = "V:";
+            // 
+            // DeleteCfgBtn
+            // 
+            DeleteCfgBtn.BackColor = Color.Transparent;
+            DeleteCfgBtn.BorderColor = Color.FromArgb(32, 32, 32);
+            DeleteCfgBtn.EnteredBorderColor = Color.FromArgb(157, 59, 255);
+            DeleteCfgBtn.EnteredColor = Color.FromArgb(34, 34, 34);
+            DeleteCfgBtn.Font = new Font("Microsoft Sans Serif", 12F);
+            DeleteCfgBtn.Image = null;
+            DeleteCfgBtn.ImageAlign = ContentAlignment.MiddleLeft;
+            DeleteCfgBtn.InactiveColor = Color.FromArgb(22, 22, 22);
+            DeleteCfgBtn.Location = new Point(704, 295);
+            DeleteCfgBtn.Name = "DeleteCfgBtn";
+            DeleteCfgBtn.PressedBorderColor = Color.White;
+            DeleteCfgBtn.PressedColor = Color.MediumSlateBlue;
+            DeleteCfgBtn.Size = new Size(127, 40);
+            DeleteCfgBtn.TabIndex = 12;
+            DeleteCfgBtn.Text = "Delete Saves";
+            DeleteCfgBtn.TextAlignment = StringAlignment.Center;
+            DeleteCfgBtn.Click += DeleteCfgBtn_Click;
+            // 
+            // ClearCfgBtn
+            // 
+            ClearCfgBtn.BackColor = Color.Transparent;
+            ClearCfgBtn.BorderColor = Color.FromArgb(32, 32, 32);
+            ClearCfgBtn.EnteredBorderColor = Color.FromArgb(157, 59, 255);
+            ClearCfgBtn.EnteredColor = Color.FromArgb(34, 34, 34);
+            ClearCfgBtn.Font = new Font("Microsoft Sans Serif", 12F);
+            ClearCfgBtn.Image = null;
+            ClearCfgBtn.ImageAlign = ContentAlignment.MiddleLeft;
+            ClearCfgBtn.InactiveColor = Color.FromArgb(22, 22, 22);
+            ClearCfgBtn.Location = new Point(704, 341);
+            ClearCfgBtn.Name = "ClearCfgBtn";
+            ClearCfgBtn.PressedBorderColor = Color.White;
+            ClearCfgBtn.PressedColor = Color.MediumSlateBlue;
+            ClearCfgBtn.Size = new Size(127, 40);
+            ClearCfgBtn.TabIndex = 11;
+            ClearCfgBtn.Text = "Clear Saves";
+            ClearCfgBtn.TextAlignment = StringAlignment.Center;
+            ClearCfgBtn.Click += ClearCfgBtn_Click;
             // 
             // AvatarIDLabel
             // 
@@ -297,7 +385,7 @@
             RestartBtn.Name = "RestartBtn";
             RestartBtn.PressedBorderColor = Color.White;
             RestartBtn.PressedColor = Color.MediumSlateBlue;
-            RestartBtn.Size = new Size(332, 40);
+            RestartBtn.Size = new Size(467, 40);
             RestartBtn.TabIndex = 2;
             RestartBtn.Text = "Restart";
             RestartBtn.TextAlignment = StringAlignment.Center;
@@ -313,11 +401,11 @@
             ResetAvatarBtn.Image = null;
             ResetAvatarBtn.ImageAlign = ContentAlignment.MiddleLeft;
             ResetAvatarBtn.InactiveColor = Color.FromArgb(22, 22, 22);
-            ResetAvatarBtn.Location = new Point(182, 402);
+            ResetAvatarBtn.Location = new Point(322, 402);
             ResetAvatarBtn.Name = "ResetAvatarBtn";
             ResetAvatarBtn.PressedBorderColor = Color.White;
             ResetAvatarBtn.PressedColor = Color.MediumSlateBlue;
-            ResetAvatarBtn.Size = new Size(163, 40);
+            ResetAvatarBtn.Size = new Size(158, 40);
             ResetAvatarBtn.TabIndex = 1;
             ResetAvatarBtn.Text = "Reset";
             ResetAvatarBtn.TextAlignment = StringAlignment.Center;
@@ -337,51 +425,31 @@
             UnlockBtn.Name = "UnlockBtn";
             UnlockBtn.PressedBorderColor = Color.White;
             UnlockBtn.PressedColor = Color.MediumSlateBlue;
-            UnlockBtn.Size = new Size(163, 40);
+            UnlockBtn.Size = new Size(126, 40);
             UnlockBtn.TabIndex = 0;
             UnlockBtn.Text = "Unlock";
             UnlockBtn.TextAlignment = StringAlignment.Center;
             UnlockBtn.Click += UnlockBtn_Click;
             // 
-            // ClearCfgBtn
+            // RestartWithVRCheckBox
             // 
-            ClearCfgBtn.BackColor = Color.Transparent;
-            ClearCfgBtn.BorderColor = Color.FromArgb(32, 32, 32);
-            ClearCfgBtn.EnteredBorderColor = Color.FromArgb(157, 59, 255);
-            ClearCfgBtn.EnteredColor = Color.FromArgb(34, 34, 34);
-            ClearCfgBtn.Font = new Font("Microsoft Sans Serif", 12F);
-            ClearCfgBtn.Image = null;
-            ClearCfgBtn.ImageAlign = ContentAlignment.MiddleLeft;
-            ClearCfgBtn.InactiveColor = Color.FromArgb(22, 22, 22);
-            ClearCfgBtn.Location = new Point(578, 341);
-            ClearCfgBtn.Name = "ClearCfgBtn";
-            ClearCfgBtn.PressedBorderColor = Color.White;
-            ClearCfgBtn.PressedColor = Color.MediumSlateBlue;
-            ClearCfgBtn.Size = new Size(120, 40);
-            ClearCfgBtn.TabIndex = 11;
-            ClearCfgBtn.Text = "Clear Saves";
-            ClearCfgBtn.TextAlignment = StringAlignment.Center;
-            ClearCfgBtn.Click += ClearCfgBtn_Click;
-            // 
-            // DeleteCfgBtn
-            // 
-            DeleteCfgBtn.BackColor = Color.Transparent;
-            DeleteCfgBtn.BorderColor = Color.FromArgb(32, 32, 32);
-            DeleteCfgBtn.EnteredBorderColor = Color.FromArgb(157, 59, 255);
-            DeleteCfgBtn.EnteredColor = Color.FromArgb(34, 34, 34);
-            DeleteCfgBtn.Font = new Font("Microsoft Sans Serif", 12F);
-            DeleteCfgBtn.Image = null;
-            DeleteCfgBtn.ImageAlign = ContentAlignment.MiddleLeft;
-            DeleteCfgBtn.InactiveColor = Color.FromArgb(22, 22, 22);
-            DeleteCfgBtn.Location = new Point(704, 341);
-            DeleteCfgBtn.Name = "DeleteCfgBtn";
-            DeleteCfgBtn.PressedBorderColor = Color.White;
-            DeleteCfgBtn.PressedColor = Color.MediumSlateBlue;
-            DeleteCfgBtn.Size = new Size(127, 40);
-            DeleteCfgBtn.TabIndex = 12;
-            DeleteCfgBtn.Text = "Delete Saves";
-            DeleteCfgBtn.TextAlignment = StringAlignment.Center;
-            DeleteCfgBtn.Click += DeleteCfgBtn_Click;
+            RestartWithVRCheckBox.AutoSize = true;
+            RestartWithVRCheckBox.BackColor = Color.FromArgb(44, 44, 44);
+            RestartWithVRCheckBox.CheckedColor = Color.FromArgb(157, 59, 255);
+            RestartWithVRCheckBox.DisabledColor = Color.FromArgb(196, 198, 202);
+            RestartWithVRCheckBox.DisabledStringColor = Color.FromArgb(186, 187, 189);
+            RestartWithVRCheckBox.Enable = true;
+            RestartWithVRCheckBox.EnabledCheckedColor = Color.FromArgb(157, 59, 255);
+            RestartWithVRCheckBox.EnabledStringColor = Color.FromArgb(153, 153, 153);
+            RestartWithVRCheckBox.EnabledUncheckedColor = Color.FromArgb(156, 158, 161);
+            RestartWithVRCheckBox.Font = new Font("Segoe UI", 12F);
+            RestartWithVRCheckBox.ForeColor = Color.White;
+            RestartWithVRCheckBox.Location = new Point(591, 428);
+            RestartWithVRCheckBox.Name = "RestartWithVRCheckBox";
+            RestartWithVRCheckBox.Size = new Size(125, 20);
+            RestartWithVRCheckBox.TabIndex = 12;
+            RestartWithVRCheckBox.Text = "Restart in VR";
+            RestartWithVRCheckBox.UseVisualStyleBackColor = false;
             // 
             // MainForm
             // 
@@ -392,6 +460,7 @@
             Controls.Add(lostBorderPanel1);
             ForeColor = Color.White;
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MaximumSize = new Size(900, 600);
             MinimumSize = new Size(900, 600);
@@ -426,5 +495,9 @@
         private ReaLTaiizor.Controls.Button AppendConsoleBtn;
         private ReaLTaiizor.Controls.Button DeleteCfgBtn;
         private ReaLTaiizor.Controls.Button ClearCfgBtn;
+        private Label VersionLabel;
+        private Label VERSIONTEXT;
+        private ReaLTaiizor.Controls.Button UnlockVRCFBtn;
+        private ReaLTaiizor.Controls.HopeCheckBox RestartWithVRCheckBox;
     }
 }

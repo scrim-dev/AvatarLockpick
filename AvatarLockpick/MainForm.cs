@@ -4,6 +4,7 @@ using System.ComponentModel;
 using Microsoft.VisualBasic;
 using AvatarLockpick.Utils;
 using System.Windows.Forms;
+using Windows.AI.MachineLearning;
 
 namespace AvatarLockpick
 {
@@ -45,8 +46,6 @@ namespace AvatarLockpick
 
         private const int SW_HIDE = 0;
         private const int SW_SHOW = 5;
-
-        private bool isConsoleVisible = true;
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public static bool AutoRestartTog { get; set; } = false;
@@ -110,6 +109,8 @@ namespace AvatarLockpick
         {
             MsgBoxUtils.ShowInfo("Welcome to AvatarLockpick! This tool is designed to help you unlock avatars in VRChat. " +
                 "Please make sure you have changed into the avatar you want to unlock before using this!", "Welcome");
+
+            VERSIONTEXT.Text = Program.AppVersion;
         }
 
         private void UnlockBtn_Click(object sender, EventArgs e)
@@ -124,7 +125,7 @@ namespace AvatarLockpick
             if (AutoRestartTog)
             {
                 VRCManager.CloseVRChat();
-                VRCManager.LaunchVRChat();
+                VRCManager.LaunchVRChat(RestartWithVRCheckBox.Checked);
             }
 
             if (success)
@@ -159,7 +160,7 @@ namespace AvatarLockpick
         private void RestartBtn_Click(object sender, EventArgs e)
         {
             VRCManager.CloseVRChat();
-            VRCManager.LaunchVRChat();
+            VRCManager.LaunchVRChat(RestartWithVRCheckBox.Checked);
         }
 
         private void AutoRestartCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -220,13 +221,38 @@ namespace AvatarLockpick
         }
 
         private void ClearCfgBtn_Click(object sender, EventArgs e)
-        { 
+        {
             _config.Clear();
         }
 
         private void DeleteCfgBtn_Click(object sender, EventArgs e)
         {
             Config.ClearConfig();
+        }
+
+        private void UnlockVRCFBtn_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(UserIDTextBox.Text) || string.IsNullOrEmpty(AvatarIDTextBox.Text))
+            {
+                MsgBoxUtils.ShowError("Please enter a User ID and Avatar ID!", "Error");
+                return;
+            }
+
+            bool success = AvatarFinder.UnlockVRCFAvatar(UserIDTextBox.Text, AvatarIDTextBox.Text);
+            if (AutoRestartTog)
+            {
+                VRCManager.CloseVRChat();
+                VRCManager.LaunchVRChat(RestartWithVRCheckBox.Checked);
+            }
+
+            if (success)
+            {
+                MsgBoxUtils.ShowInfo("Avatar unlocked successfully!", "Success");
+            }
+            else
+            {
+                MsgBoxUtils.ShowError("Failed to unlock avatar!", "Error");
+            }
         }
     }
 }

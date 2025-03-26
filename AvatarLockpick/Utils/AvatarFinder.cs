@@ -302,5 +302,61 @@ namespace AvatarLockpick.Utils
                 throw new Exception($"Error opening avatar in Notepad {avatarFileName}: {ex.Message}", ex);
             }
         }
+
+        public static bool UnlockVRCFAvatar(string userId, string avatarFileName)
+        {
+            try
+            {
+                string avatarPath = GetVRChatAvatarPath(userId);
+                string fullAvatarPath = Path.Combine(avatarPath, avatarFileName);
+
+                if (!File.Exists(fullAvatarPath))
+                {
+                    throw new FileNotFoundException($"Avatar file not found: {avatarFileName}");
+                }
+
+                string jsonContent = File.ReadAllText(fullAvatarPath);
+                JObject jsonObj = JObject.Parse(jsonContent);
+                bool modified = false;
+
+                // Target the specific parameters directly
+                var animationParameters = jsonObj["animationParameters"] as JArray;
+                if (animationParameters != null)
+                {
+                    foreach (JObject param in animationParameters.Children<JObject>())
+                    {
+                        string paramName = param["name"]?.Value<string>() ?? string.Empty;
+
+                        if (paramName.Equals("VRCF Lock/Password Version", StringComparison.OrdinalIgnoreCase))
+                        {
+                            param["value"] = 1;
+                            modified = true;
+                            AppendToConsole("Updated Password Version to 1");
+                        }
+                        else if (paramName.Equals("VRCF Lock/Lock", StringComparison.OrdinalIgnoreCase))
+                        {
+                            param["value"] = 0;
+                            modified = true;
+                            AppendToConsole("Updated Lock to 0");
+                        }
+                    }
+                }
+
+                if (modified)
+                {
+                    File.WriteAllText(fullAvatarPath, jsonObj.ToString(Formatting.None));
+                    AppendToConsole("Successfully saved changes to avatar file");
+                    return true;
+                }
+
+                AppendToConsole("No required lock parameters found in avatar file");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                AppendToConsole($"Error processing avatar: {ex.Message}");
+                throw new Exception($"Failed to unlock avatar {avatarFileName}: {ex.Message}", ex);
+            }
+        }
     }
 }

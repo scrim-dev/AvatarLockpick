@@ -38,15 +38,26 @@ namespace AvatarLockpick.Utils
         }
 
         /// <summary>
-        /// Launches VRChat through Steam
+        /// Launches VRChat through Steam with VR toggle
         /// </summary>
-        public static void LaunchVRChat()
+        public static void LaunchVRChat(bool vr)
         {
-            Process.Start(new ProcessStartInfo
+            if (vr)
             {
-                FileName = STEAM_PROTOCOL,
-                UseShellExecute = true
-            });
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = STEAM_PROTOCOL,
+                    UseShellExecute = true
+                });
+            }
+            else
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = STEAM_PROTOCOL + " --no-vr",
+                    UseShellExecute = true
+                });
+            }
         }
 
         /// <summary>
@@ -62,17 +73,12 @@ namespace AvatarLockpick.Utils
         }
 
         /// <summary>
-        /// Attempts to close VRChat gracefully
+        /// Beams VRChat
         /// </summary>
-        /// <returns>True if the process was closed successfully, false if it failed or wasn't running</returns>
         public static bool CloseVRChat()
         {
             var process = GetVRChatProcess();
-            if (process != null)
-            {
-                process.CloseMainWindow();
-                return process.WaitForExit(5000); // Wait up to 5 seconds for graceful exit
-            }
+            process?.Kill();
             return false;
         }
 
