@@ -1,4 +1,4 @@
-# AvatarLockpick 🔓
+# AvatarLockpick
 Ever wanted to use a VRChat avatar but it was locked? Well now you can unlock it using AvatarLockpick!
 
 ## What's this all about?
@@ -15,8 +15,9 @@ AvatarLockpick is user friendly tool for unlocking VRChat avatars. It works by s
 > 
 > Using this tool cannot result in a ban as it operates within VRChat's Terms of Service by only reading locally cached files.
 
-## See it in action! 🎮
-[<img src="https://img.shields.io/badge/▶️_Watch_Video_Tutorial-4c71f2?style=for-the-badge" />](https://youtu.be/PnvDtNmAfOk)
+## Revised V2 UI (Coming Soon)
+<img src="https://github.com/scrim-dev/AvatarLockpick/blob/master/AppSample/Medal_LNtVc3zsBD.png" width="600" alt="Alt text">
+<img src="https://github.com/scrim-dev/AvatarLockpick/blob/master/AppSample/Medal_pWViultzXZ.png" width="600" alt="Alt text">
 
 ## Getting Started
 It's super easy to get started with AvatarLockpick! Here's what you need to do:
@@ -29,3 +30,5 @@ It's super easy to get started with AvatarLockpick! Here's what you need to do:
    - **Unlock All**: Unlocks all avatars in your cache.
 
 That's it! Now you're ready to run around with your favorite avatars!
+
+Still confused? Head over to [HELP](https://github.com/scrim-dev/AvatarLockpick/blob/master/HELP.md)
