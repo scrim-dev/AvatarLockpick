@@ -1,0 +1,488 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AvatarLockpick</title>
+    <!-- IMPORTANT: Add an icon library like Font Awesome here -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="assets/main.css" />
+    <!-- Add any required font imports here, e.g., Google Fonts -->
+</head>
+<body>
+
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <div class="splash-content">
+            <h1 class="app-title">
+                <!-- Wrap each character in a span with calculated delay -->
+                <span style="--delay: 0.0s">A</span><span style="--delay: 0.05s">v</span><span style="--delay: 0.1s">a</span><span style="--delay: 0.15s">t</span><span style="--delay: 0.2s">a</span><span style="--delay: 0.25s">r</span><span style="--delay: 0.3s">L</span><span style="--delay: 0.35s">o</span><span style="--delay: 0.4s">c</span><span style="--delay: 0.45s">k</span><span style="--delay: 0.5s">p</span><span style="--delay: 0.55s">i</span><span style="--delay: 0.6s">c</span><span style="--delay: 0.65s">k</span>
+            </h1>
+            <div id="splash-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Sidebar Toggle Button -->
+    <button id="sidebar-toggle" aria-label="Toggle Sidebar"><i class="fa-solid fa-bars"></i></button>
+
+    <!-- Main Application Wrapper -->
+    <div id="app-wrapper" style="display: none;"> <!-- Initially hidden -->
+        <nav class="sidebar">
+            <ul>
+                <!-- Replaced text with icons and added aria-label for tooltip -->
+                <li><button class="tab-button active" data-tab="avatar" aria-label="Avatar"><i class="fa-solid fa-user"></i><span class="tab-text">Avatar</span></button></li>
+                <li><button class="tab-button" data-tab="unlock" aria-label="Unlock"><i class="fa-solid fa-lock-open"></i><span class="tab-text">Unlock</span></button></li>
+                <li><button class="tab-button" data-tab="settings" aria-label="Settings"><i class="fa-solid fa-gear"></i><span class="tab-text">Settings</span></button></li>
+                <li><button class="tab-button" data-tab="info" aria-label="Info"><i class="fa-solid fa-circle-info"></i><span class="tab-text">Info</span></button></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <!-- Tab Panels -->
+            <div id="avatar-tab" class="tab-panel active">
+                 <h2><i class="fa-solid fa-user"></i> Avatar</h2>
+                 <div class="tab-content-panel">
+                     <label for="avatar-id">Avatar ID</label>
+                     <input type="text" id="avatar-id" name="avatar-id" placeholder="avtr_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+
+                     <label for="user-id">User ID</label>
+                     <input type="text" id="user-id" name="user-id" placeholder="usr_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+
+                     <div class="checkbox-container">
+                        <input type="checkbox" id="censor-user-id">
+                        <label for="censor-user-id">Censor User ID</label>
+                     </div>
+
+                     <button class="action-button" onclick="callDotNetSendIDs()"><i class="fa-solid fa-eye"></i> View Avatar</button>
+                     <button class="action-button" onclick="loadAvatarInfo()"><i class="fa-solid fa-download"></i> Load Avatar</button>
+                 </div>
+            </div>
+
+            <div id="unlock-tab" class="tab-panel">
+                <h2><i class="fa-solid fa-lock-open"></i> Unlock Actions</h2>
+                <!-- Warning Panel -->
+                <div id="unlock-warning-panel" class="tab-content-panel warning-panel" style="display: block;"> <!-- Initially visible -->
+                    <p><i class="fa-solid fa-triangle-exclamation"></i> Please load an avatar from the Avatar tab first.</p>
+                </div>
+                 <div class="tab-content-panel">
+                     <!-- Buttons for unlock actions -->
+                     <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock')" disabled><i class="fa-solid fa-unlock"></i> Unlock</button>
+                     <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock All')" disabled><i class="fa-solid fa-globe"></i> Unlock All</button>
+                     <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock (VRCFury)')" disabled><i class="fa-solid fa-bolt"></i> Unlock (VRCFury)</button>
+                     <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock using Database')" disabled><i class="fa-solid fa-database"></i> Unlock using Database</button>
+                 </div>
+                 <div id="loaded-avatar-info-panel" class="tab-content-panel" style="display: none;">
+                    <h3>Loaded Avatar</h3>
+                    <p><strong>Avatar ID:</strong> <span id="loaded-avatar-id">N/A</span></p>
+                    <p><strong>User ID:</strong> <span id="loaded-user-id">N/A</span></p>
+                    <button class="action-button secondary-action" onclick="showUnloadConfirmation()"><i class="fa-solid fa-times-circle"></i> Unload Avatar</button>
+                 </div>
+            </div>
+
+            <div id="settings-tab" class="tab-panel">
+                <h2><i class="fa-solid fa-gear"></i> Settings</h2>
+                 <div class="tab-content-panel">
+                     <h3>Theme Customization</h3>
+                     <div class="setting-option">
+                         <h4>Presets</h4>
+                         <div class="preset-buttons">
+                             <button class="action-button preset-btn" data-preset="crimson" style="--preset-bg: #DC143C;">Crimson</button>
+                             <button class="action-button preset-btn" data-preset="green" style="--preset-bg: #2ECC71;">Green</button>
+                             <button class="action-button preset-btn" data-preset="magenta" style="--preset-bg: #DE3BFF;">Magenta</button>
+                             <button class="action-button preset-btn" data-preset="dodgerblue" style="--preset-bg: #1E90FF;">Default (Blue)</button>
+                         </div>
+                         <hr style="border-color: var(--border-color); margin: 1em 0;">
+                         <h4>Custom Colors</h4>
+                         <div class="color-picker-container">
+                            <label for="bg-color-picker">Background Color:</label>
+                            <input type="color" id="bg-color-picker" data-var="--bg-color">
+                         </div>
+                         <div class="color-picker-container">
+                            <label for="panel-color-picker">Panel/Secondary BG:</label>
+                            <input type="color" id="panel-color-picker" data-var="--panel-bg-color">
+                         </div>
+                           <div class="color-picker-container">
+                            <label for="text-color-picker">Text Color:</label>
+                            <input type="color" id="text-color-picker" data-var="--text-color">
+                         </div>
+                         <div class="color-picker-container">
+                            <label for="accent-color-picker">Accent Color:</label>
+                            <input type="color" id="accent-color-picker" data-var="--accent-color">
+                         </div>
+                         <div class="color-picker-container">
+                            <label for="accent-hover-color-picker">Accent Hover Color:</label>
+                            <input type="color" id="accent-hover-color-picker" data-var="--accent-hover-color">
+                         </div>
+                          <button class="action-button" onclick="resetTheme()"><i class="fa-solid fa-rotate-left"></i> Reset Theme</button>
+                     </div>
+                     <h3>Preferences</h3>
+                    <div class="setting-option">
+                         <div class="checkbox-container">
+                             <input type="checkbox" id="animations-toggle" checked>
+                             <label for="animations-toggle">Enable UI Animations</label>
+                        </div>
+                    </div>
+                    <h3>Advanced</h3>
+                    <div class="setting-option">
+                        <p>Clearing cache will reset theme settings, sidebar state, and User ID censor preference stored in your browser for this GUI.</p>
+                        <button class="action-button secondary-action" onclick="clearCacheAndReload()"><i class="fa-solid fa-trash-can"></i> Clear Cache & Reload GUI</button>
+                    </div>
+                 </div>
+            </div>
+
+            <div id="info-tab" class="tab-panel">
+                <h2><i class="fa-solid fa-circle-info"></i> Info</h2>
+                <div class="tab-content-panel">
+                    <p>AvatarLockpick v2.0</p>
+                    <p>GUI made with Photino.NET</p>
+                    <p>Developed by Scrimmane / ScrimDev</p>
+                    <p>App Icon by Kmg Design</p>
+                    <p>Response from .NET: <span id="dotnet-response">Waiting...</span></p>
+                    <hr style="border-color: var(--border-color); margin: 1.5em 0;">
+                    <p><strong>Note:</strong> You can customize this interface! Feel free to edit the files in the application's 'GUI' folder to create your own look.</p>
+                    <button class="action-button" onclick="openHelpUrl()"><i class="fa-solid fa-question-circle"></i> Help/Documentation</button>
+                 </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Basic Popup Placeholder -->
+    <div id="action-popup" class="popup">
+        <h3 id="popup-title">Action Triggered</h3>
+        <p id="popup-message">Placeholder message for the action.</p>
+        <button onclick="closePopup()">Close</button>
+    </div>
+
+    <!-- Confirmation Popup for Unloading -->
+    <div id="confirm-unload-popup" class="popup confirmation-popup">
+        <h3 id="confirm-popup-title">Unload Avatar?</h3>
+        <p id="confirm-popup-message">Are you sure you want to unload the current avatar information?</p>
+        <div class="popup-buttons">
+            <button class="action-button primary-action" onclick="confirmUnloadAvatar()">Yes, Unload</button>
+            <button class="action-button secondary-action" onclick="cancelUnloadAvatar()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Keep the Photino communication script -->
+    <script src="app://dynamic.js"></script>
+    <!-- External script for button actions -->
+    <script src="assets/ButtonCalls.js"></script>
+    <!-- Inline script for initialization and non-button logic -->
+    <script>
+        // --- Elements Cache ---
+        const splashScreen = document.getElementById('splash-screen');
+        const appWrapper = document.getElementById('app-wrapper');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        const animationsToggle = document.getElementById('animations-toggle');
+        const userIdInput = document.getElementById('user-id');
+        const censorUserIdToggle = document.getElementById('censor-user-id');
+        const responseSpan = document.getElementById('dotnet-response');
+        const colorPickers = document.querySelectorAll('input[type="color"]');
+        const htmlElement = document.documentElement; // Target for CSS vars
+        const actionPopup = document.getElementById('action-popup');
+        const popupTitle = document.getElementById('popup-title');
+        const popupMessage = document.getElementById('popup-message');
+        const sidebarToggle = document.getElementById('sidebar-toggle'); // Cache toggle button
+        const loadedAvatarInfoPanel = document.getElementById('loaded-avatar-info-panel'); // Cache info panel
+        const loadedAvatarIdSpan = document.getElementById('loaded-avatar-id');
+        const loadedUserIdSpan = document.getElementById('loaded-user-id');
+        const unlockActionButtons = document.querySelectorAll('.unlock-action-btn'); // Cache unlock buttons
+        const unlockWarningPanel = document.getElementById('unlock-warning-panel'); // Cache warning panel
+        const confirmUnloadPopup = document.getElementById('confirm-unload-popup'); // Cache confirmation popup
+        const presetButtons = document.querySelectorAll('.preset-btn'); // Cache preset buttons
+
+        // --- Theme Objects ---
+        const themes = {
+            dodgerblue: { // New Default
+                '--bg-color': '#121212',
+                '--bg-secondary-color': '#181818',
+                '--text-color': '#ffffff',
+                '--accent-color': '#1E90FF',
+                '--accent-hover-color': '#46A3FF',
+                '--panel-bg-color': '#242424',
+                '--border-color': '#333333',
+                '--input-bg-color': '#2d2d2d',
+                '--input-border-color': '#454545'
+            },
+            crimson: {
+                // Only define overrides from default if needed, otherwise inherit
+                '--accent-color': '#DC143C',
+                '--accent-hover-color': '#E6395A',
+            },
+            green: {
+                '--accent-color': '#2ECC71',
+                '--accent-hover-color': '#58D68D',
+            },
+            magenta: {
+                '--accent-color': '#DE3BFF',
+                '--accent-hover-color': '#E566FF',
+            }
+        };
+
+        // Update defaultTheme to use the new default
+        const defaultTheme = themes.dodgerblue;
+
+        // Global variable to track loaded state and data
+        let isAvatarLoaded = false;
+        let loadedAvatarId = null;
+        let loadedUserId = null;
+
+        // --- Helper Functions ---
+        function applyTheme(themeSettings) {
+            Object.keys(themeSettings).forEach(key => {
+                 // Only apply if the key exists in the theme object
+                 if (themeSettings.hasOwnProperty(key)) {
+                     htmlElement.style.setProperty(key, themeSettings[key]);
+                 }
+            });
+             // Update accent RGB var based on the applied accent color
+            if (themeSettings.hasOwnProperty('--accent-color')){
+                updateAccentRgbVar(themeSettings['--accent-color']);
+            }
+             // Update color pickers to reflect the applied theme
+             updateColorPickers();
+        }
+
+        function updateColorPickers() {
+             colorPickers.forEach(picker => {
+                 const cssVar = picker.getAttribute('data-var');
+                 picker.value = getComputedStyle(htmlElement).getPropertyValue(cssVar).trim();
+             });
+        }
+
+        function hexToRgb(hex) {
+            let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function updateAccentRgbVar(hexColor) {
+            const rgb = hexToRgb(hexColor);
+            if (rgb) {
+                htmlElement.style.setProperty('--accent-color-rgb', `${rgb.r},${rgb.g},${rgb.b}`);
+            }
+        }
+
+        // --- Initialization ---
+        function initialize() {
+            // Set default dark theme immediately (CSS vars are already set in CSS)
+            updateColorPickers(); // Set pickers to initial values
+            updateAccentRgbVar(getComputedStyle(htmlElement).getPropertyValue('--accent-color').trim()); // Set initial RGB var
+
+            // Sidebar state (optional persistence)
+            const sidebarExpanded = localStorage.getItem('sidebarExpanded') === 'true';
+            appWrapper.classList.toggle('sidebar-expanded', sidebarExpanded);
+            // Update icon if needed (e.g., change bars to close/arrow)
+            updateSidebarToggleIcon(sidebarExpanded);
+
+            // Set animation toggle state
+            const savedAnimationPref = localStorage.getItem('animationsEnabled');
+            if (savedAnimationPref !== null) {
+                animationsToggle.checked = JSON.parse(savedAnimationPref);
+            }
+            document.body.classList.toggle('no-animations', !animationsToggle.checked);
+
+            // Set censor state
+            const savedCensorPref = localStorage.getItem('censorUserId');
+             if (savedCensorPref !== null) {
+                censorUserIdToggle.checked = JSON.parse(savedCensorPref);
+                userIdInput.type = censorUserIdToggle.checked ? 'password' : 'text';
+            }
+
+            // Initial state for Unlock tab
+            updateUnlockUI();
+        }
+
+        // --- Splash Screen Logic ---
+        window.addEventListener('load', () => {
+            initialize(); // Run initialization after DOM is loaded
+
+            setTimeout(() => {
+                splashScreen.classList.add('fade-out');
+            }, 1500);
+
+            splashScreen.addEventListener('transitionend', () => {
+                splashScreen.style.display = 'none';
+                appWrapper.style.display = 'flex';
+            }, { once: true });
+        });
+
+        // --- Sidebar Toggle Logic ---
+        sidebarToggle.addEventListener('click', () => {
+            const isExpanded = appWrapper.classList.toggle('sidebar-expanded');
+            localStorage.setItem('sidebarExpanded', isExpanded); // Persist state
+            updateSidebarToggleIcon(isExpanded);
+        });
+
+        function updateSidebarToggleIcon(isExpanded) {
+            const icon = sidebarToggle.querySelector('i');
+            if (icon) {
+                // Example: toggle between bars and left arrow
+                icon.className = isExpanded ? 'fa-solid fa-arrow-left' : 'fa-solid fa-bars';
+            }
+        }
+
+        // --- Tab Switching Logic ---
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabPanels.forEach(panel => panel.classList.remove('active'));
+
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // --- Settings Logic ---
+        animationsToggle.addEventListener('change', (event) => {
+            const enableAnimations = event.target.checked;
+            document.body.classList.toggle('no-animations', !enableAnimations);
+            localStorage.setItem('animationsEnabled', JSON.stringify(enableAnimations));
+            console.log(`Animations enabled: ${enableAnimations}`);
+        });
+
+        censorUserIdToggle.addEventListener('change', (event) => {
+            const censor = event.target.checked;
+            userIdInput.type = censor ? 'password' : 'text';
+            localStorage.setItem('censorUserId', JSON.stringify(censor));
+            console.log(`Censor User ID: ${censor}`);
+        });
+
+        colorPickers.forEach(picker => {
+            picker.addEventListener('input', (event) => {
+                const cssVar = event.target.getAttribute('data-var');
+                const newColor = event.target.value;
+                htmlElement.style.setProperty(cssVar, newColor);
+                 // Update RGB var if accent is changed (keep this)
+                if (cssVar === '--accent-color') {
+                     updateAccentRgbVar(newColor);
+                }
+                // Removed automatic setting of --accent-hover-color here
+                // Note: Persisting theme changes requires more logic (e.g., localStorage)
+            });
+        });
+
+        function resetTheme() {
+             console.log("Resetting to default theme (Dodger Blue)");
+             applyTheme(themes.dodgerblue);
+        }
+
+        window.external.receiveMessage(message => {
+             console.log(`Message received from .NET: ${message}`);
+             if(responseSpan) {
+                responseSpan.textContent = message;
+             }
+             // TODO: Parse message if it's structured (e.g., JSON)
+        });
+
+        function updateUnlockUI() {
+            if (isAvatarLoaded) {
+                loadedAvatarInfoPanel.style.display = 'block';
+                unlockWarningPanel.style.display = 'none'; // Hide warning
+                unlockActionButtons.forEach(btn => btn.disabled = false);
+            } else {
+                loadedAvatarInfoPanel.style.display = 'none';
+                unlockWarningPanel.style.display = 'block'; // Show warning
+                unlockActionButtons.forEach(btn => btn.disabled = true);
+            }
+        }
+
+        // --- Unload Avatar Confirmation Logic ---
+        function showUnloadConfirmation() {
+            if (confirmUnloadPopup) {
+                confirmUnloadPopup.classList.add('show');
+            }
+        }
+
+        function confirmUnloadAvatar() {
+            console.log("Unloading avatar...");
+            isAvatarLoaded = false;
+            loadedAvatarId = null;
+            loadedUserId = null;
+            // Optionally clear the input fields in the Avatar tab too
+            // document.getElementById('avatar-id').value = '';
+            // document.getElementById('user-id').value = '';
+            updateUnlockUI();
+            cancelUnloadAvatar(); // Close the confirmation popup
+        }
+
+        function cancelUnloadAvatar() {
+            if (confirmUnloadPopup) {
+                confirmUnloadPopup.classList.remove('show');
+            }
+        }
+
+        // Add Preset Button Listeners
+        presetButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const presetName = event.target.getAttribute('data-preset');
+                if (themes[presetName]) {
+                    console.log(`Applying preset theme: ${presetName}`);
+                    // Merge preset with default to ensure all vars are set
+                    const fullTheme = { ...themes.dodgerblue, ...themes[presetName] };
+                    applyTheme(fullTheme);
+                }
+            });
+        });
+
+        // --- Disable Context Menu & Dev Tools (Use with caution) ---
+        document.addEventListener('contextmenu', event => {
+            console.log("Context menu blocked.");
+            event.preventDefault();
+        });
+
+        document.addEventListener('keydown', event => {
+            // Block F12
+            if (event.key === 'F12') {
+                console.log("F12 blocked.");
+                event.preventDefault();
+            }
+            // Block Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+            if (event.ctrlKey && event.shiftKey && (
+                event.key === 'I' || event.key === 'i' ||
+                event.key === 'J' || event.key === 'j' ||
+                event.key === 'C' || event.key === 'c'
+            )) {
+                console.log(`Ctrl+Shift+${event.key.toUpperCase()} blocked.`);
+                event.preventDefault();
+            }
+            // Block Ctrl+U (View Source) - Less common in app contexts
+            // if (event.ctrlKey && (event.key === 'U' || event.key === 'u')) {
+            //     console.log("Ctrl+U blocked.");
+            //     event.preventDefault();
+            // }
+        });
+
+        // --- Clear Cache & Reload ---       
+        function clearCacheAndReload() {
+            const confirmation = confirm("Are you sure you want to clear locally stored settings (theme, sidebar state, etc.) and reload the GUI? This action cannot be undone.");
+            if (confirmation) {
+                console.log("Clearing local storage and reloading...");
+                try {
+                    // Clear specific keys we know we set
+                    localStorage.removeItem('sidebarExpanded');
+                    localStorage.removeItem('animationsEnabled');
+                    localStorage.removeItem('censorUserId');
+                    // Add any other keys you might store in the future
+                    // localStorage.clear(); // Alternatively, clear everything (use with caution)
+                   
+                    // Reload the page
+                    window.location.reload();
+                } catch (error) {
+                    console.error("Error clearing local storage or reloading:", error);
+                    alert("An error occurred while trying to clear cache and reload.");
+                }
+            } else {
+                console.log("Clear cache and reload cancelled.");
+            }
+        }
+
+    </script>
+</body>
+</html>

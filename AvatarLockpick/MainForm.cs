@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using Windows.AI.MachineLearning;
 
 namespace AvatarLockpick
 {

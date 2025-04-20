@@ -1,0 +1,676 @@
+/* --- Base & Reset --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    /* Define theme variables on root for easier JS access */
+    /* Darker Dark Theme Defaults */
+    --bg-color: #121212;
+    --bg-secondary-color: #181818; /* Darker secondary BG */
+    --text-color: #ffffff;
+    --text-secondary-color: #b0b0b0; /* Adjusted secondary contrast slightly */
+    --accent-color: #1E90FF; /* Dodger Blue accent */
+    --accent-hover-color: #46A3FF; /* Dodger Blue hover */
+    --border-color: #333333;
+    --panel-bg-color: #242424;
+    --input-bg-color: #2d2d2d;
+    --input-border-color: #454545;
+    --glow-color: #ff00ff; /* Magenta glow color */
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px; /* Slightly smaller base */
+    line-height: 1.5;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Disable transitions/animations if class is present */
+body.no-animations * {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* --- Themes (using JS to set variables now) --- */
+/* Keep classes for potential overrides if needed, but base is set on html */
+body.theme-dark {
+    /* Variables primarily set on :root / html */
+}
+body.theme-light {
+    /* Variables primarily set on :root / html */
+}
+body.theme-default {
+     /* Variables primarily set on :root / html */
+}
+
+
+/* --- Splash Screen --- */
+#splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Use secondary bg for splash */
+    background-color: var(--bg-secondary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.8s ease-out;
+}
+
+/* Container for splash content */
+.splash-content {
+    display: flex;
+    flex-direction: column; /* Stack title and spinner vertically */
+    align-items: center; /* Center items horizontally */
+}
+
+#splash-screen.fade-out {
+    opacity: 0;
+}
+
+#splash-screen .app-title {
+    font-size: 3.0em; /* Slightly larger */
+    font-weight: 400; /* Slightly bolder */
+    display: flex; /* Use flex to layout spans */
+    justify-content: center;
+    /* Remove previous styles */
+    /* background: ... */
+    /* background-size: ... */
+    /* -webkit-background-clip: ... */
+    /* background-clip: ... */
+    /* -webkit-text-fill-color: ... */
+    /* color: ... */
+    /* animation: gradient-flow ..., glow-pulse ...; */
+    /* text-shadow: ...; */
+}
+
+/* Style for individual characters */
+#splash-screen .app-title span {
+    display: inline-block; /* Needed for transform */
+    color: var(--accent-color); /* Use accent color */
+    /* Apply wave animation */
+    animation: text-wave 0.8s ease-in-out infinite alternate;
+    /* Add staggered delay using CSS variable set inline later */
+    animation-delay: var(--delay);
+}
+
+/* New wave animation */
+@keyframes text-wave {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-6px); /* Adjust vertical distance */
+    }
+}
+
+/* Spinner Styles */
+#splash-spinner {
+    margin-top: 2em; /* Space between title and spinner */
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(var(--text-color-rgb, 255, 255, 255), 0.2); /* Light border */
+    border-top-color: var(--accent-color); /* Use accent color for spinner top */
+    border-radius: 50%;
+    animation: spinner-spin 1s linear infinite;
+}
+
+/* Spinner Animation */
+@keyframes spinner-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- App Wrapper --- */
+#app-wrapper {
+    display: flex;
+    height: 100vh;
+    transition: padding-left 0.3s ease-out; /* Smooth transition when sidebar expands */
+}
+
+/* --- Sidebar Toggle Button --- */
+#sidebar-toggle {
+    position: fixed; /* Keep it fixed relative to viewport */
+    top: 10px;
+    left: 10px;
+    z-index: 100; /* Above sidebar */
+    background: none;
+    border: none;
+    color: var(--text-secondary-color);
+    font-size: 1.4em;
+    padding: 5px;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.3s ease;
+}
+
+#sidebar-toggle:hover {
+    color: var(--accent-color);
+}
+
+/* Adjust position when sidebar is expanded */
+.sidebar-expanded #sidebar-toggle {
+   left: 190px; /* Position next to expanded sidebar */
+   transform: rotate(180deg); /* Optional: rotate arrow */
+}
+
+
+/* --- Sidebar --- */
+.sidebar {
+    width: 60px;
+    background-color: var(--bg-secondary-color);
+    padding: 1em 0;
+    padding-top: 50px; /* Make space for fixed toggle button */
+    height: 100%;
+    position: fixed; /* Fixed position */
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 1px solid var(--border-color);
+    box-shadow: inset -2px 0 5px rgba(0,0,0,0.1);
+    transition: width 0.3s ease-out; /* Animate width change */
+    z-index: 99;
+    overflow: hidden; /* Hide text when collapsed */
+}
+
+.sidebar-expanded .sidebar {
+    width: 180px; /* Expanded width */
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.sidebar li {
+    margin: 0;
+}
+
+.tab-button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 55px;
+    padding: 0 18px; /* Adjust padding for icon */
+    background: none;
+    border: none;
+    border-right: 4px solid transparent;
+    color: var(--text-secondary-color);
+    font-size: 1.4em; /* Icon size */
+    cursor: pointer;
+    transition: background-color 0.25s ease, border-right-color 0.25s ease, color 0.25s ease;
+    position: relative;
+    justify-content: center; /* Center icon when collapsed */
+}
+
+/* Expanded Tab Button Styles */
+.sidebar-expanded .tab-button {
+    justify-content: flex-start; /* Align items left */
+    padding: 0 20px; /* Adjust padding */
+}
+
+.tab-button span.tab-text {
+    display: none; /* Hidden by default */
+    margin-left: 15px;
+    font-size: 0.7em; /* Text size relative to icon size */
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease 0.1s; /* Fade in text */
+}
+
+.sidebar-expanded .tab-button span.tab-text {
+    display: inline;
+    opacity: 1;
+}
+
+/* Add Tooltips (Simple Example) */
+.tab-button::after {
+    content: attr(aria-label); /* Use aria-label for tooltip text */
+    position: absolute;
+    left: 110%; /* Position to the right */
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #111;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.tab-button:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tab-button i {
+    transition: transform 0.2s ease-out;
+    z-index: 2;
+    position: relative;
+    flex-shrink: 0; /* Prevent icon from shrinking */
+    width: 25px; /* Give icon a fixed width for alignment */
+    text-align: center;
+}
+
+.tab-button:hover {
+    /* Use accent color with low opacity for hover background */
+    background-color: rgba(var(--accent-color-rgb, 222, 59, 255), 0.1);
+    color: var(--accent-hover-color);
+}
+
+/* Apply tilt only if animations are enabled */
+body:not(.no-animations) .tab-button:hover i {
+     transform: rotate(25deg);
+}
+
+.tab-button.active {
+    /* Use accent color with slightly higher opacity */
+    background-color: rgba(var(--accent-color-rgb, 222, 59, 255), 0.15);
+    color: var(--accent-color);
+    border-right-color: var(--accent-color);
+}
+
+.tab-button.active i {
+    transform: none; /* Don't keep tilt when active */
+}
+
+/* --- Content Area --- */
+.content {
+    flex-grow: 1;
+    padding: 1.5em 2em;
+    padding-left: 80px; /* Initial padding to account for collapsed sidebar + toggle */
+    overflow-y: auto;
+    background-color: var(--bg-color);
+    transition: padding-left 0.3s ease-out; /* Match sidebar transition */
+}
+
+.sidebar-expanded .content {
+    padding-left: 200px; /* Padding when sidebar is expanded */
+}
+
+.tab-panel {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+/* Panel within tabs */
+.tab-content-panel {
+    background-color: var(--panel-bg-color);
+    padding: 1.5em;
+    border-radius: 8px;
+    margin-bottom: 1.5em;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: var(--accent-color);
+    margin-bottom: 0.8em;
+    font-weight: 400;
+    font-size: 1.6em;
+    /* Removed glow */
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.4em;
+}
+
+p {
+    margin-bottom: 1em;
+    color: var(--text-secondary-color);
+}
+
+/* --- Input Fields & Labels --- */
+label {
+    display: block;
+    margin-bottom: 0.5em;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+input[type="text"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 0.8em 1em;
+    margin-bottom: 1em;
+    border-radius: 5px;
+    border: 1px solid var(--input-border-color);
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    font-size: 0.95em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb, 0, 120, 212), 0.3); /* Focus ring using accent */
+}
+
+/* Convert accent hex to RGB for rgba - needs JS */
+/* Example: #0078d4 -> 0, 120, 212 */
+
+/* --- Checkboxes & Toggles --- */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+    cursor: pointer;
+}
+
+.checkbox-container input[type="checkbox"] {
+    margin-right: 0.7em;
+    height: 18px;
+    width: 18px;
+    accent-color: var(--accent-color); /* Style checkbox color */
+}
+
+.checkbox-container label {
+    margin-bottom: 0; /* Reset margin for inline label */
+    font-weight: normal;
+    color: var(--text-secondary-color);
+}
+
+
+/* --- Settings --- */
+.setting-option {
+    margin-bottom: 1.5em;
+    padding: 1.5em;
+    background-color: var(--panel-bg-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.setting-option label {
+     color: var(--text-color);
+}
+
+.color-picker-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between label and picker */
+    margin-bottom: 0.8em;
+}
+
+.color-picker-container label {
+    flex-basis: 150px; /* Fixed width for labels */
+    flex-shrink: 0;
+    margin-bottom: 0;
+}
+
+input[type="color"] {
+    width: 40px;
+    height: 40px;
+    border: none;
+    padding: 0; /* Remove default padding */
+    border-radius: 50%; /* Make it a circle */
+    cursor: pointer;
+    background-color: transparent;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+/* Hide the actual color input square provided by the browser, showing only our styled circle */
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+
+
+/* --- Buttons (Unlock Tab, etc.) --- */
+.action-button {
+    display: inline-flex; /* Use flex for icon + text */
+    align-items: center;
+    gap: 0.6em; /* Space between icon and text */
+    background: var(--accent-color);
+    margin: 0.5em 0.5em 0.5em 0; /* Spacing between buttons */
+    padding: 0.8em 1.5em;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease-out;
+    font-size: 0.95em;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.action-button i { /* Style icon inside button */
+    font-size: 1.1em;
+    line-height: 1; /* Prevent extra space */
+    transition: transform 0.2s ease-out;
+}
+
+.action-button:hover {
+    background: var(--accent-hover-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Apply tilt to button icon on hover */
+body:not(.no-animations) .action-button:hover i {
+     transform: rotate(25deg);
+}
+
+/* Click animation for action buttons */
+body:not(.no-animations) .action-button:active {
+    transform: scale(0.97);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Slightly reduce shadow */
+}
+
+/* Adjust primary button from previous example if still used */
+button.primary {
+    /* Inherit from action-button or redefine */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    background: var(--accent-color);
+    margin: 1em 0;
+    padding: 0.8em 1.5em;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    font-size: 0.95em;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+button.primary:hover {
+    background: var(--accent-hover-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+/* --- Animations --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Simple Popup Placeholder Style --- */
+/* This is very basic, implement a proper modal/popup solution later */
+.popup {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--panel-bg-color);
+    color: var(--text-color);
+    padding: 2em;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    z-index: 1001;
+    display: none; /* Hidden by default */
+    text-align: center;
+}
+.popup.show {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+.popup button {
+     /* Style close button if needed */
+     margin-top: 1em;
+     background: var(--accent-color);
+     color: white;
+     border: none;
+     padding: 0.5em 1em;
+     border-radius: 4px;
+     cursor: pointer;
+}
+
+/* Warning Panel Style */
+.warning-panel {
+    background-color: rgba(255, 165, 0, 0.1); /* Light orange background */
+    border-color: orange;
+}
+
+.warning-panel p {
+    color: orange; /* Orange text */
+    font-weight: 500;
+}
+
+.warning-panel i {
+    margin-right: 0.5em;
+}
+
+/* Styles for Confirmation Popup */
+.confirmation-popup h3 {
+    color: #DC143C; /* Crimson warning color */
+    margin-bottom: 0.8em;
+}
+
+.confirmation-popup p {
+    color: var(--text-secondary-color);
+    margin-bottom: 1.5em;
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+}
+
+/* Differentiate button styles if needed */
+.confirmation-popup .action-button.primary-action {
+    /* Uses warning color for confirmation */
+    background-color: #DC143C;
+    color: white;
+}
+.confirmation-popup .action-button.primary-action:hover {
+    background-color: #E6395A; /* Lighter crimson for hover */
+}
+
+.action-button.secondary-action { /* Keep this generic for cancel/other secondary */
+    background-color: var(--input-bg-color);
+    color: var(--text-secondary-color);
+    border: 1px solid var(--input-border-color);
+}
+
+.action-button.secondary-action:hover {
+    background-color: var(--border-color);
+    color: var(--text-color);
+}
+
+/* Style for unload button within info panel */
+#loaded-avatar-info-panel .secondary-action {
+    margin-top: 1em; /* Add some space above */
+}
+
+/* Preset button styling */
+.preset-buttons {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 0.8em;
+    margin-bottom: 1em; /* Space before HR */
+}
+
+.preset-btn {
+    /* Use the inline variable for background color */
+    background-color: var(--preset-bg);
+    color: white;
+    /* Make text shadow more visible on colored backgrounds */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.preset-btn:hover {
+    filter: brightness(1.15); /* Simple hover effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* --- Custom Scrollbars --- */
+/* Works in WebKit browsers (Chrome, Edge, Safari, Opera) */
+
+/* Hide default scrollbar */
+::-webkit-scrollbar {
+    width: 10px; /* Width of vertical scrollbar */
+    height: 10px; /* Height of horizontal scrollbar */
+    background-color: transparent; /* Make scrollbar track transparent */
+}
+
+/* Scrollbar Handle (Thumb) */
+::-webkit-scrollbar-thumb {
+    background-color: rgba(var(--accent-color-rgb, 30, 144, 255), 0.5); /* Use transparent accent color */
+    border-radius: 5px;
+    border: 2px solid transparent; /* Add padding */
+    background-clip: content-box; /* Clip background to content area */
+    transition: background-color 0.2s ease;
+}
+
+/* Scrollbar Handle on hover/active */
+::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:active {
+    background-color: rgba(var(--accent-color-rgb, 30, 144, 255), 0.8); /* Darker/more opaque on hover */
+}
+
+/* Scrollbar Track */
+::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.1); /* Very subtle track background */
+    border-radius: 5px;
+}
+
+/* Scrollbar Corner */
+::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+/* Firefox specific scrollbar styling (optional, less customizable) */
+/* For broader compatibility, though limited styling options */
+* {
+  scrollbar-width: thin; /* "auto" or "thin" */
+  scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.1); /* thumb and track color */
+}

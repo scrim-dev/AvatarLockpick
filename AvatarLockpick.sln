@@ -1,9 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35617.110 d17.13
+VisualStudioVersion = 17.13.35617.110
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvatarLockpick", "AvatarLockpick\AvatarLockpick.csproj", "{AF545187-5E26-474C-97C1-25E95799D44C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvatarLockpick.Revised", "AvatarLockpick.Revised\AvatarLockpick.Revised.csproj", "{8D8AF4BF-0400-47AC-9E7D-003DD12C6816}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +22,10 @@ Global
 		{AF545187-5E26-474C-97C1-25E95799D44C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF545187-5E26-474C-97C1-25E95799D44C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF545187-5E26-474C-97C1-25E95799D44C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D8AF4BF-0400-47AC-9E7D-003DD12C6816}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D8AF4BF-0400-47AC-9E7D-003DD12C6816}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D8AF4BF-0400-47AC-9E7D-003DD12C6816}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D8AF4BF-0400-47AC-9E7D-003DD12C6816}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
