@@ -48,18 +48,16 @@ namespace AvatarLockpick.Revised.Utils
             );
         }
 
-        public async Task<string> DownloadStringAsync(string url)
+        public async Task<string?> DownloadStringAsync(string url)
         {
-            if (_httpClient == null)
-                throw new InvalidOperationException("Call Load() first!");
+            if (_httpClient == null) { return null; }
 
             return await _httpClient.GetStringAsync(url).ConfigureAwait(false);
         }
 
-        public string DownloadString(string url)
+        public string? DownloadString(string url)
         {
-            if (_httpClient == null)
-                throw new InvalidOperationException("Call Load() first!");
+            if (_httpClient == null) { return null; }
 
             return _httpClient.GetStringAsync(url).GetAwaiter().GetResult();
         }

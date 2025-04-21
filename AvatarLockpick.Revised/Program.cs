@@ -12,11 +12,14 @@ namespace AvatarLockpick.Revised
         // A unique name for the mutex to ensure only one instance runs.
         private const string AppMutexName = "Global\\AvatarLockpickRevised_Mutex_2A7B9C1D";
 
-        //Application Icon by Kmg Design
-        //https://github.com/tryphotino/photino.NET
+        //Application Icon by: Kmg Design
+        //GUI made with: https://github.com/tryphotino/photino.NET
         [STAThread]
         static void Main(string[] args)
         {
+            ConsoleSetup.Init();
+            Console.Title = "AvatarLockpick App";
+            AppLog.Warn("Startup", "Loading Application...");
             // Try to grab the mutex
             using (Mutex mutex = new Mutex(true, AppMutexName, out bool createdNew))
             {
@@ -74,9 +77,13 @@ namespace AvatarLockpick.Revised
                         GUIcom.Communication(message);
                     })
                     .Load("GUI/index.html"); // Can be used with relative path strings or "new URI()" instance to load a website.
+                Thread.Sleep(1200);
+                Console.Clear();
+                AppLog.Warn("Startup", "Do not close the console as it is needed. If you'd like to hide it open" +
+                    " the hideconsole.txt file in the 'GUI' folder and change it from false to true. Then close and reopen the app.");
+                AppLog.Success("Startup", "App Loaded!");
                 window.WaitForClose(); // Starts the application event loop
             }
-             // Mutex is automatically released when exiting the 'using' block or if an exception occurs.
         }
     }
 }

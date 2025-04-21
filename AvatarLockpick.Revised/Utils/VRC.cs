@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Diagnostics;
 
-namespace AvatarLockpick.Utils
+namespace AvatarLockpick.Revised.Utils
 {
-    internal class VRCManager
+    internal class VRC
     {
         private const string VRCHAT_PROCESS_NAME = "VRChat";
         private const string STEAM_PROTOCOL = "steam://rungameid/438100";
@@ -68,7 +68,7 @@ namespace AvatarLockpick.Utils
             var process = GetVRChatProcess();
             if (process == null)
                 return "Not Running";
-            
+
             return process.Responding ? "Running" : "Not Responding";
         }
 

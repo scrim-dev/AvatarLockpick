@@ -154,4 +154,42 @@ function openHelpUrl() {
     console.log("Requesting help URL from .NET...");
     const message = { type: 'openHelpUrl' };
     sendMessageToDotNet(message);
+}
+
+/**
+ * Sends a restart command to the .NET backend.
+ * @param {string} restartType - The type of restart ('restart-novr' or 'restart-vr').
+ */
+function triggerRestart(restartType) {
+    // Check if avatar is loaded before proceeding (optional, depends on backend needs)
+    if (!isAvatarLoaded || !window.loadedAvatarId) {
+        console.error("No avatar loaded. Restart action might depend on loaded avatar.");
+        // Optionally show a popup or just send the command anyway
+        // alert("Please load an avatar first.");
+        // return;
+    }
+
+    console.log(`Triggering restart: ${restartType}`);
+
+    const message = {
+        type: restartType,
+        // Optionally include avatar/user ID if the backend needs it for context
+        // avatarId: window.loadedAvatarId,
+        // userId: window.loadedUserId
+    };
+    sendMessageToDotNet(message);
+
+    // Optionally show a simple feedback popup
+    // For consistency, you could reuse triggerPopup or make a simpler notification
+    const actionPopupElement = document.getElementById('action-popup');
+    const popupTitleElement = document.getElementById('popup-title');
+    const popupMessageElement = document.getElementById('popup-message');
+
+    if (actionPopupElement && popupTitleElement && popupMessageElement) {
+        popupTitleElement.textContent = restartType === 'restart-vr' ? 'Restart (VR)' : 'Restart';
+        popupMessageElement.textContent = `Requesting ${popupTitleElement.textContent}...`;
+        actionPopupElement.classList.add('show');
+    } else {
+        console.warn("Popup elements not found, skipping feedback popup for restart action.")
+    }
 } 

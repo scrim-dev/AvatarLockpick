@@ -16,15 +16,6 @@ namespace AvatarLockpick.Revised.Utils
 {
     internal class AvatarUnlocker
     {
-        //Reminder: remove on release
-        public static bool ShouldTest { get; private set; } = true;
-
-        [DllImport("kernel32.dll")]
-        public static extern bool AllocConsole();
-
-        [DllImport("kernel32.dll")]
-        public static extern bool FreeConsole();
-
         //I can honestly do this better but it doesn't matter it works
         /// <summary>
         /// Starts unlock process for each type
@@ -36,21 +27,11 @@ namespace AvatarLockpick.Revised.Utils
 
         public static void Start(int Type, string UserID, string AvatarID)
         {
-            AllocConsole();
+            Console.WriteLine("Console Loaded!");
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.Title = "Debug Console";
+            Console.Title = "AvatarLockpick Debug Console";
             Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
-
-            if (ShouldTest)
-            {
-                Console.WriteLine(StringUtils.Repeat("=", 20));
-                AppLog.Log("Testing", "Hello World!");
-                AppLog.Warn("Testing", "Hello World!");
-                AppLog.Success("Testing", "Hello World!");
-                AppLog.Error("Testing", "Hello World!");
-                Console.WriteLine(StringUtils.Repeat("=", 20));
-            }
 
             switch (Type)
             {
@@ -70,9 +51,6 @@ namespace AvatarLockpick.Revised.Utils
                     Unlock(UserID, AvatarID);
                     break;
             }
-
-            Thread.Sleep(1400);
-            FreeConsole();
         }
 
         private static string GetVRChatAvatarPath(string userId)
@@ -92,7 +70,7 @@ namespace AvatarLockpick.Revised.Utils
         private static void Unlock(string UID, string AID)
         {
             AppLog.Log("Unlock", "Starting unlock process...");
-            Thread.Sleep(1200);
+
             try
             {
                 string avatarPath = GetVRChatAvatarPath(UID);
@@ -112,7 +90,7 @@ namespace AvatarLockpick.Revised.Utils
 
                 if (!System.IO.File.Exists(fullAvatarPath))
                 {
-                    throw new FileNotFoundException($"Avatar file not found: {AID}");
+                    AppLog.Error("File", $"Avatar file not found: {AID}");
                 }
 
                 string jsonContent = System.IO.File.ReadAllText(fullAvatarPath);
@@ -259,7 +237,6 @@ namespace AvatarLockpick.Revised.Utils
             {
                 AppLog.Error("ERR", $"Error: {ex.Message}");
                 AppLog.Error("STACK", $"Stack trace: {ex.StackTrace}");
-                throw new Exception($"Error unlocking avatar {AID}: {ex.Message}", ex);
             }
         }
 
@@ -275,7 +252,7 @@ namespace AvatarLockpick.Revised.Utils
 
                 if (!Directory.Exists(avatarPath))
                 {
-                    throw new DirectoryNotFoundException($"Avatar directory not found for user ID: {UID}");
+                    AppLog.Error($"Avatar directory not found for user ID: {UID}");
                 }
 
                 string[] avatarFiles = Directory.GetFiles(avatarPath);
@@ -283,14 +260,14 @@ namespace AvatarLockpick.Revised.Utils
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error unlocking avatars: {ex.Message}", ex);
+                AppLog.Error($"Error unlocking avatars: {ex.Message}", ex);
             }*/
         }
 
         private static void UnlockVRCF(string UID, string AID)
         {
             AppLog.Log("UnlockVRCFuryLocks", "Starting unlock process...");
-            Thread.Sleep(1200);
+
             try
             {
                 string avatarPath = GetVRChatAvatarPath(UID);
@@ -310,7 +287,7 @@ namespace AvatarLockpick.Revised.Utils
 
                 if (!System.IO.File.Exists(fullAvatarPath))
                 {
-                    throw new FileNotFoundException($"Avatar file not found: {AID}");
+                    AppLog.Error("File", $"Avatar file not found: {AID}");
                 }
 
                 string jsonContent = System.IO.File.ReadAllText(fullAvatarPath);
@@ -456,7 +433,6 @@ namespace AvatarLockpick.Revised.Utils
             {
                 AppLog.Error("ERR", $"Error: {ex.Message}");
                 AppLog.Error("ST", $"Stack trace: {ex.StackTrace}");
-                throw new Exception($"Error unlocking avatar {AID}: {ex.Message}", ex);
             }
         }
 
@@ -489,7 +465,7 @@ namespace AvatarLockpick.Revised.Utils
             }
 
             AppLog.Log("UnlockWithDatabaseScan", "Starting unlock process...");
-            Thread.Sleep(1200);
+
             try
             {
                 string avatarPath = GetVRChatAvatarPath(UID);
@@ -509,7 +485,7 @@ namespace AvatarLockpick.Revised.Utils
 
                 if (!System.IO.File.Exists(fullAvatarPath))
                 {
-                    throw new FileNotFoundException($"Avatar file not found: {AID}");
+                    AppLog.Error("File", $"Avatar file not found: {AID}");
                 }
 
                 string jsonContent = System.IO.File.ReadAllText(fullAvatarPath);
@@ -664,9 +640,7 @@ namespace AvatarLockpick.Revised.Utils
             {
                 AppLog.Error("ERR", $"Error: {ex.Message}");
                 AppLog.Error("ST", $"Stack trace: {ex.StackTrace}");
-                throw new Exception($"Error unlocking avatar {AID}: {ex.Message}", ex);
             }
         }
     }
 }
-//Hello UwU

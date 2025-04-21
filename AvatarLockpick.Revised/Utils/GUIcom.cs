@@ -41,6 +41,26 @@ namespace AvatarLockpick.Revised.Utils
                     URLStuff.OpenUrl($"https://github.com/scrim-dev/AvatarLockpick/blob/master/HELP.md");
                 }
 
+                if ((string)jsonData["type"] == "restart-novr")
+                {
+                    Task.Run(() =>
+                    {
+                        VRC.CloseVRChat();
+                        Task.Delay(1000); //Just in case
+                        VRC.LaunchVRChat(false);
+                    });
+                }
+
+                if ((string)jsonData["type"] == "restart-vr")
+                {
+                    Task.Run(() =>
+                    {
+                        VRC.CloseVRChat();
+                        Task.Delay(1000); //Just in case
+                        VRC.LaunchVRChat(true);
+                    });
+                }
+
                 if (actionToken != null && actionToken.Type == JTokenType.String)
                 {
                     string action = actionToken.ToString();
