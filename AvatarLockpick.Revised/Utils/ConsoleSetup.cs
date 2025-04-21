@@ -9,10 +9,15 @@ namespace AvatarLockpick.Revised.Utils
 {
     internal class ConsoleSetup
     {
-        public static bool HideCons = false;
+        //This class is so bad omgggg (pls ignore <3)
+        [DllImport("user32.dll")]
+        static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
-        private const int MF_BYCOMMAND = 0x00000000;
-        private const int SC_MAXIMIZE = 0xF030;
+        [DllImport("user32.dll")]
+        static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
         [DllImport("user32.dll")]
         private static extern int DeleteMenu(IntPtr hMenu, int nPosition, int wFlags);
@@ -30,16 +35,23 @@ namespace AvatarLockpick.Revised.Utils
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
-        [DllImport("user32.dll")]
-        static extern int SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
+        [DllImport("user32.dll", EntryPoint = "SetWindowLong")]
+        private static extern int SetWindowLong32(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
+        private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
         const int SW_HIDE = 0;
         const int GWL_EXSTYLE = -20;
-        const uint WS_EX_TOOLWINDOW = 0x00000080;
+        const int WS_EX_TOOLWINDOW = 0x00000080;
         const uint SWP_NOMOVE = 0x0002;
         const uint SWP_NOSIZE = 0x0001;
         const uint SWP_NOZORDER = 0x0004;
         const uint SWP_FRAMECHANGED = 0x0020;
+        private const int MF_BYCOMMAND = 0x00000000;
+        private const int SC_MAXIMIZE = 0xF030;
+        const int WS_EX_APPWINDOW = 0x00040000;
+        const int HWND_BOTTOM = 1;
 
         public static void Init()
         {
@@ -63,15 +75,37 @@ namespace AvatarLockpick.Revised.Utils
                 {
                     if (handle != IntPtr.Zero)
                     {
-                        // Hide the window
+                        // Hide lol
                         ShowWindow(handle, SW_HIDE);
 
-                        // Remove from taskbar by making it a toolwindow
                         SetWindowLong(handle, GWL_EXSTYLE, WS_EX_TOOLWINDOW);
 
-                        // Ensure changes take effect
                         SetWindowPos(handle, IntPtr.Zero, 0, 0, 0, 0,
                             SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+                    }
+
+                    //For newer windows terminal
+                    IntPtr hWnd = GetConsoleWindow();
+                    if (hWnd != IntPtr.Zero)
+                    {
+                        ShowWindow(hWnd, SW_HIDE);
+
+                        int style = GetWindowLong(hWnd, GWL_EXSTYLE);
+                        SetWindowLong(hWnd, GWL_EXSTYLE,
+                            (style | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
+
+                        SetWindowPos(hWnd, (IntPtr)HWND_BOTTOM,
+                            0, 0, 0, 0,
+                            SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+                        IntPtr terminalHandle = FindWindow("CASCADIA_HOSTING_WINDOW_CLASS", null);
+                        if (terminalHandle != IntPtr.Zero)
+                        {
+                            int termStyle = GetWindowLong(terminalHandle, GWL_EXSTYLE);
+                            SetWindowLong(terminalHandle, GWL_EXSTYLE,
+                                (termStyle | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
+                            ShowWindow(terminalHandle, SW_HIDE);
+                        }
                     }
                 }
             }
