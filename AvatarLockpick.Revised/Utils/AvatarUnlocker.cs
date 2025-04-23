@@ -32,6 +32,7 @@ namespace AvatarLockpick.Revised.Utils
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Title = "AvatarLockpick Debug Console";
             Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
+            try { WindowUtils.BringConsoleToFrontIfVisible(); } catch { }
 
             switch (Type)
             {
