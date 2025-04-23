@@ -536,21 +536,23 @@ button.primary:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     z-index: 1001;
     display: none; /* Hidden by default */
+    min-width: 300px; /* Ensure minimum width */
+    max-width: 450px; /* Limit maximum width */
     text-align: center;
 }
 .popup.show {
     display: block;
     animation: fadeIn 0.3s ease-out;
 }
-.popup button {
-     /* Style close button if needed */
-     margin-top: 1em;
-     background: var(--accent-color);
-     color: white;
-     border: none;
-     padding: 0.5em 1em;
-     border-radius: 4px;
-     cursor: pointer;
+.popup button:not(.action-button) { /* Avoid styling action buttons inside popups */
+    /* Style close button if needed */
+    margin-top: 1em;
+    background: var(--accent-color);
+    color: var(--text-color);
+    border: none;
+    padding: 0.5em 1em;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 /* Warning Panel Style */
@@ -673,4 +675,23 @@ button.primary:hover {
 * {
   scrollbar-width: thin; /* "auto" or "thin" */
   scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.1); /* thumb and track color */
+}
+
+/* Specific Styles for Notice Popup */
+.notice-popup h3 {
+    color: var(--accent-color); /* Use accent color for notice title */
+    margin-bottom: 1em;
+}
+
+.notice-popup p {
+    margin-bottom: 1.5em;
+    text-align: left; /* Align message text left */
+}
+
+.popup-timer {
+    font-size: 0.9em;
+    color: var(--text-secondary-color);
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.8em;
+    margin-top: 1em;
 }

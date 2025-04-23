@@ -56,6 +56,7 @@
 
                      <button class="action-button" onclick="callDotNetSendIDs()"><i class="fa-solid fa-eye"></i> View Avatar</button>
                      <button class="action-button" onclick="loadAvatarInfo()"><i class="fa-solid fa-download"></i> Load Avatar</button>
+                     <button class="action-button secondary-action" onclick="clearInputFields()"><i class="fa-solid fa-eraser"></i> Clear Fields</button>
                  </div>
             </div>
 
@@ -167,6 +168,14 @@
         </div>
     </div>
 
+    <!-- Unlock Tab Notice Popup -->
+    <div id="unlock-notice-popup" class="popup notice-popup">
+        <h3><i class="fa-solid fa-info-circle"></i> Notice</h3>
+        <p>The 'Unlock using Database' feature scans the avatar file against a database of known lock signatures. This can help unlock avatars even if the locking components are hidden, renamed, or scrambled.</p>
+        <div class="popup-timer">Closing in <span id="notice-timer">10</span>s...</div>
+        <button onclick="closeUnlockNotice()">Close</button>
+    </div>
+
     <!-- Keep the Photino communication script -->
     <script src="app://dynamic.js"></script>
     <!-- External script for button actions -->
@@ -181,12 +190,15 @@
         const animationsToggle = document.getElementById('animations-toggle');
         const userIdInput = document.getElementById('user-id');
         const censorUserIdToggle = document.getElementById('censor-user-id');
+        const avatarIdInput = document.getElementById('avatar-id'); // Cache Avatar ID input
         const responseSpan = document.getElementById('dotnet-response');
         const colorPickers = document.querySelectorAll('input[type="color"]');
         const htmlElement = document.documentElement; // Target for CSS vars
         const actionPopup = document.getElementById('action-popup');
         const popupTitle = document.getElementById('popup-title');
         const popupMessage = document.getElementById('popup-message');
+        const unlockNoticePopup = document.getElementById('unlock-notice-popup'); // Cache notice popup
+        const noticeTimerSpan = document.getElementById('notice-timer'); // Cache notice timer span
         const sidebarToggle = document.getElementById('sidebar-toggle'); // Cache toggle button
         const loadedAvatarInfoPanel = document.getElementById('loaded-avatar-info-panel'); // Cache info panel
         const loadedAvatarIdSpan = document.getElementById('loaded-avatar-id');
@@ -231,9 +243,11 @@
         let isAvatarLoaded = false;
         let loadedAvatarId = null;
         let loadedUserId = null;
+        let noticeShownThisSession = false; // Flag for unlock notice
+        let noticeTimerInterval = null; // Variable to hold the timer interval
 
         // --- Helper Functions ---
-        function applyTheme(themeSettings) {
+        function applyTheme(themeSettings, saveToLocalStorage = true) {
             Object.keys(themeSettings).forEach(key => {
                  // Only apply if the key exists in the theme object
                  if (themeSettings.hasOwnProperty(key)) {
@@ -246,6 +260,48 @@
             }
              // Update color pickers to reflect the applied theme
              updateColorPickers();
+
+             // --- Save Theme State ---
+             if (saveToLocalStorage) {
+                 // Check if the applied theme matches a known preset exactly
+                 let matchedPreset = null;
+                 for (const name in themes) {
+                     // Compare applied theme properties against merged default+preset
+                     const presetFull = { ...defaultTheme, ...themes[name] };
+                     let isMatch = true;
+                     Object.keys(presetFull).forEach(key => {
+                         if (themeSettings[key] !== presetFull[key]) {
+                             isMatch = false;
+                         }
+                     });
+                      if (isMatch && Object.keys(themeSettings).length === Object.keys(presetFull).length) {
+                         matchedPreset = name;
+                         break;
+                     }
+                 }
+
+                 if (matchedPreset) {
+                     console.log(`Saving applied theme as preset: ${matchedPreset}`);
+                     localStorage.setItem('themeType', 'preset');
+                     localStorage.setItem('themeName', matchedPreset);
+                     // Clear any potential leftover custom color keys
+                     colorPickers.forEach(picker => {
+                         const cssVar = picker.getAttribute('data-var');
+                         localStorage.removeItem(`customColor_${cssVar}`);
+                     });
+                 } else {
+                     console.log("Saving applied theme as custom.");
+                     localStorage.setItem('themeType', 'custom');
+                     localStorage.removeItem('themeName'); // Remove preset name
+                     // Save individual colors
+                     Object.keys(themeSettings).forEach(key => {
+                          // Only save keys that correspond to color pickers
+                         if (key.startsWith('--')) { // Basic check for CSS vars
+                            localStorage.setItem(`customColor_${key}`, themeSettings[key]);
+                         }
+                     });
+                 }
+             }
         }
 
         function updateColorPickers() {
@@ -274,8 +330,30 @@
         // --- Initialization ---
         function initialize() {
             // Set default dark theme immediately (CSS vars are already set in CSS)
-            updateColorPickers(); // Set pickers to initial values
-            updateAccentRgbVar(getComputedStyle(htmlElement).getPropertyValue('--accent-color').trim()); // Set initial RGB var
+            // --- Load Theme ---
+            const savedThemeType = localStorage.getItem('themeType');
+            const savedThemeName = localStorage.getItem('themeName');
+            let themeToApply = { ...defaultTheme }; // Start with default
+
+            if (savedThemeType === 'preset' && savedThemeName && themes[savedThemeName]) {
+                console.log(`Initializing with saved preset theme: ${savedThemeName}`);
+                themeToApply = { ...defaultTheme, ...themes[savedThemeName] }; // Merge preset
+            } else if (savedThemeType === 'custom') {
+                console.log("Initializing with saved custom theme settings.");
+                // Load individual custom colors
+                colorPickers.forEach(picker => {
+                    const cssVar = picker.getAttribute('data-var');
+                    const savedColor = localStorage.getItem(`customColor_${cssVar}`);
+                    if (savedColor) {
+                        themeToApply[cssVar] = savedColor;
+                    }
+                });
+            } else {
+                console.log("Initializing with default theme (Dodger Blue).");
+            }
+            applyTheme(themeToApply, false); // Apply loaded/default theme without saving again
+            // updateColorPickers(); // This is now called within applyTheme
+            // updateAccentRgbVar(...); // This is now called within applyTheme
 
             // Sidebar state (optional persistence)
             const sidebarExpanded = localStorage.getItem('sidebarExpanded') === 'true';
@@ -295,6 +373,23 @@
              if (savedCensorPref !== null) {
                 censorUserIdToggle.checked = JSON.parse(savedCensorPref);
                 userIdInput.type = censorUserIdToggle.checked ? 'password' : 'text';
+            }
+
+            // --- Load Notice State ---
+            const noticeAlreadyShown = localStorage.getItem('unlockNoticeShown') === 'true';
+            if (noticeAlreadyShown) {
+                noticeShownThisSession = true; // Prevent notice from showing again
+                console.log("Unlock notice has been shown in a previous session.");
+            }
+
+            // Load cached Avatar and User IDs
+            const savedAvatarId = localStorage.getItem('avatarId');
+            const savedUserId = localStorage.getItem('userId');
+            if (savedAvatarId) {
+                avatarIdInput.value = savedAvatarId;
+            }
+            if (savedUserId) {
+                userIdInput.value = savedUserId;
             }
 
             // Initial state for Unlock tab
@@ -338,7 +433,15 @@
 
                 button.classList.add('active');
                 const tabId = button.getAttribute('data-tab');
-                document.getElementById(`${tabId}-tab`).classList.add('active');
+                const targetPanel = document.getElementById(`${tabId}-tab`);
+                if (targetPanel) {
+                    targetPanel.classList.add('active');
+                }
+
+                // Show notice if Unlock tab is selected and notice hasn't been shown
+                if (tabId === 'unlock' && !noticeShownThisSession) {
+                    showUnlockNotice();
+                }
             });
         });
 
@@ -367,13 +470,24 @@
                      updateAccentRgbVar(newColor);
                 }
                 // Removed automatic setting of --accent-hover-color here
-                // Note: Persisting theme changes requires more logic (e.g., localStorage)
+                // Save the custom change
+                localStorage.setItem('themeType', 'custom');
+                localStorage.setItem(`customColor_${cssVar}`, newColor);
+                localStorage.removeItem('themeName'); // It's custom now
+                console.log(`Saved custom color ${cssVar}: ${newColor}`);
             });
         });
 
         function resetTheme() {
              console.log("Resetting to default theme (Dodger Blue)");
-             applyTheme(themes.dodgerblue);
+             // --- Clear Saved Theme ---
+             localStorage.removeItem('themeType');
+             localStorage.removeItem('themeName');
+             colorPickers.forEach(picker => {
+                 const cssVar = picker.getAttribute('data-var');
+                 localStorage.removeItem(`customColor_${cssVar}`);
+             });
+             applyTheme(themes.dodgerblue); // This will re-save it as the 'dodgerblue' preset
         }
 
         window.external.receiveMessage(message => {
@@ -382,6 +496,11 @@
                 responseSpan.textContent = message;
              }
              // TODO: Parse message if it's structured (e.g., JSON)
+             // Handle potential responses related to popups if needed
+             // Example: maybe close a specific popup based on a .NET message
+             if (message === "ActionCompleteClosePopup") {
+                  closePopup(); // Close the generic action popup
+             }
         });
 
         function updateUnlockUI() {
@@ -429,7 +548,15 @@
                     console.log(`Applying preset theme: ${presetName}`);
                     // Merge preset with default to ensure all vars are set
                     const fullTheme = { ...themes.dodgerblue, ...themes[presetName] };
-                    applyTheme(fullTheme);
+                    applyTheme(fullTheme, true);
+                    // Save preset choice explicitly
+                    localStorage.setItem('themeType', 'preset');
+                    localStorage.setItem('themeName', presetName);
+                    // Clear custom color keys
+                    colorPickers.forEach(picker => {
+                        const cssVar = picker.getAttribute('data-var');
+                        localStorage.removeItem(`customColor_${cssVar}`);
+                    });
                 }
             });
         });
@@ -475,6 +602,15 @@
                     // Add any other keys you might store in the future
                     // localStorage.clear(); // Alternatively, clear everything (use with caution)
                    
+                    // --- Clear Theme & Notice Cache ---
+                    localStorage.removeItem('themeType');
+                    localStorage.removeItem('themeName');
+                    localStorage.removeItem('unlockNoticeShown');
+                    colorPickers.forEach(picker => {
+                         const cssVar = picker.getAttribute('data-var');
+                         localStorage.removeItem(`customColor_${cssVar}`);
+                    });
+                   
                     // Reload the page
                     window.location.reload();
                 } catch (error) {
@@ -484,6 +620,66 @@
             } else {
                 console.log("Clear cache and reload cancelled.");
             }
+        }
+
+        // --- Unlock Notice Popup Logic ---
+        function closeUnlockNotice() {
+             if (unlockNoticePopup) {
+                 unlockNoticePopup.classList.remove('show');
+                 // Clear the interval timer if it's running
+                 if (noticeTimerInterval) {
+                     clearInterval(noticeTimerInterval);
+                     noticeTimerInterval = null; // Clear the interval ID
+                     console.log("Unlock notice popup closed manually.");
+                 }
+             }
+        }
+
+        function showUnlockNotice() {
+            if (unlockNoticePopup && !noticeShownThisSession) {
+                noticeShownThisSession = true;
+                // --- Save Notice State ---
+                localStorage.setItem('unlockNoticeShown', 'true');
+                console.log("Showing unlock notice popup.");
+ 
+                let secondsLeft = 20; // Changed timer to 20 seconds
+                noticeTimerSpan.textContent = secondsLeft;
+                unlockNoticePopup.classList.add('show');
+ 
+                // Clear any existing timer before starting a new one
+                if (noticeTimerInterval) {
+                    clearInterval(noticeTimerInterval);
+                }
+ 
+                noticeTimerInterval = setInterval(() => {
+                    secondsLeft--;
+                    if (noticeTimerSpan) { // Check if span still exists
+                      noticeTimerSpan.textContent = secondsLeft;
+                    }
+                    if (secondsLeft <= 0) {
+                        // Use the close function to ensure timer is cleared properly
+                        closeUnlockNotice();
+                    }
+                }, 1000); // Update every second
+            }
+        }
+
+        // --- Input Caching --- Add Listeners
+        avatarIdInput.addEventListener('input', (event) => {
+            localStorage.setItem('avatarId', event.target.value);
+        });
+
+        userIdInput.addEventListener('input', (event) => {
+            localStorage.setItem('userId', event.target.value);
+        });
+
+        // --- Clear Input Fields Logic ---
+        function clearInputFields() {
+            console.log("Clearing Avatar and User ID fields and cache.");
+            avatarIdInput.value = '';
+            userIdInput.value = '';
+            localStorage.removeItem('avatarId');
+            localStorage.removeItem('userId');
         }
 
     </script>
