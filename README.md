@@ -22,15 +22,4 @@ AvatarLockpick is user friendly tool for unlocking VRChat avatars. It works by s
 <img src="https://github.com/scrim-dev/AvatarLockpick/blob/master/AppSample/Medal_pWViultzXZ.png" width="600" alt="Alt text">
 
 ## Getting Started
-It's super easy to get started with AvatarLockpick! Here's what you need to do:
-
-1. Launch VRChat and let it load up
-2. Open AvatarLockpick while VRChat is running
-3. Enter your User ID and the Avatar ID you want to unlock
-4. Choose your unlocking option:
-   - **Unlock**: Unlock just one avatar in your cache.
-   - **Unlock All**: Unlocks all avatars in your cache.
-
-That's it! Now you're ready to run around with your favorite avatars!
-
-Still confused? Head over to [HELP](https://github.com/scrim-dev/AvatarLockpick/blob/master/HELP.md)
+Read this: ℹ️[Help Me](https://github.com/scrim-dev/AvatarLockpick/blob/master/HELP.md)
