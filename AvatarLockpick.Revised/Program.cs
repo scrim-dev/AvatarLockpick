@@ -17,6 +17,8 @@ namespace AvatarLockpick.Revised
         [STAThread]
         static void Main(string[] args)
         {
+            AppLog.SetupLogFile();
+
             ConsoleSetup.Init();
             Console.Title = "AvatarLockpick App";
             AppLog.Warn("Startup", "Loading Application...");
@@ -82,6 +84,21 @@ namespace AvatarLockpick.Revised
                 AppLog.Warn("Startup", "Do not close the console as it is needed. If you'd like to hide it open" +
                     " the hideconsole.txt file in the 'GUI' folder and change it from false to true. Then close and reopen the app.");
                 AppLog.Success("Startup", "App Loaded!");
+
+                ConsoleSetup.OnExit += () =>
+                {
+                    if (AppLog.ClearLogsOnExit)
+                    {
+                        if (Directory.Exists($"GUI\\Logs"))
+                        {
+                            try { Directory.Delete($"GUI\\Logs", true); } catch { }
+                        }
+                    }
+                };
+
+                window.SetChromeless(false);
+                window.SetDevToolsEnabled(false);
+                window.SetIconFile($"GUI\\assets\\unlockicon.ico");
                 window.WaitForClose(); // Starts the application event loop
             }
         }

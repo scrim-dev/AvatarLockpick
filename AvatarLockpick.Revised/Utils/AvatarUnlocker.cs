@@ -247,22 +247,6 @@ namespace AvatarLockpick.Revised.Utils
             MessageBoxUtils.ShowWarning("This function isn't finished and is usually buggy.\n" +
                     "Therefor it's disabled. I will rework it in future.\n\n(Avatars Not Unlocked)");
             //To do
-            /*try
-            {
-                string avatarPath = GetVRChatAvatarPath(AID);
-
-                if (!Directory.Exists(avatarPath))
-                {
-                    AppLog.Error($"Avatar directory not found for user ID: {UID}");
-                }
-
-                string[] avatarFiles = Directory.GetFiles(avatarPath);
-                bool anyAvatarUnlocked = false;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error($"Error unlocking avatars: {ex.Message}", ex);
-            }*/
         }
 
         private static void UnlockVRCF(string UID, string AID)
@@ -537,7 +521,7 @@ namespace AvatarLockpick.Revised.Utils
                                         {
                                             param["value"] = new JValue(1);
                                             wasUnlocked = true;
-                                            AppLog.Success("JSON", "Changed value to 0");
+                                            AppLog.Success("JSON", "Changed value to 1");
                                         }
                                         MessageBoxUtils.ShowInfo("Avatar should be unlocked. If not try again or contact me for support.", "Nice!");
                                     }
