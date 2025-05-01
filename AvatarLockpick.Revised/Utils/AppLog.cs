@@ -9,7 +9,7 @@ namespace AvatarLockpick.Revised.Utils
 {
     internal class AppLog
     {
-        public static bool ClearLogsOnExit = true;
+        public static bool ClearLogsOnExit = false;
         public static string? LogFilePath { get; private set; }
         public static void SetupLogFile()
         {
@@ -31,6 +31,8 @@ namespace AvatarLockpick.Revised.Utils
                 try { File.WriteAllText($"GUI\\Logs\\{LogFile}", "LOGS:\n"); } catch { }
                 LogFilePath = $"GUI\\Logs\\{LogFile}";
             }
+
+            try { File.WriteAllText("GUI\\ClearLogs.txt", "false"); } catch { }
         }
 
         public static void Log(string CurrentTask, string Message)

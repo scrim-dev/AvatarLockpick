@@ -6,3 +6,6 @@ unlock
 lock
 locked
 VRCF Lock/Lock
+Unlocked NSFW
+Lock NSFW
+NSFW

@@ -7,7 +7,7 @@ namespace AvatarLockpick.Revised
 {
     internal class Program
     {
-        public static string AppVersion = "2.0";
+        public static string AppVersion = "2.1";
         public static HttpUtils HttpC { get; private set; } = new();
         // A unique name for the mutex to ensure only one instance runs.
         private const string AppMutexName = "Global\\AvatarLockpickRevised_Mutex_2A7B9C1D";
@@ -84,6 +84,8 @@ namespace AvatarLockpick.Revised
                 AppLog.Warn("Startup", "Do not close the console as it is needed. If you'd like to hide it open" +
                     " the hideconsole.txt file in the 'GUI' folder and change it from false to true. Then close and reopen the app.");
                 AppLog.Success("Startup", "App Loaded!");
+
+                try { AppLog.ClearLogsOnExit = bool.Parse(File.ReadAllText("GUI\\ClearLogs.txt")); } catch { AppLog.ClearLogsOnExit = false; }
 
                 ConsoleSetup.OnExit += () =>
                 {
