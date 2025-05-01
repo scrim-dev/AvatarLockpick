@@ -9,3 +9,5 @@ VRCF Lock/Lock
 Unlocked NSFW
 Lock NSFW
 NSFW
+locker
+unlocker
