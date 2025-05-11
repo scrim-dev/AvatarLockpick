@@ -11,3 +11,5 @@ Lock NSFW
 NSFW
 locker
 unlocker
+VRCF Lock/Password Version
+Password
