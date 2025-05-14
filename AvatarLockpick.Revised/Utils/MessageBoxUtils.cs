@@ -8,8 +8,6 @@ namespace AvatarLockpick.Revised.Utils
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern int MessageBox(IntPtr hWnd, string lpText, string lpCaption, uint uType);
 
-        // Define MessageBox constants (subset)
-        // For uType parameter
         // Buttons
         private const uint MB_OK = 0x00000000U;
         private const uint MB_OKCANCEL = 0x00000001U;
@@ -22,13 +20,10 @@ namespace AvatarLockpick.Revised.Utils
         private const uint MB_ICONWARNING = 0x00000030U;
         private const uint MB_ICONINFORMATION = 0x00000040U;
 
-        // Optional: Default Button (e.g., MB_DEFBUTTON1, MB_DEFBUTTON2)
-
-        // Return values (though we aren't capturing them in the helpers)
-        // private const int IDOK = 1;
-        // private const int IDCANCEL = 2;
-        // private const int IDYES = 6;
-        // private const int IDNO = 7;
+        private const int IDOK = 1;
+        private const int IDCANCEL = 2;
+        private const int IDYES = 6;
+        private const int IDNO = 7;
 
         /// <summary>
         /// Displays a native Windows message box.
@@ -71,6 +66,34 @@ namespace AvatarLockpick.Revised.Utils
         public static void ShowInfo(string text, string caption = "Information")
         {
             Show(text, caption, MB_OK | MB_ICONINFORMATION);
+        }
+
+        /// <summary>
+        /// Displays a question message box WITH delegates.
+        /// </summary>
+        /// <param name="text">The information message text.</param>
+        /// <param name="caption">The title bar text.</param>
+        public static void ShowQuestion(string text, string caption,
+                                      Action onYes, Action ?onNo = null,
+                                      bool defaultNo = false)
+        {
+            uint flags = MB_YESNO | MB_ICONQUESTION;
+
+            if (defaultNo)
+            {
+                flags |= 0x00000100U;
+            }
+
+            int result = Show(text, caption, flags);
+
+            if (result == IDYES)
+            {
+                onYes?.Invoke();
+            }
+            else if (result == IDNO)
+            {
+                onNo?.Invoke();
+            }
         }
     }
 } 
