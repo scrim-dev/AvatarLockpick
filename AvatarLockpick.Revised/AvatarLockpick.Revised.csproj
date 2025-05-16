@@ -26,11 +26,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="GUI\**" />
+    <None Remove="HTML\AppStyle.css" />
+    <None Remove="HTML\ButtonCalls.js" />
+    <None Remove="HTML\index.html" />
+    <None Remove="HTML\unlockicon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="HTML\AppStyle.css" />
+    <EmbeddedResource Include="HTML\ButtonCalls.js" />
+    <EmbeddedResource Include="HTML\index.html" />
+    <EmbeddedResource Include="HTML\unlockicon.ico" />
     <EmbeddedResource Include="unlockicon.ico" />
-    <None Update="GUI\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   
   <ItemGroup>
