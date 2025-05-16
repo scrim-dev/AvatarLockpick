@@ -17,6 +17,7 @@ namespace AvatarLockpick.Revised
         [STAThread]
         static void Main(string[] args)
         {
+            Console.Title = "Loading app...";
             VersionChecker.CheckForUpdates();
 
             AppLog.SetupLogFile();

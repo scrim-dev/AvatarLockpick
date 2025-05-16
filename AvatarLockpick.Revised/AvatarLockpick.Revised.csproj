@@ -8,7 +8,7 @@
     <Nullable>enable</Nullable>
     <_SuppressWinFormsTrimError>true</_SuppressWinFormsTrimError>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <PublishAot>True</PublishAot>
+    <PublishAot>False</PublishAot>
     <Authors>ScrimDev</Authors>
     <Company>ScrimDev</Company>
     <Copyright>Scrimmane</Copyright>
@@ -18,7 +18,10 @@
     <ApplicationIcon>unlockicon.ico</ApplicationIcon>
     <UseWindowsForms>False</UseWindowsForms>
     <UseWPF>False</UseWPF>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+    <PublishTrimmed>True</PublishTrimmed>
+    <Description>A tool for unlocking VRChat Avatars</Description>
   </PropertyGroup>
 
   <ItemGroup>
