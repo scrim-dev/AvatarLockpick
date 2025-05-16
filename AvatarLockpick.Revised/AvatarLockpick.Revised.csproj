@@ -20,8 +20,9 @@
     <UseWPF>False</UseWPF>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <PlatformTarget>x64</PlatformTarget>
-    <PublishTrimmed>True</PublishTrimmed>
+    <PublishTrimmed>False</PublishTrimmed>
     <Description>A tool for unlocking VRChat Avatars</Description>
+    <PackageProjectUrl>https://github.com/scrim-dev/AvatarLockpick</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
