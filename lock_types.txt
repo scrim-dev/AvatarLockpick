@@ -1,7 +1,5 @@
 R18/unlock
-4hh8mh6q85GR52p05DB
-9GQx7BW8lm
-01Erm75CL36HI20I
+R18/lock
 unlock
 lock
 locked
@@ -13,3 +11,4 @@ locker
 unlocker
 VRCF Lock/Password Version
 Password
+Password Lock
