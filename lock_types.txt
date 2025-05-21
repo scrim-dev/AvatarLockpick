@@ -12,3 +12,7 @@ unlocker
 VRCF Lock/Password Version
 Password
 Password Lock
+VF123_SecurityLockMenu
+VF123_SecurityLockSync
+Lock Sync
+Avatar Lock
