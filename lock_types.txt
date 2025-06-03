@@ -22,3 +22,5 @@ VF131_SecurityLockSync
 VF131_SecurityLockMenu
 SecurityLockSync
 SecurityLockMenu
+unlock_avatar
+unlock avatar
