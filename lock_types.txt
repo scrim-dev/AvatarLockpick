@@ -18,3 +18,7 @@ Lock Sync
 Avatar Lock
 VF138_SecurityLockSync
 VF138_SecurityLockMenu
+VF131_SecurityLockSync
+VF131_SecurityLockMenu
+SecurityLockSync
+SecurityLockMenu
