@@ -24,3 +24,5 @@ SecurityLockSync
 SecurityLockMenu
 unlock_avatar
 unlock avatar
+PasswordInput
+Password_Input
