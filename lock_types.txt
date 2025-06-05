@@ -26,3 +26,8 @@ unlock_avatar
 unlock avatar
 PasswordInput
 Password_Input
+Ad
+AD
+18plus
+18+
+Unlock NSFW
