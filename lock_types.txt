@@ -32,3 +32,6 @@ Ad
 Unlock NSFW
 MenuLock
 LockInput
+VF151_SecurityLockSync
+VF151_SecurityLockMenu
+VF128_
