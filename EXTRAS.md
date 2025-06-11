@@ -1,5 +1,19 @@
 # Extra Information
 
+## ⚠️ Important Note
+> **This tool is NOT associated with VRChat Inc. in any way.**
+> 
+> AvatarLockpick is completely safe to use as it:
+> - Only scans your local VRChat cache files
+> - Never modifies the game or its processes
+> - Runs entirely as an external application
+> - Does not interact with VRChat's runtime
+> 
+> Using this tool will NOT result in a ban as it operates within VRChat's Terms of Service by only reading locally cached files.
+>
+> Also beware that some avatars have locks that are scrambled or hidden so some avatars may not unlock fully. (I will try my best to figure out ways to still unlock these avatars)
+
+## ⚠️ False Positives
 You may have encountered a warning from Windows Defender or other anti-virus (AV) software when downloading or running my application. I understand this can be concerning, but please be assured: **my open-source applications are safe to use when downloaded directly from my official GitHub repositories.**
 
 ## Why is this happening?
