@@ -75,14 +75,14 @@ namespace AvatarLockpick.Revised.Utils
                 DeleteMenu(sysMenu, SC_MAXIMIZE, MF_BYCOMMAND);
             }
 
-            if (!File.Exists($"{AppFolders.DataLowFolder}\\hideconsole.txt"))
+            if (!File.Exists($"UI\\hideconsole.txt"))
             {
-                try { File.WriteAllText($"{AppFolders.DataLowFolder}\\hideconsole.txt", "false"); } catch { }
+                try { File.WriteAllText($"UI\\hideconsole.txt", "false"); } catch { }
             }
 
             try
             {
-                if (File.ReadAllText($"{AppFolders.DataLowFolder}\\hideconsole.txt") == "true")
+                if (File.ReadAllText($"UI\\hideconsole.txt") == "true")
                 {
                     if (handle != IntPtr.Zero)
                     {

@@ -21,15 +21,11 @@ namespace AvatarLockpick.Revised
             Console.Title = "Loading app...";
             VersionChecker.CheckForUpdates();
 
-            AppFolders.Load();
-
             AppLog.SetupLogFile();
 
             ConsoleSetup.Init();
             Console.Title = "AvatarLockpick App";
             AppLog.Warn("Startup", "Loading Application...");
-
-            ExtractResources($"{AppFolders.DataLowFolder}\\App");
 
             // Try to grab the mutex
             using (Mutex mutex = new Mutex(true, AppMutexName, out bool createdNew))
@@ -41,11 +37,11 @@ namespace AvatarLockpick.Revised
                     return; // Exit the application
                 }
 
-                if (!File.Exists($"{AppFolders.DataLowFolder}\\no_startup_warn.scrim"))
+                if (!File.Exists($"UI\\no_startup_warn.scrim"))
                 {
                     MessageBoxUtils.ShowWarning("If you run into any bugs, issues or crashes contact me on discord:\nscrimmane (679060175440707605)" +
                     "\nOr post an 'issue' on github!", "Hey!");
-                    try { File.WriteAllText($"{AppFolders.DataLowFolder}\\no_startup_warn.scrim", "cached"); } catch { /*Nothing*/ }
+                    try { File.WriteAllText($"UI\\no_startup_warn.scrim", "cached"); } catch { }
                 }
 
                 HttpC.Load();
@@ -87,69 +83,31 @@ namespace AvatarLockpick.Revised
                         //Send data to be processed
                         GUIcom.Communication(message);
                     })
-                    .Load($"{AppFolders.DataLowFolder}\\App\\index.html"); // Can be used with relative path strings or "new URI()" instance to load a website.
+                    .Load($"UI\\index.html"); // Can be used with relative path strings or "new URI()" instance to load a website.
 
                 Thread.Sleep(1200);
                 Console.Clear();
                 AppLog.Warn("Startup", "Do not close the console as it is needed. If you'd like to hide it open " +
-                    $"the hideconsole.txt file in the '{AppFolders.DataLowFolder}' folder and change it from false to true. Then close and reopen the app.");
+                    $"the hideconsole.txt file in the 'UI' folder and change it from false to true. Then close and reopen the app.");
                 AppLog.Success("Startup", "App Loaded!");
 
-                try { AppLog.ClearLogsOnExit = bool.Parse(File.ReadAllText($"{AppFolders.DataLowFolder}\\ClearLogs.txt")); } catch { AppLog.ClearLogsOnExit = false; }
+                try { AppLog.ClearLogsOnExit = bool.Parse(File.ReadAllText($"UI\\ClearLogs.txt")); } catch { AppLog.ClearLogsOnExit = false; }
 
                 ConsoleSetup.OnExit += () =>
                 {
                     if (AppLog.ClearLogsOnExit)
                     {
-                        if (Directory.Exists($"{AppFolders.DataLowFolder}\\Logs"))
+                        if (Directory.Exists($"UI\\Logs"))
                         {
-                            try { Directory.Delete($"{AppFolders.DataLowFolder}\\Logs", true); } catch { }
+                            try { Directory.Delete($"UI\\Logs", true); } catch { }
                         }
                     }
                 };
 
                 window.SetChromeless(false);
                 window.SetDevToolsEnabled(false);
-                window.SetIconFile($"{AppFolders.DataLowFolder}\\App\\unlockicon.ico");
+                window.SetIconFile($"UI\\unlockicon.ico");
                 window.WaitForClose(); // Starts the application event loop
-            }
-        }
-
-        private static void ExtractResources(string outputDirectory)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            string resourcePrefix = $"{assembly.GetName().Name}.HTML.";
-
-            // Map resource names to output paths
-            var resources = new Dictionary<string, string>
-        {
-            { $"{resourcePrefix}index.html", Path.Combine(outputDirectory, "index.html") },
-            { $"{resourcePrefix}AppStyle.css", Path.Combine(outputDirectory, "AppStyle.css") },
-            { $"{resourcePrefix}ButtonCalls.js", Path.Combine(outputDirectory, "ButtonCalls.js") },
-            { $"{resourcePrefix}unlockicon.ico", Path.Combine(outputDirectory, "unlockicon.ico") }
-        };
-
-            foreach (var resource in resources)
-            {
-                try
-                {
-                    // Create directory if needed
-                    Directory.CreateDirectory(Path.GetDirectoryName(resource.Value));
-
-                    using (Stream stream = assembly.GetManifestResourceStream(resource.Key))
-                    using (FileStream fileStream = File.Create(resource.Value))
-                    {
-                        if (stream == null)
-                            throw new FileNotFoundException($"Embedded resource not found: {resource.Key}");
-
-                        stream.CopyTo(fileStream);
-                    }
-                    Console.WriteLine($"Extracted: {resource.Value}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to extract {resource.Key}: {ex.Message}");
-                }
             }
         }
     }

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35617.110
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvatarLockpick", "AvatarLockpick\AvatarLockpick.csproj", "{AF545187-5E26-474C-97C1-25E95799D44C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvatarLockpick-Legacy", "AvatarLockpick\AvatarLockpick-Legacy.csproj", "{AF545187-5E26-474C-97C1-25E95799D44C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvatarLockpick.Revised", "AvatarLockpick.Revised\AvatarLockpick.Revised.csproj", "{8D8AF4BF-0400-47AC-9E7D-003DD12C6816}"
 EndProject

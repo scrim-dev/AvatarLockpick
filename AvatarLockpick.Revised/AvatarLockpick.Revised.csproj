@@ -26,17 +26,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="HTML\AppStyle.css" />
-    <None Remove="HTML\ButtonCalls.js" />
-    <None Remove="HTML\index.html" />
-    <None Remove="HTML\unlockicon.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="HTML\AppStyle.css" />
-    <EmbeddedResource Include="HTML\ButtonCalls.js" />
-    <EmbeddedResource Include="HTML\index.html" />
-    <EmbeddedResource Include="HTML\unlockicon.ico" />
     <EmbeddedResource Include="unlockicon.ico" />
   </ItemGroup>
   
@@ -44,6 +33,21 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Pastel" Version="6.0.1" />
     <PackageReference Include="Photino.NET" Version="4.0.16" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="UI\AppStyle.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UI\AppScript.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UI\index.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UI\unlockicon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

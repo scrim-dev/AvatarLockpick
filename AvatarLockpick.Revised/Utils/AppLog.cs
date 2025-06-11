@@ -15,24 +15,24 @@ namespace AvatarLockpick.Revised.Utils
         {
             var LogFile = $"Log_{DateTime.Now:d}_{DateTime.Now:HH.mm.ss}.txt".Replace("/", "_");
 
-            if (!Directory.Exists($"{AppFolders.DataLowFolder}\\Logs"))
+            if (!Directory.Exists($"UI\\Logs"))
             {
-                try { Directory.CreateDirectory($"{AppFolders.DataLowFolder}\\Logs"); } 
+                try { Directory.CreateDirectory($"UI\\Logs"); } 
                 catch(Exception ex)
                 {
                     MessageBoxUtils.ShowError(ex.Message);
                 }
 
-                try { File.WriteAllText($"{AppFolders.DataLowFolder}\\Logs\\{LogFile}", "LOGS:\n"); } catch { }
-                LogFilePath = $"{AppFolders.DataLowFolder}\\Logs\\{LogFile}";
+                try { File.WriteAllText($"UI\\Logs\\{LogFile}", "LOGS:\n"); } catch { }
+                LogFilePath = $"UI\\Logs\\{LogFile}";
             }
             else
             {
-                try { File.WriteAllText($"{AppFolders.DataLowFolder}\\Logs\\{LogFile}", "LOGS:\n"); } catch { }
-                LogFilePath = $"{AppFolders.DataLowFolder}\\Logs\\{LogFile}";
+                try { File.WriteAllText($"UI\\Logs\\{LogFile}", "LOGS:\n"); } catch { }
+                LogFilePath = $"UI\\Logs\\{LogFile}";
             }
 
-            try { File.WriteAllText($"{AppFolders.DataLowFolder}\\ClearLogs.txt", "false"); } catch { }
+            try { File.WriteAllText($"UI\\ClearLogs.txt", "false"); } catch { }
         }
 
         public static void Log(string CurrentTask, string Message)

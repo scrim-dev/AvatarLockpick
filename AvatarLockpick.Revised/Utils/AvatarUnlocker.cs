@@ -1,15 +1,16 @@
-﻿using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.System;
-using System.Net;
 using static System.Net.WebRequestMethods;
 
 namespace AvatarLockpick.Revised.Utils
@@ -17,6 +18,7 @@ namespace AvatarLockpick.Revised.Utils
     internal class AvatarUnlocker
     {
         //I can honestly do this better but it doesn't matter it works
+
         /// <summary>
         /// Starts unlock process for each type
         /// [1 = Unlock]
@@ -24,7 +26,6 @@ namespace AvatarLockpick.Revised.Utils
         /// [3 = Unlock VRCF]
         /// [4 = Attempt to unlock lock types from db]
         /// </summary>
-
         public static void Start(int Type, string UserID, string AvatarID)
         {
             Console.WriteLine("Console Loaded!");
@@ -99,6 +100,8 @@ namespace AvatarLockpick.Revised.Utils
                 AppLog.Log("JSON", $"Raw JSON content: {jsonContent}");
 
                 bool wasUnlocked = false;
+
+                wasUnlocked = TargetVF(jsonContent);
 
                 try
                 {
@@ -223,14 +226,12 @@ namespace AvatarLockpick.Revised.Utils
 
                 if (wasUnlocked)
                 {
-                    AppLog.Warn("JSON", "No locked properties found or all properties were already unlocked");
-                    //return false;
-                    MessageBoxUtils.ShowInfo("Avatar not unlocked, no value found. Maybe try again?", "Awww!");
+                    AppLog.Success("JSON", "Avatar unlocked!");
+                    MessageBoxUtils.ShowInfo("Avatar unlocked", "Unlocked");
                 }
                 else
                 {
                     AppLog.Warn("JSON", "No locked properties found or all properties were already unlocked");
-                    //return false;
                     MessageBoxUtils.ShowInfo("Avatar not unlocked, no value found. Maybe try again?", "Awww!");
                 }
             }
@@ -241,12 +242,10 @@ namespace AvatarLockpick.Revised.Utils
             }
         }
 
+        //Need to finish.
         private static void UnlockAll(string UID, string AID)
         {
-            AppLog.Log("UnlockAllAvatars", "Starting unlock process...");
-            MessageBoxUtils.ShowWarning("This function isn't finished and is usually buggy.\n" +
-                    "Therefor it's disabled. I will rework it in future.\n\n(Avatars Not Unlocked)");
-            //To do
+            return;
         }
 
         private static void UnlockVRCF(string UID, string AID)
@@ -302,6 +301,11 @@ namespace AvatarLockpick.Revised.Utils
                             normalizedName = normalizedName.Trim(); // Also trim any remaining whitespace
 
                             AppLog.Log("JSON", $"Checking parameter: {nameProperty} (normalized: {normalizedName})");
+
+                            /*if (normalizedName.Contains("_SecurityLockSync"))
+                            {
+                                AppLog.Log("VF", $"Found VF locked parameter with name: {nameProperty}");
+                            }*/
 
                             if (normalizedName.Equals("locked", StringComparison.OrdinalIgnoreCase))
                             {
@@ -403,15 +407,13 @@ namespace AvatarLockpick.Revised.Utils
 
                 if (wasUnlocked)
                 {
-                    AppLog.Warn("JSON", "No locked properties found or all properties were already unlocked");
-                    //return false;
-                    MessageBoxUtils.ShowInfo("Avatar not unlocked, no value found. Maybe try again?\n(It could also be unlocked already!)", "Awww!");
+                    AppLog.Success("JSON", "Avatar unlocked!");
+                    MessageBoxUtils.ShowInfo("Avatar unlocked", "Unlocked");
                 }
                 else
                 {
                     AppLog.Warn("JSON", "No locked properties found or all properties were already unlocked");
-                    //return false;
-                    MessageBoxUtils.ShowInfo("Avatar not unlocked, no value found. Maybe try again?\n(It could also be unlocked already!)", "Awww!");
+                    MessageBoxUtils.ShowInfo("Avatar not unlocked, no value found. Maybe try again?", "Awww!");
                 }
             }
             catch (Exception ex)
@@ -484,6 +486,8 @@ namespace AvatarLockpick.Revised.Utils
                     // First try to parse as a single object
                     JObject jsonObj = JObject.Parse(jsonContent);
                     AppLog.Success("JSON", "Successfully parsed JSON as object");
+
+                    wasUnlocked = TargetVF(jsonContent);
 
                     // Get the animationParameters array
                     var animParams = jsonObj["animationParameters"] as JArray;
@@ -612,13 +616,13 @@ namespace AvatarLockpick.Revised.Utils
 
                 if (wasUnlocked)
                 {
-                    AppLog.Warn("JSON", "No locked properties found or all properties were already unlocked");
-                    //return false;
+                    AppLog.Success("JSON", "Avatar unlocked!");
+                    MessageBoxUtils.ShowInfo("Avatar unlocked", "Unlocked");
                 }
                 else
                 {
                     AppLog.Warn("JSON", "No locked properties found or all properties were already unlocked");
-                    //return false;
+                    MessageBoxUtils.ShowInfo("Avatar not unlocked, no value found. Maybe try again?", "Awww!");
                 }
             }
             catch (Exception ex)
@@ -626,6 +630,44 @@ namespace AvatarLockpick.Revised.Utils
                 AppLog.Error("ERR", $"Error: {ex.Message}");
                 AppLog.Error("ST", $"Stack trace: {ex.StackTrace}");
             }
+        }
+
+        public static bool TargetVF(string jsonString)
+        {
+            try
+            {
+                var jsonObj = JObject.Parse(jsonString);
+
+                if (jsonObj["animationParameters"] is JArray parameters)
+                {
+                    AppLog.Log("VF", "Targetting VF parameters..");
+                    foreach (var param in parameters.OfType<JObject>())
+                    {
+                        string name = param["name"]?.ToString();
+                        if (name == null) continue;
+
+                        if (name.Contains("_SecurityLockSync"))
+                        {
+                            param["value"] = 1;
+                            AppLog.Success("Unlocked", "SecurityLockSync and your avatar should be unlocked.");
+                            return true;
+                        }
+
+                        if (name.Contains("_SecurityLockMenu"))
+                        {
+                            param["value"] = 1;
+                            AppLog.Success("Unlocked", "SecurityLockSync and your avatar should be unlocked.");
+                            return true;
+                        }
+                    }
+                }
+
+            }
+            catch
+            {
+                return false;
+            }
+            return false;
         }
     }
 }
