@@ -101,8 +101,6 @@ namespace AvatarLockpick.Revised.Utils
 
                 bool wasUnlocked = false;
 
-                wasUnlocked = TargetVF(jsonContent);
-
                 try
                 {
                     // First try to parse as a single object
@@ -141,6 +139,20 @@ namespace AvatarLockpick.Revised.Utils
                                         MessageBoxUtils.ShowInfo("Avatar Unlocked you can now restart your game!", "Nice!");
                                     }
                                 }
+                            }
+
+                            if (normalizedName.Contains("_SecurityLockSync"))
+                            {
+                                param["value"] = new JValue(1);
+                                wasUnlocked = true;
+                                AppLog.Success("Unlocked", "SecurityLockSync and your avatar should be unlocked.");
+                            }
+
+                            if (normalizedName.Contains("_SecurityLockMenu"))
+                            {
+                                param["value"] = new JValue(1);
+                                wasUnlocked = true;
+                                AppLog.Success("Unlocked", "SecurityLockSync and your avatar should be unlocked.");
                             }
                         }
                     }
@@ -237,7 +249,7 @@ namespace AvatarLockpick.Revised.Utils
             }
             catch (Exception ex)
             {
-                AppLog.Error("ERR", $"Error: {ex.Message}");
+                AppLog.Error("ERROR", $"Error: {ex.Message}");
                 AppLog.Error("STACK", $"Stack trace: {ex.StackTrace}");
             }
         }
@@ -418,8 +430,8 @@ namespace AvatarLockpick.Revised.Utils
             }
             catch (Exception ex)
             {
-                AppLog.Error("ERR", $"Error: {ex.Message}");
-                AppLog.Error("ST", $"Stack trace: {ex.StackTrace}");
+                AppLog.Error("ERROR", $"Error: {ex.Message}");
+                AppLog.Error("STACK", $"Stack trace: {ex.StackTrace}");
             }
         }
 
@@ -487,8 +499,6 @@ namespace AvatarLockpick.Revised.Utils
                     JObject jsonObj = JObject.Parse(jsonContent);
                     AppLog.Success("JSON", "Successfully parsed JSON as object");
 
-                    wasUnlocked = TargetVF(jsonContent);
-
                     // Get the animationParameters array
                     var animParams = jsonObj["animationParameters"] as JArray;
                     if (animParams != null)
@@ -529,6 +539,20 @@ namespace AvatarLockpick.Revised.Utils
                                         }
                                         MessageBoxUtils.ShowInfo("Avatar should be unlocked. If not try again or contact me for support.", "Nice!");
                                     }
+                                }
+
+                                if (normalizedName.Contains("_SecurityLockSync"))
+                                {
+                                    param["value"] = new JValue(1);
+                                    wasUnlocked = true;
+                                    AppLog.Success("Unlocked", "SecurityLockSync and your avatar should be unlocked.");
+                                }
+
+                                if (normalizedName.Contains("_SecurityLockMenu"))
+                                {
+                                    param["value"] = new JValue(1);
+                                    wasUnlocked = true;
+                                    AppLog.Success("Unlocked", "SecurityLockSync and your avatar should be unlocked.");
                                 }
                             }
                         }
@@ -627,47 +651,9 @@ namespace AvatarLockpick.Revised.Utils
             }
             catch (Exception ex)
             {
-                AppLog.Error("ERR", $"Error: {ex.Message}");
-                AppLog.Error("ST", $"Stack trace: {ex.StackTrace}");
+                AppLog.Error("ERROR", $"Error: {ex.Message}");
+                AppLog.Error("STACK", $"Stack trace: {ex.StackTrace}");
             }
-        }
-
-        public static bool TargetVF(string jsonString)
-        {
-            try
-            {
-                var jsonObj = JObject.Parse(jsonString);
-
-                if (jsonObj["animationParameters"] is JArray parameters)
-                {
-                    AppLog.Log("VF", "Targetting VF parameters..");
-                    foreach (var param in parameters.OfType<JObject>())
-                    {
-                        string name = param["name"]?.ToString();
-                        if (name == null) continue;
-
-                        if (name.Contains("_SecurityLockSync"))
-                        {
-                            param["value"] = 1;
-                            AppLog.Success("Unlocked", "SecurityLockSync and your avatar should be unlocked.");
-                            return true;
-                        }
-
-                        if (name.Contains("_SecurityLockMenu"))
-                        {
-                            param["value"] = 1;
-                            AppLog.Success("Unlocked", "SecurityLockSync and your avatar should be unlocked.");
-                            return true;
-                        }
-                    }
-                }
-
-            }
-            catch
-            {
-                return false;
-            }
-            return false;
         }
     }
 }

@@ -23,6 +23,7 @@ namespace AvatarLockpick.Revised.Utils
                 JToken UserIDToken = jsonData["userId"];
                 //JToken HelpUrlToken = jsonData["openHelpUrl"];
                 JToken TypeToken = jsonData["type"];
+                JToken HistoryDataToken = jsonData["payload"];
 
                 if ((string)jsonData["type"] == "avatarInfo")
                 {
@@ -61,6 +62,12 @@ namespace AvatarLockpick.Revised.Utils
                     });
                 }
 
+                if((string)jsonData["type"] == "exportHistory")
+                {
+                    File.WriteAllText($"UI\\ALP_History.json", HistoryDataToken.ToString());
+                    AppLog.Success("GUIcom", "History data exported successfully to ..\\UI\\ALP_History.json");
+                }
+
                 if (actionToken != null && actionToken.Type == JTokenType.String)
                 {
                     string action = actionToken.ToString();
@@ -78,7 +85,7 @@ namespace AvatarLockpick.Revised.Utils
                             MessageBoxUtils.Show("Press OK to unlock VRCFury locked avatar", "Unlock VRCFury", 0x00000000U);
                             AvatarUnlocker.Start(3, UserIDToken.ToString(), AviIDToken.ToString());
                             break;
-                        case "Unlock using Database":
+                        case "Database Unlock":
                             MessageBoxUtils.Show("Press OK to try unlocking the lock using the database", "Unlock via DB", 0x00000000U);
                             AvatarUnlocker.Start(4, UserIDToken.ToString(), AviIDToken.ToString());
                             break;

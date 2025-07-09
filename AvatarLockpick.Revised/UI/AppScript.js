@@ -87,6 +87,13 @@ function loadAvatarInfo() {
         console.error("updateUnlockUI function not found.");
     }
 
+    // --- Add to history ---
+    if (typeof addAvatarToHistory === 'function') {
+        addAvatarToHistory(avatarId, userId);
+    } else {
+        console.error("addAvatarToHistory function not found.");
+    }
+
     // Optionally, send a message to .NET to confirm loading
     // sendMessageToDotNet({ type: 'avatarLoaded', avatarId });
 
@@ -131,20 +138,6 @@ function triggerPopup(actionType) {
         userId: window.loadedUserId || null // Include loaded User ID (or null if none)
     };
     sendMessageToDotNet(message);
-}
-
-/**
- * Closes the action popup.
- * Assumes element with ID 'action-popup' exists.
- */
-function closePopup() {
-     // Assuming global element
-    const actionPopupElement = document.getElementById('action-popup');
-     if (!actionPopupElement) {
-         console.error("Popup element not found.");
-        return;
-    }
-    actionPopupElement.classList.remove('show');
 }
 
 /**

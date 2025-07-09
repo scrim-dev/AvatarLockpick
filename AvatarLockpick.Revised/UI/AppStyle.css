@@ -608,6 +608,47 @@ button.primary:hover {
     color: var(--text-color);
 }
 
+/* Styles for Unlock Action Buttons */
+.unlock-action-container {
+    margin-bottom: 1.5em; /* Space between each button group */
+}
+
+.unlock-action-container:last-child {
+    margin-bottom: 0;
+}
+
+.unlock-action-container .action-button {
+    width: 100%; /* Make button take full width */
+    justify-content: center; /* Center icon and text */
+    margin-bottom: 0.5em; /* Space between button and description */
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.unlock-action-description {
+    font-size: 0.9em;
+    color: var(--text-secondary-color);
+    text-align: center;
+    padding: 0 1em; /* Give some horizontal padding */
+    margin: 0;
+}
+
+#net-response-content {
+    background-color: var(--input-bg-color);
+    color: #2ECC71; /* Green text */
+    padding: 1em;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    max-height: 40vh; /* Limit height */
+    overflow-y: auto; /* Enable vertical scroll */
+    text-align: left;
+    white-space: pre-wrap; /* Wrap long lines */
+    word-break: break-all;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+    margin-bottom: 1em;
+}
+
 /* Style for unload button within info panel */
 #loaded-avatar-info-panel .secondary-action {
     margin-top: 1em; /* Add some space above */
@@ -665,6 +706,96 @@ button.primary:hover {
     border-radius: 5px;
 }
 
+/* --- History/Recents Tab Styles --- */
+#history-list-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1em;
+    max-height: 55vh; /* Adjust height as needed */
+    overflow-y: auto;
+    padding: 0.5em;
+    min-height: 100px; /* Ensure it doesn't collapse when empty */
+}
+
+.history-item {
+    background-color: var(--bg-secondary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+}
+
+body:not(.no-animations) .history-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(var(--accent-color-rgb, 30, 144, 255), 0.2);
+    border-color: var(--accent-color);
+}
+
+.history-item h4 {
+    color: var(--accent-color);
+    margin-bottom: 0.5em;
+    font-size: 1em;
+    word-break: break-all; /* Prevent long IDs from overflowing */
+}
+
+.history-item p {
+    font-size: 0.9em;
+    color: var(--text-secondary-color);
+    word-break: break-all;
+    margin-bottom: 0.5em; /* Tighter spacing */
+}
+
+.history-item p small {
+    font-style: italic;
+    color: var(--text-secondary-color);
+}
+
+.history-item-actions {
+    display: flex;
+    gap: 0.5em;
+    margin-top: auto; /* Pushes actions to the bottom */
+    padding-top: 1em;
+}
+
+.history-item-actions .action-button {
+    padding: 0.5em 1em;
+    font-size: 0.9em;
+    flex-grow: 1; /* Make buttons fill space */
+    margin: 0; /* Override default margins */
+}
+
+#no-history-message {
+    width: 100%;
+    text-align: center;
+    color: var(--text-secondary-color);
+    padding: 2em;
+}
+
+.history-item-note-container {
+    background-color: rgba(0,0,0,0.2);
+    border-left: 3px solid var(--accent-color);
+    padding: 0.8em 1em;
+    margin: 1em 0;
+    border-radius: 0 4px 4px 0;
+}
+
+.history-item-note {
+    font-size: 0.9em;
+    margin: 0;
+    color: var(--text-color);
+    white-space: pre-wrap; /* Respect newlines in notes */
+    word-break: break-word;
+}
+
+.history-item-note.placeholder {
+    font-style: italic;
+    color: var(--text-secondary-color);
+    opacity: 0.8;
+}
+
+
 /* Scrollbar Corner */
 ::-webkit-scrollbar-corner {
     background-color: transparent;
@@ -694,4 +825,25 @@ button.primary:hover {
     border-top: 1px solid var(--border-color);
     padding-top: 0.8em;
     margin-top: 1em;
+}
+
+textarea {
+    width: 100%;
+    padding: 0.8em 1em;
+    margin-bottom: 1em;
+    border-radius: 5px;
+    border: 1px solid var(--input-border-color);
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    font-size: 0.95em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    min-height: 120px;
+    resize: vertical;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb, 0, 120, 212), 0.3);
 }

@@ -33,6 +33,7 @@
                 <!-- Replaced text with icons and added aria-label for tooltip -->
                 <li><button class="tab-button active" data-tab="avatar" aria-label="Avatar"><i class="fa-solid fa-user"></i><span class="tab-text">Avatar</span></button></li>
                 <li><button class="tab-button" data-tab="unlock" aria-label="Unlock"><i class="fa-solid fa-lock-open"></i><span class="tab-text">Unlock</span></button></li>
+                <li><button class="tab-button" data-tab="recents" aria-label="Recents"><i class="fa-solid fa-history"></i><span class="tab-text">Recents</span></button></li>
                 <li><button class="tab-button" data-tab="settings" aria-label="Settings"><i class="fa-solid fa-gear"></i><span class="tab-text">Settings</span></button></li>
                 <li><button class="tab-button" data-tab="info" aria-label="Info"><i class="fa-solid fa-circle-info"></i><span class="tab-text">Info</span></button></li>
             </ul>
@@ -68,13 +69,27 @@
                 </div>
                  <div class="tab-content-panel">
                      <!-- Buttons for unlock actions -->
-                     <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock')" disabled><i class="fa-solid fa-unlock"></i> Unlock</button>
-                     <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock All')" disabled><i class="fa-solid fa-globe"></i> Unlock All (W.I.P)</button>
-                     <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock (VRCFury)')" disabled><i class="fa-solid fa-bolt"></i> Unlock (VRCFury)</button>
-                     <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock using Database')" disabled><i class="fa-solid fa-database"></i> Unlock using Database</button>
+                     <div class="unlock-action-container">
+                        <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock')" disabled><i class="fa-solid fa-unlock"></i> Unlock</button>
+                        <p class="unlock-action-description">Will use the general unlock method to unlock avatars.</p>
+                     </div>
+                     <div class="unlock-action-container">
+                        <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock (VRCFury)')" disabled><i class="fa-solid fa-bolt"></i> Unlock (VRCFury)</button>
+                        <p class="unlock-action-description">Will attempt to unlock VRCFury parameters.</p>
+                    </div>
+                     <div class="unlock-action-container">
+                        <button class="action-button unlock-action-btn" onclick="triggerPopup('Database Unlock')" disabled><i class="fa-solid fa-database"></i> Database Unlock</button>
+                        <p class="unlock-action-description">Scans avatar's locks against a database of parameters to find a match and unlock.</p>
+                    </div>
                      <!-- New Restart Buttons -->
-                     <button class="action-button unlock-action-btn" onclick="triggerRestart('restart-novr')" disabled><i class="fa-solid fa-arrows-rotate"></i> Restart</button>
-                     <button class="action-button unlock-action-btn" onclick="triggerRestart('restart-vr')" disabled><i class="fa-solid fa-arrows-rotate"></i> Restart (VR)</button>
+                     <div class="unlock-action-container">
+                        <button class="action-button unlock-action-btn" onclick="triggerRestart('restart-novr')" disabled><i class="fa-solid fa-arrows-rotate"></i> Restart</button>
+                        <p class="unlock-action-description">Restarts VRChat.</p>
+                    </div>
+                    <div class="unlock-action-container">
+                        <button class="action-button unlock-action-btn" onclick="triggerRestart('restart-vr')" disabled><i class="fa-solid fa-arrows-rotate"></i> Restart (VR)</button>
+                        <p class="unlock-action-description">Restarts VRChat in VR mode.</p>
+                    </div>
                  </div>
                  <div id="loaded-avatar-info-panel" class="tab-content-panel" style="display: none;">
                     <h3>Loaded Avatar</h3>
@@ -82,6 +97,22 @@
                     <p><strong>User ID:</strong> <span id="loaded-user-id">N/A</span></p>
                     <button class="action-button secondary-action" onclick="showUnloadConfirmation()"><i class="fa-solid fa-times-circle"></i> Unload Avatar</button>
                  </div>
+            </div>
+
+            <div id="recents-tab" class="tab-panel">
+                <h2><i class="fa-solid fa-history"></i> Recents</h2>
+                <div class="tab-content-panel">
+                    <h3>History</h3>
+                    <div id="history-list-container">
+                        <!-- History items will be populated here by JavaScript -->
+                        <p id="no-history-message">No recent avatars loaded. Load an avatar in the 'Avatar' tab to see it here.</p>
+                    </div>
+                </div>
+                <div class="tab-content-panel">
+                    <h3>Manage History</h3>
+                    <button class="action-button" onclick="exportHistory()"><i class="fa-solid fa-file-export"></i> Export as JSON</button>
+                    <button class="action-button" onclick="showImportPopup()"><i class="fa-solid fa-file-import"></i> Import from JSON</button>
+                </div>
             </div>
 
             <div id="settings-tab" class="tab-panel">
@@ -142,8 +173,8 @@
                     <p>GUI made with Photino.NET</p>
                     <p>Developed by Scrimmane / ScrimDev</p>
                     <p>App Icon by Kmg Design</p>
-                    <p>Response from .NET: <span id="dotnet-response">Waiting...</span></p>
                     <hr style="border-color: var(--border-color); margin: 1.5em 0;">
+                    <button class="action-button" onclick="showNetResponsePopup()"><i class="fa-solid fa-terminal"></i> View .NET Log</button>
                     <p><strong>Note:</strong> You can customize this interface! Feel free to edit the files in the application's 'UI' folder to create your own look.</p>
                     <button class="action-button" onclick="openHelpUrl()"><i class="fa-solid fa-question-circle"></i> Help Page</button>
                 </div>
@@ -155,7 +186,9 @@
     <div id="action-popup" class="popup">
         <h3 id="popup-title">Action Triggered</h3>
         <p id="popup-message">Placeholder message for the action.</p>
-        <button onclick="closePopup()">Close</button>
+        <div class="popup-buttons">
+            <button class="action-button" onclick="closePopup()">Close</button>
+        </div>
     </div>
 
     <!-- Confirmation Popup for Unloading -->
@@ -165,6 +198,39 @@
         <div class="popup-buttons">
             <button class="action-button primary-action" onclick="confirmUnloadAvatar()">Yes, Unload</button>
             <button class="action-button secondary-action" onclick="cancelUnloadAvatar()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Note Editor Popup -->
+    <div id="note-popup" class="popup">
+        <h3><i class="fa-solid fa-note-sticky"></i> Edit Note</h3>
+        <p>Add or edit your note for the avatar below.</p>
+        <textarea id="note-textarea" placeholder="e.g., 'Cool robot avatar with glowing bits'"></textarea>
+        <div class="popup-buttons">
+            <button class="action-button" onclick="saveNote()">Save Note</button>
+            <button class="action-button secondary-action" onclick="closeNotePopup()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- .NET Response Popup -->
+    <div id="net-response-popup" class="popup">
+        <h3><i class="fa-solid fa-terminal"></i> .NET Log</h3>
+        <pre id="net-response-content">Waiting for messages from .NET...</pre>
+        <div class="popup-buttons">
+            <button class="action-button" onclick="closeNetResponsePopup()">Close</button>
+            <button class="action-button secondary-action" onclick="clearNetLog()">Clear Log</button>
+        </div>
+    </div>
+
+    <!-- Import JSON Popup -->
+    <div id="import-json-popup" class="popup">
+        <h3>Import History from JSON</h3>
+        <p>Paste your JSON content below. This will overwrite your current history.</p>
+        <textarea id="import-json-textarea" placeholder='[{"avatarId":"avtr_...","userId":"usr_...","timestamp":...}]'></textarea>
+        <div id="import-error-message" style="color: #DC143C; margin-top: 10px; display: none;"></div>
+        <div class="popup-buttons">
+            <button class="action-button" onclick="importHistory()">Import</button>
+            <button class="action-button secondary-action" onclick="closeImportPopup()">Cancel</button>
         </div>
     </div>
 
@@ -207,6 +273,18 @@
         const unlockWarningPanel = document.getElementById('unlock-warning-panel'); // Cache warning panel
         const confirmUnloadPopup = document.getElementById('confirm-unload-popup'); // Cache confirmation popup
         const presetButtons = document.querySelectorAll('.preset-btn'); // Cache preset buttons
+        
+        // --- New Elements for Recents Tab ---
+        const historyListContainer = document.getElementById('history-list-container');
+        const noHistoryMessage = document.getElementById('no-history-message');
+        const importJsonPopup = document.getElementById('import-json-popup');
+        const importJsonTextarea = document.getElementById('import-json-textarea');
+        const importErrorMessage = document.getElementById('import-error-message');
+        const netResponsePopup = document.getElementById('net-response-popup');
+        const netResponseContent = document.getElementById('net-response-content');
+        const notePopup = document.getElementById('note-popup');
+        const noteTextarea = document.getElementById('note-textarea');
+
 
         // --- Theme Objects ---
         const themes = {
@@ -243,6 +321,9 @@
         let isAvatarLoaded = false;
         let loadedAvatarId = null;
         let loadedUserId = null;
+        let avatarHistory = []; // For Recents tab
+        let netLog = ["Waiting for messages from .NET..."]; // For .NET Log
+        let currentEditingAvatarId = null; // To track which note is being edited
         let noticeShownThisSession = false; // Flag for unlock notice
         let noticeTimerInterval = null; // Variable to hold the timer interval
 
@@ -392,6 +473,19 @@
                 userIdInput.value = savedUserId;
             }
 
+            // Load history from localStorage
+            const savedHistory = localStorage.getItem('avatarHistory');
+            if (savedHistory) {
+                try {
+                    avatarHistory = JSON.parse(savedHistory);
+                } catch (e) {
+                    console.error("Error parsing avatar history from localStorage:", e);
+                    avatarHistory = [];
+                }
+            }
+            renderHistory();
+
+
             // Initial state for Unlock tab
             updateUnlockUI();
         }
@@ -490,11 +584,200 @@
              applyTheme(themes.dodgerblue); // This will re-save it as the 'dodgerblue' preset
         }
 
+        // --- History / Recents Tab Functions ---
+        function renderHistory() {
+            historyListContainer.innerHTML = ''; // Clear current list
+            if (avatarHistory.length === 0) {
+                if (noHistoryMessage) noHistoryMessage.style.display = 'block';
+            } else {
+                if (noHistoryMessage) noHistoryMessage.style.display = 'none';
+                avatarHistory.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'history-item';
+                    const formattedDate = new Date(item.timestamp).toLocaleString();
+                    const noteContent = item.note 
+                        ? `<p class="history-item-note">${item.note}</p>`
+                        : `<p class="history-item-note placeholder">Looks like this avatar is a mystery. Add a note so your future self knows what's up!</p>`;
+
+                    itemDiv.innerHTML = `
+                        <h4>${item.avatarId}</h4>
+                        <p><strong>User:</strong> ${item.userId || 'N/A'}</p>
+                        <p><small>Loaded: ${formattedDate}</small></p>
+                        <div class="history-item-note-container">
+                            ${noteContent}
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="action-button" onclick="loadFromHistory('${item.avatarId}', '${item.userId}')"><i class="fa-solid fa-upload"></i> Load</button>
+                            <button class="action-button secondary-action" onclick="showNotePopup('${item.avatarId}')"><i class="fa-solid fa-pencil"></i> ${item.note ? 'Edit' : 'Add'} Note</button>
+                            <button class="action-button secondary-action" onclick="deleteFromHistory(event, '${item.avatarId}')"><i class="fa-solid fa-trash"></i> Delete</button>
+                        </div>
+                    `;
+                    historyListContainer.appendChild(itemDiv);
+                });
+            }
+        }
+
+        function addAvatarToHistory(avatarId, userId) {
+            let existingNote = null;
+            // Remove existing entry if it exists to move it to the top, preserving the note
+            const existingIndex = avatarHistory.findIndex(item => item.avatarId === avatarId);
+            if (existingIndex > -1) {
+                existingNote = avatarHistory[existingIndex].note;
+                avatarHistory.splice(existingIndex, 1);
+            }
+
+            // Add new entry to the top of the list
+            avatarHistory.unshift({
+                avatarId: avatarId,
+                userId: userId,
+                timestamp: new Date().getTime(),
+                note: existingNote // Keep existing note or set to null
+            });
+
+            // Limit history size (e.g., to 50 items)
+            if (avatarHistory.length > 50) {
+                avatarHistory.pop();
+            }
+
+            // Save and re-render
+            localStorage.setItem('avatarHistory', JSON.stringify(avatarHistory));
+            renderHistory();
+        }
+        
+        function loadFromHistory(avatarId, userId) {
+            avatarIdInput.value = avatarId;
+            userIdInput.value = userId;
+            
+            // Persist these loaded values
+            localStorage.setItem('avatarId', avatarId);
+            localStorage.setItem('userId', userId);
+
+            // Switch to avatar tab and load info
+            document.querySelector('.tab-button[data-tab="avatar"]').click();
+            loadAvatarInfo();
+        }
+
+        function showNotePopup(avatarId) {
+            currentEditingAvatarId = avatarId;
+            const historyItem = avatarHistory.find(item => item.avatarId === avatarId);
+            if (historyItem) {
+                noteTextarea.value = historyItem.note || '';
+                notePopup.classList.add('show');
+            }
+        }
+
+        function closeNotePopup() {
+            notePopup.classList.remove('show');
+            currentEditingAvatarId = null;
+        }
+
+        function saveNote() {
+            if (currentEditingAvatarId) {
+                const historyItem = avatarHistory.find(item => item.avatarId === currentEditingAvatarId);
+                if (historyItem) {
+                    historyItem.note = noteTextarea.value.trim() ? noteTextarea.value : null;
+                    localStorage.setItem('avatarHistory', JSON.stringify(avatarHistory));
+                    renderHistory();
+                }
+            }
+            closeNotePopup();
+        }
+
+        function deleteFromHistory(event, avatarId) {
+            event.stopPropagation(); // Prevent the hover effect from triggering a click on the parent
+            avatarHistory = avatarHistory.filter(item => item.avatarId !== avatarId);
+            localStorage.setItem('avatarHistory', JSON.stringify(avatarHistory));
+            renderHistory();
+        }
+
+        function exportHistory() {
+            if (avatarHistory.length === 0) {
+                if (popupTitle && popupMessage && actionPopup) {
+                    popupTitle.textContent = "Export Failed";
+                    popupMessage.textContent = "History is empty. Nothing to export.";
+                    actionPopup.classList.add('show');
+                } else {
+                     alert("History is empty. Nothing to export."); // Fallback
+                }
+                return;
+            }
+            const jsonString = JSON.stringify(avatarHistory, null, 2);
+            const message = { type: 'exportHistory', payload: jsonString };
+            sendMessageToDotNet(message);
+
+            if (popupTitle && popupMessage && actionPopup) {
+                popupTitle.textContent = "Export Successful";
+                popupMessage.textContent = "History has been sent to the application for exporting.";
+                actionPopup.classList.add('show');
+            } else {
+                alert("History has been sent to the application for exporting."); // Fallback
+            }
+        }
+
+        function showImportPopup() {
+            importJsonTextarea.value = '';
+            importErrorMessage.style.display = 'none';
+            importJsonPopup.classList.add('show');
+        }
+
+        function closeImportPopup() {
+            importJsonPopup.classList.remove('show');
+        }
+
+        function importHistory() {
+            const jsonString = importJsonTextarea.value;
+            if (!jsonString) {
+                importErrorMessage.textContent = "Textarea is empty.";
+                importErrorMessage.style.display = 'block';
+                return;
+            }
+
+            try {
+                const importedData = JSON.parse(jsonString);
+                // Basic validation
+                if (!Array.isArray(importedData) || !importedData.every(item => item.avatarId && item.timestamp)) {
+                     throw new Error("Invalid history format. Must be an array of objects with 'avatarId' and 'timestamp'.");
+                }
+                // Ensure imported notes are handled correctly
+                avatarHistory = importedData.map(item => ({
+                    avatarId: item.avatarId,
+                    userId: item.userId || null,
+                    timestamp: item.timestamp,
+                    note: item.note || null
+                }));
+                localStorage.setItem('avatarHistory', JSON.stringify(avatarHistory));
+                renderHistory();
+                closeImportPopup();
+            } catch (e) {
+                importErrorMessage.textContent = `Import failed: ${e.message}`;
+                importErrorMessage.style.display = 'block';
+            }
+        }
+
+        function closePopup() {
+            if (actionPopup) {
+                actionPopup.classList.remove('show');
+            }
+        }
+
+
         window.external.receiveMessage(message => {
              console.log(`Message received from .NET: ${message}`);
-             if(responseSpan) {
-                responseSpan.textContent = message;
+
+             const timestamp = new Date().toLocaleTimeString();
+             const logEntry = `[${timestamp}] ${message}`;
+             
+             if (netLog.length === 1 && netLog[0] === "Waiting for messages from .NET...") {
+                 netLog = [logEntry];
+             } else {
+                 netLog.push(logEntry);
              }
+
+             if(netResponseContent) {
+                netResponseContent.textContent = netLog.join('\n');
+                netResponseContent.scrollTop = netResponseContent.scrollHeight;
+             }
+
              // TODO: Parse message if it's structured (e.g., JSON)
              // Handle potential responses related to popups if needed
              // Example: maybe close a specific popup based on a .NET message
@@ -502,6 +785,26 @@
                   closePopup(); // Close the generic action popup
              }
         });
+
+        function showNetResponsePopup() {
+            if (netResponsePopup) {
+                netResponseContent.textContent = netLog.join('\n');
+                netResponsePopup.classList.add('show');
+            }
+        }
+
+        function closeNetResponsePopup() {
+            if (netResponsePopup) {
+                netResponsePopup.classList.remove('show');
+            }
+        }
+
+        function clearNetLog() {
+            netLog = ["Log cleared."];
+            if (netResponseContent) {
+                netResponseContent.textContent = netLog[0];
+            }
+        }
 
         function updateUnlockUI() {
             if (isAvatarLoaded) {
@@ -606,6 +909,7 @@
                     localStorage.removeItem('themeType');
                     localStorage.removeItem('themeName');
                     localStorage.removeItem('unlockNoticeShown');
+                    localStorage.removeItem('avatarHistory'); // Clear history cache
                     colorPickers.forEach(picker => {
                          const cssVar = picker.getAttribute('data-var');
                          localStorage.removeItem(`customColor_${cssVar}`);

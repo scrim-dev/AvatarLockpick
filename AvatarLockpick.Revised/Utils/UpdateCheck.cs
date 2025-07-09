@@ -11,8 +11,7 @@ namespace AvatarLockpick.Revised.Utils
         private static readonly HttpClient _httpClient = new();
 
         // GitHub raw content URL for version file
-        private const string VersionFileUrl =
-            "https://raw.githubusercontent.com/scrim-dev/AvatarLockpick/refs/heads/master/ver.txt";
+        private const string VersionFileUrl = "https://raw.githubusercontent.com/scrim-dev/AvatarLockpick/refs/heads/master/version.txt";
 
         public static void CheckForUpdates()
         {
@@ -28,7 +27,7 @@ namespace AvatarLockpick.Revised.Utils
                             $"AvatarLockpick: {result.RemoteVersion}\n\nDo you want to Update?", "Update", delegate
                         {
                             //All zips will be called LockpickApp.zip now
-                            URLStuff.OpenUrl($"https://github.com/scrim-dev/AvatarLockpick/releases/download/{result.RemoteVersion}/LockpickApp.zip");
+                            URLStuff.OpenUrl($"https://github.com/scrim-dev/AvatarLockpick/releases/download/v{result.RemoteVersion}/LockpickApp.zip");
                         });
 
                         break;

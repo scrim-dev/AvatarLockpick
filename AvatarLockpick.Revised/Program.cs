@@ -8,10 +8,12 @@ namespace AvatarLockpick.Revised
 {
     internal class Program
     {
-        public static string AppVersion = "2.1";
+        public const string AppVersion = "2.2";
         public static HttpUtils HttpC { get; private set; } = new();
-        // A unique name for the mutex to ensure only one instance runs.
-        private const string AppMutexName = "Global\\AvatarLockpickRevised_Mutex_2A7B9C1D";
+        public static Size AppSize { get; private set; } = new Size(1300, 800);
+
+        // Fixed mutex name to avoid conflicts with older instances
+        private const string AppMutexName = $"AvatarLockpickRevised_{AppVersion}";
 
         //Application Icon by: Kmg Design
         //GUI made with: https://github.com/tryphotino/photino.NET
@@ -54,7 +56,7 @@ namespace AvatarLockpick.Revised
                     .SetTitle(windowTitle)
                     // Resize to a percentage of the main monitor work area
                     .SetUseOsDefaultSize(false)
-                    .SetSize(new Size(900, 600))
+                    .SetSize(AppSize)
                     // Center window in the middle of the screen
                     .Center()
                     // Users can resize windows by default.
@@ -103,6 +105,11 @@ namespace AvatarLockpick.Revised
                         }
                     }
                 };
+
+                if(!File.Exists($"UI\\ALP_History.json"))
+                {
+                    try { File.WriteAllText($"UI\\ALP_History.json", "{}"); } catch { }
+                }
 
                 window.SetChromeless(false);
                 window.SetDevToolsEnabled(false);
