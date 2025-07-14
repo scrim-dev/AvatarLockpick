@@ -1,9 +1,10 @@
-#Cursor AI will ignore these folders
+#AI will ignore these
+
 AppSample/
 AvatarLockpick-Legacy/
 .vscode/
 .vs/
-
-#Files
+Showcase/
 .editorconfig
 lock_types.txt
+.git/
