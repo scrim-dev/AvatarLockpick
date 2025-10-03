@@ -14,3 +14,7 @@ AvatarLockpick is user friendly tool for unlocking VRChat avatars. It works by s
 Read this: ℹ️[Help Me](https://github.com/scrim-dev/AvatarLockpick/blob/master/HELP.md)
 
 Or this: ℹ️[Extra Info](https://github.com/scrim-dev/AvatarLockpick/blob/master/EXTRAS.md)
+
+### Discord Server for support and more
+
+[![](https://dcbadge.limes.pink/api/server/5fc2BWuFWU)](https://discord.gg/5fc2BWuFWU)
