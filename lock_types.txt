@@ -45,5 +45,4 @@ PW 5
 H Lock
 Unlock Avatar
 直达解锁
-开锁
-ロックを解除する
+\u76f4\u8fbe\u89e3\u9501
