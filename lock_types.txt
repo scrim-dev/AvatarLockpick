@@ -44,3 +44,6 @@ PW 4
 PW 5
 H Lock
 Unlock Avatar
+直达解锁
+开锁
+ロックを解除する
