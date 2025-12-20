@@ -11,6 +11,26 @@ namespace AvatarLockpick.Revised.Utils
     {
         public static bool ClearLogsOnExit = false;
         public static string? LogFilePath { get; private set; }
+        
+        // Event to notify subscribers (like the UI) of new log messages
+        public static event Action<string, string, string>? OnLogReceived;
+        
+        // Event to notify subscribers of download progress
+        public static event Action<int, string, string>? OnProgressReceived;
+        
+        // Event to notify when download is complete
+        public static event Action? OnDownloadComplete;
+
+        public static void Progress(int percent, string status, string title = "Downloading...")
+        {
+            OnProgressReceived?.Invoke(percent, status, title);
+        }
+
+        public static void DownloadComplete()
+        {
+            OnDownloadComplete?.Invoke();
+        }
+
         public static void SetupLogFile()
         {
             var LogFile = $"Log_{DateTime.Now:d}_{DateTime.Now:HH.mm.ss}.txt".Replace("/", "_");
@@ -37,64 +57,32 @@ namespace AvatarLockpick.Revised.Utils
 
         public static void Log(string CurrentTask, string Message)
         {
-            //Time
-            Console.Write("[".Pastel("#e8e8e8"));
-            Console.Write(DateTime.Now.ToString("hh:mm:ss").Pastel("#00ff5e"));
-            Console.Write("] ".Pastel("#e8e8e8"));
-
-            //Message
-            Console.Write("[".Pastel("#e8e8e8"));
-            Console.Write(CurrentTask.Pastel("#0084ff"));
-            Console.Write("] ".Pastel("#e8e8e8"));
-            Console.Write($"{Message}{Environment.NewLine}".Pastel(ConsoleColor.White));
+            // Trigger event for UI
+            OnLogReceived?.Invoke("info", CurrentTask, Message);
 
             WriteToLogFile("i", Message);
         }
 
         public static void Success(string CurrentTask, string Message)
         {
-            //Time
-            Console.Write("[".Pastel("#e8e8e8"));
-            Console.Write(DateTime.Now.ToString("hh:mm:ss").Pastel("#00ff5e"));
-            Console.Write("] ".Pastel("#e8e8e8"));
-
-            //Message
-            Console.Write("[".Pastel("#e8e8e8"));
-            Console.Write(CurrentTask.Pastel("#0084ff"));
-            Console.Write("] ".Pastel("#e8e8e8"));
-            Console.Write($"[SUCCESS] {Message}{Environment.NewLine}".Pastel("#00ff40"));
+            // Trigger event for UI
+            OnLogReceived?.Invoke("success", CurrentTask, Message);
 
             WriteToLogFile("+", Message);
         }
 
         public static void Warn(string CurrentTask, string Message)
         {
-            //Time
-            Console.Write("[".Pastel("#e8e8e8"));
-            Console.Write(DateTime.Now.ToString("hh:mm:ss").Pastel("#00ff5e"));
-            Console.Write("] ".Pastel("#e8e8e8"));
-
-            //Message
-            Console.Write("[".Pastel("#e8e8e8"));
-            Console.Write(CurrentTask.Pastel("#0084ff"));
-            Console.Write("] ".Pastel("#e8e8e8"));
-            Console.Write($"[WARN] {Message}{Environment.NewLine}".Pastel("#ffcc00"));
+            // Trigger event for UI
+            OnLogReceived?.Invoke("warn", CurrentTask, Message);
 
             WriteToLogFile("!", Message);
         }
 
         public static void Error(string CurrentTask, string Message)
         {
-            //Time
-            Console.Write("[".Pastel("#e8e8e8"));
-            Console.Write(DateTime.Now.ToString("hh:mm:ss").Pastel("#00ff5e"));
-            Console.Write("] ".Pastel("#e8e8e8"));
-
-            //Message
-            Console.Write("[".Pastel("#e8e8e8"));
-            Console.Write(CurrentTask.Pastel("#0084ff"));
-            Console.Write("] ".Pastel("#e8e8e8"));
-            Console.Write($"[ERROR] {Message}{Environment.NewLine}".Pastel("#ff002b"));
+            // Trigger event for UI
+            OnLogReceived?.Invoke("error", CurrentTask, Message);
 
             WriteToLogFile("X", Message);
         }

@@ -8,7 +8,7 @@ namespace AvatarLockpick.Revised
 {
     internal class Program
     {
-        public const string AppVersion = "2.2";
+        public const string AppVersion = "2.3";
         public static HttpUtils HttpC { get; private set; } = new();
         public static Size AppSize { get; private set; } = new Size(1300, 800);
 
@@ -20,13 +20,10 @@ namespace AvatarLockpick.Revised
         [STAThread]
         static void Main(string[] args)
         {
-            Console.Title = "Loading app...";
             VersionChecker.CheckForUpdates();
 
             AppLog.SetupLogFile();
 
-            ConsoleSetup.Init();
-            Console.Title = "AvatarLockpick App";
             AppLog.Warn("Startup", "Loading Application...");
 
             // Try to grab the mutex
@@ -87,24 +84,58 @@ namespace AvatarLockpick.Revised
                     })
                     .Load($"UI\\index.html"); // Can be used with relative path strings or "new URI()" instance to load a website.
 
-                Thread.Sleep(1200);
-                Console.Clear();
-                AppLog.Warn("Startup", "Do not close the console as it is needed. If you'd like to hide it open " +
-                    $"the hideconsole.txt file in the 'UI' folder and change it from false to true. Then close and reopen the app.");
+                // Wire up Logging to UI
+                AppLog.OnLogReceived += (type, task, msg) =>
+                {
+                    try
+                    {
+                        var logData = new
+                        {
+                            type = "log",
+                            logType = type,
+                            task = task,
+                            message = msg,
+                            timestamp = DateTime.Now.ToString("HH:mm:ss")
+                        };
+                        string json = Newtonsoft.Json.JsonConvert.SerializeObject(logData);
+                        window.SendWebMessage(json);
+                    }
+                    catch { }
+                };
+
+                // Wire up Progress to UI
+                AppLog.OnProgressReceived += (percent, status, title) =>
+                {
+                    try
+                    {
+                        var progressData = new
+                        {
+                            type = "downloadProgress",
+                            progress = percent,
+                            status = status,
+                            title = title
+                        };
+                        string json = Newtonsoft.Json.JsonConvert.SerializeObject(progressData);
+                        window.SendWebMessage(json);
+                    }
+                    catch { }
+                };
+
+                // Wire up Download Complete to UI
+                AppLog.OnDownloadComplete += () =>
+                {
+                    try
+                    {
+                        var completeData = new { type = "downloadComplete" };
+                        string json = Newtonsoft.Json.JsonConvert.SerializeObject(completeData);
+                        window.SendWebMessage(json);
+                    }
+                    catch { }
+                };
+
                 AppLog.Success("Startup", "App Loaded!");
 
                 try { AppLog.ClearLogsOnExit = bool.Parse(File.ReadAllText($"UI\\ClearLogs.txt")); } catch { AppLog.ClearLogsOnExit = false; }
-
-                ConsoleSetup.OnExit += () =>
-                {
-                    if (AppLog.ClearLogsOnExit)
-                    {
-                        if (Directory.Exists($"UI\\Logs"))
-                        {
-                            try { Directory.Delete($"UI\\Logs", true); } catch { }
-                        }
-                    }
-                };
 
                 if(!File.Exists($"UI\\ALP_History.json"))
                 {
@@ -115,6 +146,15 @@ namespace AvatarLockpick.Revised
                 window.SetDevToolsEnabled(false);
                 window.SetIconFile($"UI\\unlockicon.ico");
                 window.WaitForClose(); // Starts the application event loop
+
+                // Cleanup on exit
+                if (AppLog.ClearLogsOnExit)
+                {
+                    if (Directory.Exists($"UI\\Logs"))
+                    {
+                        try { Directory.Delete($"UI\\Logs", true); } catch { }
+                    }
+                }
             }
         }
     }

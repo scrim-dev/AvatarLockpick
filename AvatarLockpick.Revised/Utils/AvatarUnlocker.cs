@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Data.Sqlite;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -19,22 +20,29 @@ namespace AvatarLockpick.Revised.Utils
     {
         //I can honestly do this better but it doesn't matter it works
 
+        // Custom database settings
+        private static string CustomDbUrl = "";
+        private static string CustomDbPath = "";
+
+        /// <summary>
+        /// Sets custom database URL or file path for the Beta Database Unlock feature
+        /// </summary>
+        public static void SetCustomDatabase(string url, string path)
+        {
+            CustomDbUrl = url ?? "";
+            CustomDbPath = path ?? "";
+        }
+
         /// <summary>
         /// Starts unlock process for each type
         /// [1 = Unlock]
         /// [2 = Unlock All]
         /// [3 = Unlock VRCF]
-        /// [4 = Attempt to unlock lock types from db]
+        /// [4 = Attempt to unlock lock types from db (txt)]
+        /// [5 = Attempt to unlock lock types from SQL db (Beta)]
         /// </summary>
         public static void Start(int Type, string UserID, string AvatarID)
         {
-            Console.WriteLine("Console Loaded!");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.Title = "AvatarLockpick Debug Console";
-            Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
-            try { WindowUtils.BringConsoleToFrontIfVisible(); } catch { }
-
             switch (Type)
             {
                 case 1:
@@ -48,6 +56,9 @@ namespace AvatarLockpick.Revised.Utils
                     break;
                 case 4:
                     UnlockDB(UserID, AvatarID);
+                    break;
+                case 5:
+                    UnlockDBBeta(UserID, AvatarID);
                     break;
                 default:
                     Unlock(UserID, AvatarID);
@@ -460,7 +471,7 @@ namespace AvatarLockpick.Revised.Utils
             AppLog.Log("Locks", "All possible lock types:");
             foreach (var lockType in AllLockTypes)
             {
-                Console.WriteLine(lockType);
+                AppLog.Log("Locks", lockType);
             }
 
             AppLog.Log("UnlockWithDatabaseScan", "Starting unlock process...");
@@ -517,7 +528,10 @@ namespace AvatarLockpick.Revised.Utils
 
                             foreach (var lockType in AllLockTypes)
                             {
-                                if (normalizedName.Equals(lockType, StringComparison.OrdinalIgnoreCase))
+                                // Check both normalized name (for hidden/scrambled ascii locks) AND original name (for unicode locks)
+                                if (normalizedName.Equals(lockType, StringComparison.OrdinalIgnoreCase) || 
+                                    nameProperty.Equals(lockType, StringComparison.OrdinalIgnoreCase) ||
+                                    nameProperty.Trim().Equals(lockType, StringComparison.OrdinalIgnoreCase))
                                 {
                                     AppLog.Log("JSON", $"Found locked parameter with name: {lockType}");
                                     var valueToken = param["value"];
@@ -541,14 +555,14 @@ namespace AvatarLockpick.Revised.Utils
                                     }
                                 }
 
-                                if (normalizedName.Contains("_SecurityLockSync"))
+                                if (normalizedName.Contains("_SecurityLockSync") || nameProperty.Contains("_SecurityLockSync"))
                                 {
                                     param["value"] = new JValue(1);
                                     wasUnlocked = true;
                                     AppLog.Success("Unlocked", "SecurityLockSync and your avatar should be unlocked.");
                                 }
 
-                                if (normalizedName.Contains("_SecurityLockMenu"))
+                                if (normalizedName.Contains("_SecurityLockMenu") || nameProperty.Contains("_SecurityLockMenu"))
                                 {
                                     param["value"] = new JValue(1);
                                     wasUnlocked = true;
@@ -584,9 +598,14 @@ namespace AvatarLockpick.Revised.Utils
                             if (string.IsNullOrEmpty(nameProperty)) continue;
 
                             string normalizedName = Regex.Replace(nameProperty, @"[^\u0000-\u007F]+", "", RegexOptions.None);
+                            normalizedName = normalizedName.Trim(); // Also trim any remaining whitespace
+
                             foreach (var lockType in AllLockTypes)
                             {
-                                if (normalizedName.Equals(lockType, StringComparison.OrdinalIgnoreCase))
+                                // Check both normalized name (for hidden/scrambled ascii locks) AND original name (for unicode locks)
+                                if (normalizedName.Equals(lockType, StringComparison.OrdinalIgnoreCase) || 
+                                    nameProperty.Equals(lockType, StringComparison.OrdinalIgnoreCase) ||
+                                    nameProperty.Trim().Equals(lockType, StringComparison.OrdinalIgnoreCase))
                                 {
                                     AppLog.Log("JSON", $"Found locked property with name: {nameProperty}");
                                     var valueToken = item["value"];
@@ -618,6 +637,16 @@ namespace AvatarLockpick.Revised.Utils
                                                 AppLog.Success("JSON", "Changed string value to '0'");
                                             }
                                         }
+                                        // Handle generic non-zero cases or default to unlocking if matched
+                                        else if (valueToken.Type == JTokenType.Integer && valueToken.Value<int>() == 0)
+                                        {
+                                             // Already 0, but maybe it needs to be 1? 
+                                             // The object logic had an else { value = 1 }. 
+                                             // The array logic was more specific. 
+                                             // If it's on the lock list, we generally want to disable it (0 or false).
+                                             // But if the user wants "remove it", setting to 0 is usually safe.
+                                        }
+                                        MessageBoxUtils.ShowInfo("Avatar should be unlocked. If not try again or contact me for support.", "Nice!");
                                     }
                                 }
                             }
@@ -647,6 +676,331 @@ namespace AvatarLockpick.Revised.Utils
                 {
                     AppLog.Warn("JSON", "No locked properties found or all properties were already unlocked");
                     MessageBoxUtils.ShowInfo("Avatar not unlocked, no value found. Maybe try again?", "Awww!");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("ERROR", $"Error: {ex.Message}");
+            }
+        }
+
+        // Beta SQL Database lock types
+        private static List<string> BetaLockTypes = new List<string>();
+        private static Dictionary<string, int> BetaLockUnlockValues = new Dictionary<string, int>();
+
+        private static void LoadBetaLockTypes()
+        {
+            BetaLockTypes.Clear();
+            BetaLockUnlockValues.Clear();
+
+            // Use custom URL if set, otherwise use default URL
+            string defaultDbUrl = "https://github.com/scrim-dev/AvatarLockpick-Database/raw/refs/heads/main/db/VRC_LOCKS.db";
+            string dbUrl = !string.IsNullOrEmpty(CustomDbUrl) ? CustomDbUrl : defaultDbUrl;
+            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UI", "VRC_LOCKS.db");
+            
+            // If custom local path is set, use it directly instead of downloading
+            bool useLocalFile = !string.IsNullOrEmpty(CustomDbPath) && System.IO.File.Exists(CustomDbPath);
+
+            try
+            {
+                if (useLocalFile)
+                {
+                    // Use custom local database file
+                    AppLog.Progress(0, "Loading local database...", "Loading SQL Database");
+                    AppLog.Log("BetaDB", $"Using custom local database: {CustomDbPath}");
+                    dbPath = CustomDbPath;
+                }
+                else
+                {
+                    // Download database from URL
+                    AppLog.Progress(0, "Connecting to server...", "Downloading SQL Database");
+                    AppLog.Log("BetaDB", $"Downloading database from: {dbUrl}");
+
+                    // Delete old database file if it exists to avoid file locking issues
+                    if (System.IO.File.Exists(dbPath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(dbPath);
+                            AppLog.Log("BetaDB", "Deleted old database file");
+                        }
+                        catch (Exception delEx)
+                        {
+                            AppLog.Warn("BetaDB", $"Could not delete old database: {delEx.Message}");
+                        }
+                    }
+
+                    using (var client = new HttpClient())
+                    {
+                        // Disable caching
+                        client.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
+                        {
+                            NoCache = true,
+                            NoStore = true
+                        };
+                        client.DefaultRequestHeaders.Add("Pragma", "no-cache");
+
+                        AppLog.Progress(10, "Fetching database...", "Downloading SQL Database");
+
+                        var response = client.GetAsync(dbUrl).GetAwaiter().GetResult();
+                        if (response.IsSuccessStatusCode)
+                        {
+                            AppLog.Progress(40, "Downloading data...", "Downloading SQL Database");
+                            var dbBytes = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                            
+                            AppLog.Progress(70, $"Saving database ({dbBytes.Length} bytes)...", "Downloading SQL Database");
+                            System.IO.File.WriteAllBytes(dbPath, dbBytes);
+                            
+                            AppLog.Progress(80, "Database saved!", "Downloading SQL Database");
+                            AppLog.Success("BetaDB", $"Database downloaded successfully ({dbBytes.Length} bytes)");
+                        }
+                        else
+                        {
+                            AppLog.DownloadComplete();
+                            AppLog.Error("BetaDB", $"Failed to download database: {response.StatusCode}");
+                            return;
+                        }
+                    }
+                }
+
+                // Read from SQLite database
+                AppLog.Progress(85, "Reading lock types...", "Processing Database");
+                AppLog.Log("BetaDB", "Reading lock types from SQL database...");
+
+                // Use full path and proper connection string
+                var connectionString = new SqliteConnectionStringBuilder
+                {
+                    DataSource = dbPath,
+                    Mode = SqliteOpenMode.ReadOnly
+                }.ToString();
+
+                using (var connection = new SqliteConnection(connectionString))
+                {
+                    connection.Open();
+
+                    // First, list all tables to find the correct table name
+                    var listTablesCmd = connection.CreateCommand();
+                    listTablesCmd.CommandText = "SELECT name FROM sqlite_master WHERE type='table'";
+                    
+                    string? tableName = null;
+                    using (var tableReader = listTablesCmd.ExecuteReader())
+                    {
+                        while (tableReader.Read())
+                        {
+                            string tName = tableReader.GetString(0);
+                            AppLog.Log("BetaDB", $"Found table: {tName}");
+                            if (tName.Contains("LOCK", StringComparison.OrdinalIgnoreCase))
+                            {
+                                tableName = tName;
+                            }
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(tableName))
+                    {
+                        AppLog.Error("BetaDB", "No lock table found in database");
+                        AppLog.DownloadComplete();
+                        return;
+                    }
+
+                    AppLog.Log("BetaDB", $"Using table: {tableName}");
+
+                    var command = connection.CreateCommand();
+                    command.CommandText = $"SELECT Lock_Name, Unlock_Value FROM \"{tableName}\"";
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string lockName = reader.GetString(0);
+                            int unlockValue = reader.GetInt32(1);
+
+                            if (!string.IsNullOrWhiteSpace(lockName))
+                            {
+                                BetaLockTypes.Add(lockName.Trim());
+                                BetaLockUnlockValues[lockName.Trim()] = unlockValue;
+                            }
+                        }
+                    }
+                }
+
+                AppLog.Progress(100, $"Loaded {BetaLockTypes.Count} lock types!", "Complete");
+                AppLog.Success("BetaDB", $"Loaded {BetaLockTypes.Count} lock types from SQL database");
+                
+                // Longer delay to show completion before closing
+                System.Threading.Thread.Sleep(1500);
+                AppLog.DownloadComplete();
+            }
+            catch (Exception ex)
+            {
+                AppLog.DownloadComplete();
+                AppLog.Error("BetaDB", $"Error loading SQL database: {ex.Message}");
+            }
+        }
+
+        private static void UnlockDBBeta(string UID, string AID)
+        {
+            AppLog.Warn("UnlockDBBeta", "Preparing (SQL Database - Beta)...");
+            LoadBetaLockTypes();
+
+            if (BetaLockTypes.Count == 0)
+            {
+                AppLog.Error("BetaDB", "No lock types loaded from SQL database. Aborting.");
+                MessageBoxUtils.ShowError("Failed to load lock types from SQL database.");
+                return;
+            }
+
+            AppLog.Log("BetaDB", "Lock types from SQL database:");
+            foreach (var lockType in BetaLockTypes)
+            {
+                int unlockVal = BetaLockUnlockValues.ContainsKey(lockType) ? BetaLockUnlockValues[lockType] : 0;
+                AppLog.Log("BetaDB", $"  - {lockType} (unlock value: {unlockVal})");
+            }
+
+            AppLog.Log("UnlockDBBeta", "Starting unlock process...");
+
+            try
+            {
+                string avatarPath = GetVRChatAvatarPath(UID);
+                string fullAvatarPath = Path.Combine(avatarPath, AID);
+
+                AppLog.Log("Path", $"Looking for avatar at path: {fullAvatarPath}");
+
+                if (!System.IO.File.Exists(fullAvatarPath))
+                {
+                    AppLog.Error("File", $"Avatar file not found: {AID}");
+                    MessageBoxUtils.ShowError($"Avatar file not found: {AID}");
+                    return;
+                }
+
+                string jsonContent = System.IO.File.ReadAllText(fullAvatarPath);
+                AppLog.Success("Path", "Successfully read file content");
+
+                bool wasUnlocked = false;
+
+                try
+                {
+                    JObject jsonObj = JObject.Parse(jsonContent);
+                    AppLog.Success("JSON", "Successfully parsed JSON as object");
+
+                    var animParams = jsonObj["animationParameters"] as JArray;
+                    if (animParams != null)
+                    {
+                        AppLog.Success("JSON", "Found animationParameters array");
+                        foreach (JObject param in animParams)
+                        {
+                            var nameProperty = param["name"]?.ToString();
+                            if (string.IsNullOrEmpty(nameProperty)) continue;
+
+                            string normalizedName = Regex.Replace(nameProperty, @"[^\u0000-\u007F]+", "", RegexOptions.None);
+                            normalizedName = normalizedName.Trim();
+
+                            foreach (var lockType in BetaLockTypes)
+                            {
+                                if (normalizedName.Equals(lockType, StringComparison.OrdinalIgnoreCase) ||
+                                    nameProperty.Equals(lockType, StringComparison.OrdinalIgnoreCase) ||
+                                    nameProperty.Trim().Equals(lockType, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    AppLog.Log("BetaDB", $"Found locked parameter: {nameProperty} (matches: {lockType})");
+                                    var valueToken = param["value"];
+
+                                    if (valueToken != null)
+                                    {
+                                        int unlockValue = BetaLockUnlockValues.ContainsKey(lockType) ? BetaLockUnlockValues[lockType] : 0;
+                                        AppLog.Log("BetaDB", $"Current value: {valueToken}, setting to unlock value: {unlockValue}");
+
+                                        param["value"] = new JValue(unlockValue);
+                                        wasUnlocked = true;
+                                        AppLog.Success("BetaDB", $"Changed value to {unlockValue}");
+                                    }
+                                }
+
+                                if (normalizedName.Contains("_SecurityLockSync") || nameProperty.Contains("_SecurityLockSync"))
+                                {
+                                    param["value"] = new JValue(1);
+                                    wasUnlocked = true;
+                                    AppLog.Success("BetaDB", "Unlocked SecurityLockSync");
+                                }
+
+                                if (normalizedName.Contains("_SecurityLockMenu") || nameProperty.Contains("_SecurityLockMenu"))
+                                {
+                                    param["value"] = new JValue(1);
+                                    wasUnlocked = true;
+                                    AppLog.Success("BetaDB", "Unlocked SecurityLockMenu");
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        AppLog.Warn("JSON", "No animationParameters array found in JSON");
+                    }
+
+                    if (wasUnlocked)
+                    {
+                        AppLog.Warn("BetaDB", "Writing changes back to file...");
+                        System.IO.File.WriteAllText(fullAvatarPath, jsonObj.ToString(Newtonsoft.Json.Formatting.None));
+                        AppLog.Success("BetaDB", "Successfully saved changes");
+                    }
+                }
+                catch (JsonReaderException)
+                {
+                    try
+                    {
+                        JArray jsonArray = JArray.Parse(jsonContent);
+                        AppLog.Success("JSON", "Successfully parsed JSON as array");
+
+                        foreach (JObject item in jsonArray.Children<JObject>())
+                        {
+                            var nameProperty = item["name"]?.ToString();
+                            if (string.IsNullOrEmpty(nameProperty)) continue;
+
+                            string normalizedName = Regex.Replace(nameProperty, @"[^\u0000-\u007F]+", "", RegexOptions.None);
+                            normalizedName = normalizedName.Trim();
+
+                            foreach (var lockType in BetaLockTypes)
+                            {
+                                if (normalizedName.Equals(lockType, StringComparison.OrdinalIgnoreCase) ||
+                                    nameProperty.Equals(lockType, StringComparison.OrdinalIgnoreCase) ||
+                                    nameProperty.Trim().Equals(lockType, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    AppLog.Log("BetaDB", $"Found locked property: {nameProperty}");
+                                    var valueToken = item["value"];
+
+                                    if (valueToken != null)
+                                    {
+                                        int unlockValue = BetaLockUnlockValues.ContainsKey(lockType) ? BetaLockUnlockValues[lockType] : 0;
+                                        item["value"] = new JValue(unlockValue);
+                                        wasUnlocked = true;
+                                        AppLog.Success("BetaDB", $"Changed value to {unlockValue}");
+                                    }
+                                }
+                            }
+                        }
+
+                        if (wasUnlocked)
+                        {
+                            AppLog.Warn("BetaDB", "Writing changes back to file...");
+                            System.IO.File.WriteAllText(fullAvatarPath, jsonArray.ToString(Newtonsoft.Json.Formatting.None));
+                            AppLog.Success("BetaDB", "Successfully saved changes");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        AppLog.Error("JSON", $"Error parsing JSON as array: {ex.Message}");
+                        throw;
+                    }
+                }
+
+                if (wasUnlocked)
+                {
+                    AppLog.Success("BetaDB", "Avatar unlocked using SQL database!");
+                    MessageBoxUtils.ShowInfo("Avatar unlocked using SQL database (Beta)", "Unlocked");
+                }
+                else
+                {
+                    AppLog.Warn("BetaDB", "No locked properties found or all properties were already unlocked");
+                    MessageBoxUtils.ShowInfo("Avatar not unlocked, no matching lock found. Maybe try again?", "Awww!");
                 }
             }
             catch (Exception ex)

@@ -1,0 +1,10 @@
+#Windsurf compatibility
+
+AppSample/
+AvatarLockpick-Legacy/
+.vscode/
+.vs/
+Showcase/
+.editorconfig
+lock_types.txt
+.git/

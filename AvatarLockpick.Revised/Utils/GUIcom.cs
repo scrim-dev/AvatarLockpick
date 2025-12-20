@@ -68,6 +68,14 @@ namespace AvatarLockpick.Revised.Utils
                     AppLog.Success("GUIcom", "History data exported successfully to ..\\UI\\ALP_History.json");
                 }
 
+                if ((string)jsonData["type"] == "customDbSettings")
+                {
+                    string customUrl = (string)jsonData["url"] ?? "";
+                    string customPath = (string)jsonData["path"] ?? "";
+                    AvatarUnlocker.SetCustomDatabase(customUrl, customPath);
+                    AppLog.Log("GUIcom", $"Custom database settings updated - URL: {(string.IsNullOrEmpty(customUrl) ? "(default)" : customUrl)}, Path: {(string.IsNullOrEmpty(customPath) ? "(default)" : customPath)}");
+                }
+
                 if (actionToken != null && actionToken.Type == JTokenType.String)
                 {
                     string action = actionToken.ToString();
@@ -88,6 +96,10 @@ namespace AvatarLockpick.Revised.Utils
                         case "Database Unlock":
                             MessageBoxUtils.Show("Press OK to try unlocking the lock using the database", "Unlock via DB", 0x00000000U);
                             AvatarUnlocker.Start(4, UserIDToken.ToString(), AviIDToken.ToString());
+                            break;
+                        case "Beta Database Unlock":
+                            MessageBoxUtils.Show("Press OK to try unlocking using the new SQL database (Beta)", "Unlock via SQL DB", 0x00000000U);
+                            AvatarUnlocker.Start(5, UserIDToken.ToString(), AviIDToken.ToString());
                             break;
                         default:
                             // Handle unknown action
