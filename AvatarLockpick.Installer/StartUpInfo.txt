@@ -1,0 +1,3 @@
+AvatarLockpick, or ALP, is an open-source C# application designed to unlock VRChat avatars with locked parameters. It achieves this by modifying the saved data stored in your VRChat cache. This software is compliant with VRChat's TOS and is NOT a "ripping" tool. It is simply an app to unlock locked avatars.
+
+AvatarLockpick and/or Scrim-Dev are not associated with VRChat Inc.
