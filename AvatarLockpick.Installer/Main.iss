@@ -37,7 +37,7 @@ InfoAfterFile=C:\Users\intro\source\repos\AvatarLockpick\AvatarLockpick.Installe
 PrivilegesRequired=admin
 
 OutputDir=C:\Users\intro\source\repos\AvatarLockpick\AvatarLockpick.Installer\Output
-OutputBaseFilename=AvatarLockpick_Setup
+OutputBaseFilename=AvatarLockpick.Installer
 SetupIconFile=C:\Users\intro\source\repos\AvatarLockpick\AvatarLockpick.Installer\dl_logo.ico
 SolidCompression=yes
 WizardStyle=modern dark windows11
@@ -62,8 +62,8 @@ Root: HKA; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}"; ValueType: string;
 Root: HKA; Subkey: "Software\{#MyAppPublisher}\{#MyAppName}"; ValueType: string; ValueName: "Publisher"; ValueData: "{#MyAppPublisher}"; Flags: uninsdeletekey
 
 [Files]
-Source: "C:\Users\intro\source\repos\AvatarLockpick\AvatarLockpick.Revised\bin\Release\net8.0-windows10.0.26100.0\publish\win-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\intro\source\repos\AvatarLockpick\AvatarLockpick.Revised\bin\Release\net8.0-windows10.0.26100.0\publish\win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\intro\source\repos\AvatarLockpick\AvatarLockpick.Revised\bin\Release\net8.0-windows10.0.26100.0\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\intro\source\repos\AvatarLockpick\AvatarLockpick.Revised\bin\Release\net8.0-windows10.0.26100.0\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 ; --- CHANGE 3: Create shortcuts for the USER only, not Global ---
