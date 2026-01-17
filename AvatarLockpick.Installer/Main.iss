@@ -38,7 +38,7 @@ PrivilegesRequired=admin
 
 OutputDir=C:\Users\intro\source\repos\AvatarLockpick\AvatarLockpick.Installer\Output
 OutputBaseFilename=AvatarLockpick.Installer
-SetupIconFile=C:\Users\intro\source\repos\AvatarLockpick\AvatarLockpick.Installer\dl_logo.ico
+SetupIconFile=C:\Users\intro\source\repos\AvatarLockpick\AvatarLockpick.Installer\Installer_Icon.ico
 SolidCompression=yes
 WizardStyle=modern dark windows11
 
