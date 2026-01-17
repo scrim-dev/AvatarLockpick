@@ -26,8 +26,7 @@ namespace AvatarLockpick.Revised.Utils
                         MessageBoxUtils.ShowQuestion($"A new update is available!\n\nAvatarLockpick: {result.CurrentVersion} → " +
                             $"AvatarLockpick: {result.RemoteVersion}\n\nDo you want to Update?", "Update", delegate
                         {
-                            //All zips will be called LockpickApp.zip now
-                            URLStuff.OpenUrl($"https://github.com/scrim-dev/AvatarLockpick/releases/download/v{result.RemoteVersion}/LockpickApp.zip");
+                            URLStuff.OpenUrl($"https://github.com/scrim-dev/AvatarLockpick/releases/tag/v{result.RemoteVersion}");
                         });
 
                         break;

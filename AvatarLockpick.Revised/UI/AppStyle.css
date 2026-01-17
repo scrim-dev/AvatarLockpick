@@ -517,8 +517,8 @@ button.primary:hover {
 
 /* --- Animations --- */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 /* --- Simple Popup Placeholder Style --- */
@@ -542,7 +542,18 @@ button.primary:hover {
 }
 .popup.show {
     display: block;
-    animation: fadeIn 0.3s ease-out;
+    animation: popupZoomIn 0.25s ease-out forwards;
+}
+
+@keyframes popupZoomIn {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 }
 .popup button:not(.action-button) { /* Avoid styling action buttons inside popups */
     /* Style close button if needed */
@@ -846,4 +857,125 @@ textarea:focus {
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb, 0, 120, 212), 0.3);
+}
+
+/* --- Logs Tab Styles --- */
+.logs-panel {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 180px);
+}
+
+#app-logs-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--input-border-color);
+    border-radius: 5px;
+    padding: 1em;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+    text-align: left;
+}
+
+#app-logs-container .log-entry {
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 4px;
+    text-align: left;
+    word-break: break-word;
+}
+
+.log-system {
+    color: var(--text-secondary-color);
+}
+
+.logs-actions {
+    margin-top: 1em;
+    display: flex;
+    gap: 1em;
+}
+
+/* --- Info Badge Styles --- */
+.info-badge {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8em;
+    background: linear-gradient(135deg, rgba(30, 144, 255, 0.15), rgba(30, 144, 255, 0.05));
+    border: 1px solid rgba(30, 144, 255, 0.4);
+    border-left: 4px solid var(--accent-color);
+    border-radius: 6px;
+    padding: 1em 1.2em;
+    margin: 1.5em 0;
+}
+
+.info-badge i {
+    color: var(--accent-color);
+    font-size: 1.3em;
+    margin-top: 0.1em;
+}
+
+.info-badge p {
+    margin: 0;
+    font-size: 0.9em;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+.info-badge strong {
+    color: var(--accent-color);
+}
+
+.info-badge em {
+    color: var(--accent-color);
+    font-style: normal;
+    font-weight: 600;
+}
+
+/* --- Beta Tag Styles --- */
+.beta-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: #fff;
+    font-size: 0.7em;
+    font-weight: 700;
+    padding: 0.2em 0.5em;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-left: 0.3em;
+    vertical-align: middle;
+}
+
+.beta-btn {
+    background: linear-gradient(135deg, var(--accent-color), #ff6b35) !important;
+}
+
+.beta-btn:hover {
+    background: linear-gradient(135deg, var(--accent-hover-color), #ff8c5a) !important;
+}
+
+/* --- Download Spinner Styles --- */
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5em 0;
+    color: var(--accent-color);
+}
+
+.spinner-container i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#download-status {
+    text-align: center;
+    color: var(--text-secondary-color);
+    font-size: 0.9em;
+    margin: 0;
 }

@@ -363,4 +363,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-AvatarLockpick.Installer/Output/
+
+AvatarLockpick.Installer/Output
