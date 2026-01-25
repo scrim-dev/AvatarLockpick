@@ -15,7 +15,7 @@ AvatarLockpick is user friendly tool for unlocking VRChat avatars. It works by s
 
 # Preview
 <div align="center">
-  <img src="https://github.com/scrim-dev/AvatarLockpick/blob/master/Showcase/Preview2.png" width="1200" alt="Simple Preview">
+  <img src="https://github.com/scrim-dev/AvatarLockpick/blob/master/Showcase/screenshot.png" width="1200" alt="Simple Preview">
 </div>
 
 ## Getting Started or having issues?
