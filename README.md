@@ -5,6 +5,8 @@
   <a href="https://github.com/scrim-dev/AvatarLockpick/releases/latest"> <img src="https://img.shields.io/badge/Download-Latest-blue?style=for-the-badge&logoColor=white" alt="Download HERE"/></a>
   &ensp;
   <a href="https://discord.gg/5fc2BWuFWU"> <img src="https://dcbadge.limes.pink/api/server/5fc2BWuFWU" alt="Download App"/></a>
+  &ensp;
+  &ensp;
 </div>
 
 > [!IMPORTANT]
