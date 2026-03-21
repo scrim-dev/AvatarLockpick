@@ -1,14 +1,11 @@
 # Disclaimer
-
 AI has been used to assist the development of this software.
 
-## How AI was used in this project:
+## How AI was used in this project
 The entire codebase for AvatarLockpick was written with the assistance of Artificial Intelligence, specifically using Google Antigravity and the Windsurf Editor.
 
 Just to be clear this project is roughly 50% Human and 50% AI:
-
 - The Human (Me): The core idea, the HTML GUI, the frontend layout and the foundational app backend were all conceptualized, designed and hand-coded by me.
-
 - The AI: The AI tools were used to assist the entire codebase by editing, optimizing and improving my hand-made code, as well as providing a few specific functional additions.
 
 ## Note
