@@ -7,6 +7,9 @@
   <a href="https://discord.gg/5fc2BWuFWU"> <img src="https://dcbadge.limes.pink/api/server/5fc2BWuFWU" alt="Download App"/></a>
 </div>
 
+> [!IMPORTANT]
+> This project uses [AI Assistance](https://github.com/scrim-dev/AvatarLockpick/blob/master/AI_Disclaimer.md).
+
 # AvatarLockpick
 Ever wanted to use a VRChat avatar but it was locked? Well now you can unlock it using AvatarLockpick!
 
