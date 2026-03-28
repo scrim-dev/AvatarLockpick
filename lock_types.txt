@@ -46,3 +46,5 @@ H Lock
 Unlock Avatar
 直达解锁
 \u76f4\u8fbe\u89e3\u9501
+locked0
+locked1
