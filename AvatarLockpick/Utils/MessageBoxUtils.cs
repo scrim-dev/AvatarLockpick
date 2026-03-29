@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices; // Added for DllImport
 
-namespace AvatarLockpick.Revised.Utils
+namespace AvatarLockpick.Utils
 {
     public static class MessageBoxUtils
     {

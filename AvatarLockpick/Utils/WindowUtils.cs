@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
-namespace AvatarLockpick.Revised.Utils
+namespace AvatarLockpick.Utils
 {
     internal class WindowUtils
     {

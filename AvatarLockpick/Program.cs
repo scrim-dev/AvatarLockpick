@@ -1,14 +1,14 @@
-﻿using AvatarLockpick.Revised.Utils;
+﻿using AvatarLockpick.Utils;
 using Photino.NET;
 using System.Drawing;
 using System.Reflection;
 using System.Text;
 
-namespace AvatarLockpick.Revised
+namespace AvatarLockpick
 {
     internal class Program
     {
-        public const string AppVersion = "2.3";
+        public const string AppVersion = "2.4";
         public static HttpUtils HttpC { get; private set; } = new();
         public static Size AppSize { get; private set; } = new Size(1300, 800);
 

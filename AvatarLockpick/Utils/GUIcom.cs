@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace AvatarLockpick.Revised.Utils
+namespace AvatarLockpick.Utils
 {
     internal class GUIcom
     {

@@ -9,8 +9,8 @@
     <_SuppressWinFormsTrimError>true</_SuppressWinFormsTrimError>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PublishAot>False</PublishAot>
-    <Authors>ScrimDev</Authors>
-    <Company>ScrimDev</Company>
+    <Authors>Scrim-Dev</Authors>
+    <Company>Scrim-Dev</Company>
     <Copyright>Scrimmane</Copyright>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <FileVersion>0.0.0.0</FileVersion>
@@ -23,6 +23,7 @@
     <PublishTrimmed>False</PublishTrimmed>
     <Description>A tool for unlocking VRChat Avatars</Description>
     <PackageProjectUrl>https://github.com/scrim-dev/AvatarLockpick</PackageProjectUrl>
+    <StartupObject>AvatarLockpick.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

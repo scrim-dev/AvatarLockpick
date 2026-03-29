@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace AvatarLockpick.Revised.Utils
+namespace AvatarLockpick.Utils
 {
     public static class VersionChecker
     {

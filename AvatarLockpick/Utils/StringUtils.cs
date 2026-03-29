@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AvatarLockpick.Revised.Utils
+namespace AvatarLockpick.Utils
 {
     internal class StringUtils
     {

@@ -14,7 +14,7 @@ using System.Xml.Linq;
 using Windows.System;
 using static System.Net.WebRequestMethods;
 
-namespace AvatarLockpick.Revised.Utils
+namespace AvatarLockpick.Utils
 {
     internal class AvatarUnlocker
     {
