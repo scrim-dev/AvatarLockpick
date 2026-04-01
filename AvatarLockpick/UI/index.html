@@ -1,15 +1,19 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AvatarLockpick</title>
     <!-- IMPORTANT: Add an icon library like Font Awesome here -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="AppStyle.css" />
     <!-- Add any required font imports here, e.g., Google Fonts -->
 </head>
+
 <body>
 
     <!-- Splash Screen -->
@@ -17,7 +21,13 @@
         <div class="splash-content">
             <h1 class="app-title">
                 <!-- Wrap each character in a span with calculated delay -->
-                <span style="--delay: 0.0s">A</span><span style="--delay: 0.05s">v</span><span style="--delay: 0.1s">a</span><span style="--delay: 0.15s">t</span><span style="--delay: 0.2s">a</span><span style="--delay: 0.25s">r</span><span style="--delay: 0.3s">L</span><span style="--delay: 0.35s">o</span><span style="--delay: 0.4s">c</span><span style="--delay: 0.45s">k</span><span style="--delay: 0.5s">p</span><span style="--delay: 0.55s">i</span><span style="--delay: 0.6s">c</span><span style="--delay: 0.65s">k</span>
+                <span style="--delay: 0.0s">A</span><span style="--delay: 0.05s">v</span><span
+                    style="--delay: 0.1s">a</span><span style="--delay: 0.15s">t</span><span
+                    style="--delay: 0.2s">a</span><span style="--delay: 0.25s">r</span><span
+                    style="--delay: 0.3s">L</span><span style="--delay: 0.35s">o</span><span
+                    style="--delay: 0.4s">c</span><span style="--delay: 0.45s">k</span><span
+                    style="--delay: 0.5s">p</span><span style="--delay: 0.55s">i</span><span
+                    style="--delay: 0.6s">c</span><span style="--delay: 0.65s">k</span>
             </h1>
             <div id="splash-spinner"></div>
         </div>
@@ -27,101 +37,116 @@
     <button id="sidebar-toggle" aria-label="Toggle Sidebar"><i class="fa-solid fa-bars"></i></button>
 
     <!-- Main Application Wrapper -->
-    <div id="app-wrapper" style="display: none;"> <!-- Initially hidden -->
+    <div id="app-wrapper" class="sidebar-expanded" style="display: none;"> <!-- Initially hidden -->
         <nav class="sidebar">
             <ul>
                 <!-- Replaced text with icons and added aria-label for tooltip -->
-                <li><button class="tab-button active" data-tab="avatar" aria-label="Avatar"><i class="fa-solid fa-user"></i><span class="tab-text">Avatar</span></button></li>
-                <li><button class="tab-button" data-tab="unlock" aria-label="Unlock"><i class="fa-solid fa-lock-open"></i><span class="tab-text">Unlock</span></button></li>
-                <li><button class="tab-button" data-tab="recents" aria-label="Recents"><i class="fa-solid fa-history"></i><span class="tab-text">Recents</span></button></li>
-                <li><button class="tab-button" data-tab="logs" aria-label="Logs"><i class="fa-solid fa-file-lines"></i><span class="tab-text">Logs</span></button></li>
-                <li><button class="tab-button" data-tab="settings" aria-label="Settings"><i class="fa-solid fa-gear"></i><span class="tab-text">Settings</span></button></li>
-                <li><button class="tab-button" data-tab="info" aria-label="Info"><i class="fa-solid fa-circle-info"></i><span class="tab-text">Info</span></button></li>
-            </ul>
+                <li><button class="tab-button active" data-tab="avatar" aria-label="Avatar"><i
+                            class="fa-solid fa-user"></i><span class="tab-text">Avatar</span></button></li>
+                <li><button class="tab-button" data-tab="unlock" aria-label="Unlock"><i
+                            class="fa-solid fa-lock-open"></i><span class="tab-text">Unlock</span></button></li>
+                <li><button class="tab-button" data-tab="recents" aria-label="Recents"><i
+                            class="fa-solid fa-history"></i><span class="tab-text">Recents</span></button></li>
+                <li><button class="tab-button" data-tab="logs" aria-label="Logs"><i
+                            class="fa-solid fa-file-lines"></i><span class="tab-text">Logs</span></button></li>
+                <li><button class="tab-button" data-tab="settings" aria-label="Settings"><i
+                            class="fa-solid fa-gear"></i><span class="tab-text">Settings</span></button></li>
+                <li><button class="tab-button" data-tab="help" aria-label="Help"><i
+                            class="fa-solid fa-circle-question"></i><span class="tab-text">Help</span></button></li>
+                <li><button class="tab-button" data-tab="info" aria-label="Info"><i
+                            class="fa-solid fa-circle-info"></i><span class="tab-text">Info</span></button></li>
         </nav>
 
         <main class="content">
             <!-- Tab Panels -->
             <div id="avatar-tab" class="tab-panel active">
-                 <h2><i class="fa-solid fa-user"></i> Avatar</h2>
-                 <div class="tab-content-panel">
-                     <label for="avatar-id">Avatar ID</label>
-                     <input type="text" id="avatar-id" name="avatar-id" placeholder="avtr_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                <h2><i class="fa-solid fa-user"></i> Avatar</h2>
+                <div class="tab-content-panel">
+                    <label for="avatar-id">Avatar ID</label>
+                    <input type="text" id="avatar-id" name="avatar-id"
+                        placeholder="avtr_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
 
-                     <label for="user-id">User ID</label>
-                     <input type="text" id="user-id" name="user-id" placeholder="usr_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                    <label for="user-id">User ID</label>
+                    <input type="text" id="user-id" name="user-id"
+                        placeholder="usr_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
 
-                     <div class="checkbox-container">
+                    <div class="checkbox-container">
                         <input type="checkbox" id="censor-user-id">
                         <label for="censor-user-id">Censor User ID</label>
-                     </div>
+                    </div>
 
-                     <button class="action-button" onclick="callDotNetSendIDs()"><i class="fa-solid fa-eye"></i> View Avatar</button>
-                     <button class="action-button" onclick="loadAvatarInfo()"><i class="fa-solid fa-download"></i> Load Avatar</button>
-                     <button class="action-button secondary-action" onclick="clearInputFields()"><i class="fa-solid fa-eraser"></i> Clear Fields</button>
-                 </div>
+                    <button class="action-button" onclick="callDotNetSendIDs()"><i class="fa-solid fa-eye"></i> View
+                        Avatar</button>
+                    <button class="action-button" onclick="loadAvatarInfo()"><i class="fa-solid fa-download"></i> Load
+                        Avatar</button>
+                    <button class="action-button secondary-action" onclick="clearInputFields()"><i
+                            class="fa-solid fa-eraser"></i> Clear Fields</button>
+                </div>
             </div>
 
             <div id="unlock-tab" class="tab-panel">
                 <h2><i class="fa-solid fa-lock-open"></i> Unlock Actions</h2>
                 <!-- Warning Panel -->
-                <div id="unlock-warning-panel" class="tab-content-panel warning-panel" style="display: block;"> <!-- Initially visible -->
-                    <p><i class="fa-solid fa-triangle-exclamation"></i> Please load an avatar from the Avatar tab first.</p>
+                <div id="unlock-warning-panel" class="tab-content-panel warning-panel" style="display: block;">
+                    <!-- Initially visible -->
+                    <p><i class="fa-solid fa-triangle-exclamation"></i> Please load an avatar from the Avatar tab first.
+                    </p>
                 </div>
-                 <div class="tab-content-panel">
-                     <!-- Buttons for unlock actions -->
-                     <div class="unlock-action-container">
-                        <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock')" disabled><i class="fa-solid fa-unlock"></i> Unlock</button>
+                <div class="tab-content-panel">
+                    <!-- Buttons for unlock actions -->
+                    <div class="unlock-action-container">
+                        <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock')" disabled><i
+                                class="fa-solid fa-unlock"></i> Unlock</button>
                         <p class="unlock-action-description">Will use the general unlock method to unlock avatars.</p>
-                     </div>
-                     <div class="unlock-action-container">
-                        <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock (VRCFury)')" disabled><i class="fa-solid fa-bolt"></i> Unlock (VRCFury)</button>
+                    </div>
+                    <div class="unlock-action-container">
+                        <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock (VRCFury)')"
+                            disabled><i class="fa-solid fa-bolt"></i> Unlock (VRCFury)</button>
                         <p class="unlock-action-description">Will attempt to unlock VRCFury parameters.</p>
                     </div>
-                     <div class="unlock-action-container">
-                        <button class="action-button unlock-action-btn" onclick="triggerPopup('Database Unlock')" disabled><i class="fa-solid fa-database"></i> Database Unlock</button>
-                        <p class="unlock-action-description">Scans avatar's locks against a database of parameters to find a match and unlock.</p>
+                    <div class="unlock-action-container">
+                        <button class="action-button unlock-action-btn" onclick="triggerPopup('Database Unlock')"
+                            disabled><i class="fa-solid fa-database"></i> Database Unlock</button>
+                        <p class="unlock-action-description">Scans avatar's locks against the SQL database of parameters
+                            to find a match and unlock.</p>
                     </div>
-                     <div class="unlock-action-container">
-                        <button class="action-button unlock-action-btn beta-btn" onclick="triggerPopup('Beta Database Unlock')" disabled><i class="fa-solid fa-flask"></i> Beta Database Unlock</button>
-                        <p class="unlock-action-description">Uses the new SQL-based lock database for improved matching. <span class="beta-tag">BETA</span></p>
-                    </div>
-                     <!-- Info Badge -->
-                     <div class="info-badge">
-                        <i class="fa-solid fa-circle-info"></i>
-                        <p><strong>Database Migration Notice:</strong> I'm transitioning from a text-based lock database (.txt) to a proper SQL database (.db) for better performance and reliability. You can test the new system using the <em>Beta Database Unlock</em> function above. Check the <strong>Settings</strong> tab to load your own custom database via URL or file path.</p>
-                     </div>
-                     <!-- New Restart Buttons -->
-                     <div class="unlock-action-container">
-                        <button class="action-button unlock-action-btn" onclick="triggerRestart('restart-novr')" disabled><i class="fa-solid fa-arrows-rotate"></i> Restart</button>
+                    <!-- New Restart Buttons -->
+                    <div class="unlock-action-container">
+                        <button class="action-button unlock-action-btn" onclick="triggerRestart('restart-novr')"
+                            disabled><i class="fa-solid fa-arrows-rotate"></i> Restart</button>
                         <p class="unlock-action-description">Restarts VRChat.</p>
                     </div>
                     <div class="unlock-action-container">
-                        <button class="action-button unlock-action-btn" onclick="triggerRestart('restart-vr')" disabled><i class="fa-solid fa-arrows-rotate"></i> Restart (VR)</button>
+                        <button class="action-button unlock-action-btn" onclick="triggerRestart('restart-vr')"
+                            disabled><i class="fa-solid fa-arrows-rotate"></i> Restart (VR)</button>
                         <p class="unlock-action-description">Restarts VRChat in VR mode.</p>
                     </div>
-                 </div>
-                 <div id="loaded-avatar-info-panel" class="tab-content-panel" style="display: none;">
+                </div>
+                <div id="loaded-avatar-info-panel" class="tab-content-panel" style="display: none;">
                     <h3>Loaded Avatar</h3>
-                    <p><strong>Avatar ID:</strong> <span id="loaded-avatar-id">N/A</span></p>
-                    <p><strong>User ID:</strong> <span id="loaded-user-id">N/A</span></p>
-                    <button class="action-button secondary-action" onclick="showUnloadConfirmation()"><i class="fa-solid fa-times-circle"></i> Unload Avatar</button>
-                 </div>
+                    <p><strong id="loaded-avi-id-label">Avatar ID:</strong> <span id="loaded-avatar-id">N/A</span></p>
+                    <p><strong id="loaded-user-id-label">User ID:</strong> <span id="loaded-user-id">N/A</span></p>
+                    <button class="action-button secondary-action" onclick="showUnloadConfirmation()"><i
+                            class="fa-solid fa-times-circle"></i> Unload Avatar</button>
+                </div>
             </div>
 
             <div id="recents-tab" class="tab-panel">
                 <h2><i class="fa-solid fa-history"></i> Recents</h2>
                 <div class="tab-content-panel">
-                    <h3>History</h3>
+                    <h3 id="history-h3">History</h3>
                     <div id="history-list-container">
                         <!-- History items will be populated here by JavaScript -->
-                        <p id="no-history-message">No recent avatars loaded. Load an avatar in the 'Avatar' tab to see it here.</p>
+                        <p id="no-history-message">No recent avatars loaded. Load an avatar in the 'Avatar' tab to see
+                            it here.</p>
                     </div>
                 </div>
                 <div class="tab-content-panel">
-                    <h3>Manage History</h3>
-                    <button class="action-button" onclick="exportHistory()"><i class="fa-solid fa-file-export"></i> Export as JSON</button>
-                    <button class="action-button" onclick="showImportPopup()"><i class="fa-solid fa-file-import"></i> Import from JSON</button>
+                    <h3 id="manage-history-h3">Manage History</h3>
+                    <button class="action-button" onclick="exportHistory()"><i class="fa-solid fa-file-export"></i>
+                        Export as JSON</button>
+                    <button class="action-button" onclick="showImportPopup()"><i class="fa-solid fa-file-import"></i>
+                        Import from JSON</button>
                 </div>
             </div>
 
@@ -133,88 +158,160 @@
                         <div class="log-entry"><span class="log-system">[System]</span> Waiting for logs...</div>
                     </div>
                     <div class="logs-actions">
-                         <button class="action-button secondary-action" onclick="clearAppLogs()"><i class="fa-solid fa-trash"></i> Clear Logs</button>
-                         <button class="action-button" onclick="copyAppLogs()"><i class="fa-solid fa-copy"></i> Copy to Clipboard</button>
+                        <button class="action-button secondary-action" onclick="clearAppLogs()"><i
+                                class="fa-solid fa-trash"></i> Clear Logs</button>
+                        <button class="action-button" onclick="copyAppLogs()"><i class="fa-solid fa-copy"></i> Copy to
+                            Clipboard</button>
                     </div>
                 </div>
             </div>
 
             <div id="settings-tab" class="tab-panel">
                 <h2><i class="fa-solid fa-gear"></i> Settings</h2>
-                 <div class="tab-content-panel">
-                     <h3>Theme Customization</h3>
-                     <div class="setting-option">
-                         <h4>Presets</h4>
-                         <div class="preset-buttons">
-                             <button class="action-button preset-btn" data-preset="crimson" style="--preset-bg: #DC143C;">Crimson</button>
-                             <button class="action-button preset-btn" data-preset="green" style="--preset-bg: #2ECC71;">Green</button>
-                             <button class="action-button preset-btn" data-preset="magenta" style="--preset-bg: #DE3BFF;">Magenta</button>
-                             <button class="action-button preset-btn" data-preset="dodgerblue" style="--preset-bg: #1E90FF;">Default (Blue)</button>
-                         </div>
-                         <hr style="border-color: var(--border-color); margin: 1em 0;">
-                         <h4>Custom Colors</h4>
-                         <div class="color-picker-container">
-                            <label for="bg-color-picker">Background Color:</label>
+                <div class="tab-content-panel">
+                    <h3 id="settings-theme-h3">Theme Customization</h3>
+                    <div class="setting-option">
+                        <h4 id="settings-presets-h4">Presets</h4>
+                        <div class="preset-buttons">
+                            <button class="action-button preset-btn" data-preset="crimson" id="settings-preset-crimson"
+                                style="--preset-bg: #DC143C;">Crimson</button>
+                            <button class="action-button preset-btn" data-preset="green" id="settings-preset-green"
+                                style="--preset-bg: #2ECC71;">Green</button>
+                            <button class="action-button preset-btn" data-preset="magenta" id="settings-preset-magenta"
+                                style="--preset-bg: #DE3BFF;">Magenta</button>
+                            <button class="action-button preset-btn" data-preset="dodgerblue"
+                                id="settings-preset-default" style="--preset-bg: #1E90FF;">Default (Blue)</button>
+                        </div>
+                        <hr style="border-color: var(--border-color); margin: 1em 0;">
+                        <h4 id="settings-custom-colors-h4">Custom Colors</h4>
+                        <div class="color-picker-container">
+                            <label for="bg-color-picker" id="settings-bg-label">Background Color:</label>
                             <input type="color" id="bg-color-picker" data-var="--bg-color">
-                         </div>
-                         <div class="color-picker-container">
-                            <label for="panel-color-picker">Panel/Secondary BG:</label>
+                        </div>
+                        <div class="color-picker-container">
+                            <label for="panel-color-picker" id="settings-panel-label">Panel/Secondary BG:</label>
                             <input type="color" id="panel-color-picker" data-var="--panel-bg-color">
-                         </div>
-                           <div class="color-picker-container">
-                            <label for="text-color-picker">Text Color:</label>
+                        </div>
+                        <div class="color-picker-container">
+                            <label for="text-color-picker" id="settings-text-label">Text Color:</label>
                             <input type="color" id="text-color-picker" data-var="--text-color">
-                         </div>
-                         <div class="color-picker-container">
-                            <label for="accent-color-picker">Accent Color:</label>
+                        </div>
+                        <div class="color-picker-container">
+                            <label for="accent-color-picker" id="settings-accent-label">Accent Color:</label>
                             <input type="color" id="accent-color-picker" data-var="--accent-color">
-                         </div>
-                         <div class="color-picker-container">
-                            <label for="accent-hover-color-picker">Accent Hover Color:</label>
+                        </div>
+                        <div class="color-picker-container">
+                            <label for="accent-hover-color-picker" id="settings-accent-hover-label">Accent Hover
+                                Color:</label>
                             <input type="color" id="accent-hover-color-picker" data-var="--accent-hover-color">
-                         </div>
-                          <button class="action-button" onclick="resetTheme()"><i class="fa-solid fa-rotate-left"></i> Reset Theme</button>
-                     </div>
-                     <h3>Preferences</h3>
-                    <div class="setting-option">
-                         <div class="checkbox-container">
-                             <input type="checkbox" id="animations-toggle" checked>
-                             <label for="animations-toggle">Enable UI Animations</label>
                         </div>
-                         <div class="checkbox-container">
-                             <input type="checkbox" id="backend-messages-toggle">
-                             <label for="backend-messages-toggle">Show Backend Communication Popups</label>
+                        <button class="action-button" onclick="resetTheme()"><i class="fa-solid fa-rotate-left"></i>
+                            <span id="settings-reset-theme">Reset Theme</span></button>
+                    </div>
+                    <h3 id="settings-prefs-h3">Preferences</h3>
+                    <div class="setting-option">
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="animations-toggle" checked>
+                            <label for="animations-toggle">Enable UI Animations</label>
+                        </div>
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="backend-messages-toggle">
+                            <label for="backend-messages-toggle">Show Backend Communication Popups</label>
                         </div>
                     </div>
-                    <h3>Custom Database</h3>
+                    <h3 id="settings-lang-h3">Language</h3>
                     <div class="setting-option">
-                        <p>Load your own lock database from a URL or local file path. Leave empty to use the default database.</p>
-                        <label for="custom-db-url">Database URL</label>
+                        <p id="settings-lang-p">Select your preferred language.</p>
+                        <div style="margin-top: 5px;">
+                            <select id="language-select"
+                                style="background-color: var(--input-bg-color); color: var(--text-color); border: 1px solid var(--input-border-color); padding: 8px; border-radius: 4px; width: 100%; max-width: 300px; font-family: inherit;">
+                                <option value="en">English (Default)</option>
+                                <option value="es">Español (Spanish)</option>
+                                <option value="zh">中文 (Chinese)</option>
+                                <option value="ja">日本語 (Japanese)</option>
+                                <option value="ru">Русский (Russian)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <h3 id="settings-db-h3">Custom Database</h3>
+                    <div class="setting-option">
+                        <p id="settings-db-p">Load your own lock database from a URL or local file path. Leave empty to
+                            use the default
+                            database.</p>
+                        <label for="custom-db-url" id="settings-db-url-label">Database URL</label>
                         <input type="text" id="custom-db-url" placeholder="https://example.com/my_locks.db">
-                        <label for="custom-db-path">Or Local File Path</label>
+                        <label for="custom-db-path" id="settings-db-path-label">Or Local File Path</label>
                         <input type="text" id="custom-db-path" placeholder="C:\path\to\my_locks.db">
-                        <button class="action-button" onclick="saveCustomDbSettings()"><i class="fa-solid fa-save"></i> Save Database Settings</button>
-                        <button class="action-button secondary-action" onclick="resetCustomDbSettings()"><i class="fa-solid fa-rotate-left"></i> Reset to Default</button>
+                        <button class="action-button" onclick="saveCustomDbSettings()"><i class="fa-solid fa-save"></i>
+                            <span id="settings-db-save">Save Database Settings</span></button>
+                        <button class="action-button secondary-action" onclick="resetCustomDbSettings()"><i
+                                class="fa-solid fa-rotate-left"></i> <span id="settings-db-reset">Reset to
+                                Default</span></button>
                     </div>
-                    <h3>Advanced</h3>
+                    <h3 id="settings-adv-h3">Advanced</h3>
                     <div class="setting-option">
-                        <p>Clearing cache will reset theme settings, sidebar state, and User ID censor preference stored in your browser for this GUI.</p>
-                        <button class="action-button secondary-action" onclick="clearCacheAndReload()"><i class="fa-solid fa-trash-can"></i> Clear Cache & Reload GUI</button>
+                        <p id="settings-adv-p1">Clearing cache will reset theme settings, sidebar state, and User ID
+                            censor preference stored
+                            in your browser for this GUI.</p>
+                        <button class="action-button secondary-action" onclick="clearCacheAndReload()"><i
+                                class="fa-solid fa-trash-can"></i> <span id="settings-adv-btn-clear">Clear Cache &
+                                Reload GUI</span></button>
+                        <button class="action-button" onclick="openAppDir()" style="margin-top: 10px;"><i
+                                class="fa-solid fa-folder-open"></i> <span id="settings-adv-btn-dir">Open App
+                                Directory</span></button>
                     </div>
-                 </div>
+                </div>
+            </div>
+
+            <div id="help-tab" class="tab-panel">
+                <h2><i class="fa-solid fa-circle-question"></i> Help Guide</h2>
+                <div class="tab-content-panel">
+                    <div class="info-badge" style="margin-bottom: 20px; align-items: center;">
+                        <i class="fa-brands fa-youtube"
+                            style="color: #ff0000; font-size: 1.5em; margin-right: 15px;"></i>
+                        <p id="help-yt-text" style="margin: 0;">For an in-depth visual tutorial, be sure to head over to
+                            my YouTube channel <strong>@ScrimDev</strong>!</p>
+                    </div>
+
+                    <div class="info-badge"
+                        style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px;">
+                        <h4 id="help-step1-title" style="margin: 0; display: flex; align-items: center;"><i
+                                class="fa-solid fa-clipboard-list" style="margin-right:8px;"></i> Step 1: Preparation
+                        </h4>
+                        <p id="help-step1-text" style="margin-top: 0; margin-bottom: 5px;">Launch VRChat and switch into
+                            the avatar you wish to unlock. Wait for the avatar to load completely (I recommend waiting
+                            a few extra seconds to ensure it is fully cached). Then, enter your VRChat User ID and the
+                            Avatar's ID into the application.</p>
+
+                        <h4 id="help-step2-title" style="margin: 0; display: flex; align-items: center;"><i
+                                class="fa-solid fa-lock-open" style="margin-right:8px;"></i> Step 2: Unlocking</h4>
+                        <p id="help-step2-text" style="margin-top: 0; margin-bottom: 5px;">Attempt to unlock the avatar
+                            using the standard <strong>Unlock</strong> method. If the avatar utilizes custom or VRCFury
+                            locks, use <strong>Unlock (VRCFury)</strong> or <strong>Database Unlock</strong> instead.
+                        </p>
+
+                        <h4 id="help-step3-title" style="margin: 0; display: flex; align-items: center;"><i
+                                class="fa-solid fa-flag-checkered" style="margin-right:8px;"></i> Finally: Restart</h4>
+                        <p id="help-step3-text" style="margin-top: 0; margin-bottom: 5px;">Restart your game using the
+                            restart buttons within the app. Enjoy your newly unlocked avatar!</p>
+                    </div>
+                </div>
             </div>
 
             <div id="info-tab" class="tab-panel">
                 <h2><i class="fa-solid fa-circle-info"></i> Info</h2>
                 <div class="tab-content-panel">
-                    <p>AvatarLockpick App</p>
-                    <p>GUI made with Photino.NET</p>
-                    <p>Developed by Scrimmane / ScrimDev</p>
-                    <p>App Icon by Kmg Design</p>
+                    <p id="info-p1">AvatarLockpick</p>
+                    <p id="info-p2">GUI made with Photino.NET</p>
+                    <p id="info-p3">Developed by Scrimmane / ScrimDev</p>
+                    <p id="info-p4">App Icon by Kmg Design</p>
                     <hr style="border-color: var(--border-color); margin: 1.5em 0;">
-                    <button class="action-button" onclick="showNetResponsePopup()"><i class="fa-solid fa-terminal"></i> View .NET Log</button>
-                    <p><strong>Note:</strong> You can customize this interface! Feel free to edit the files in the application's 'UI' folder to create your own look.</p>
-                    <button class="action-button" onclick="openHelpUrl()"><i class="fa-solid fa-question-circle"></i> Help Page</button>
+                    <button class="action-button" onclick="showNetResponsePopup()"><i class="fa-solid fa-terminal"></i>
+                        <span id="info-btn1">View .NET Log</span></button>
+                    <p id="info-p5"><strong>Note:</strong> You can customize this interface! Feel free to edit the files
+                        in the application's 'UI' folder to create your own look.</p>
+                    <button class="action-button" onclick="openHelpUrl()"><i class="fa-solid fa-question-circle"></i>
+                        <span id="info-btn2">Help Page</span></button>
                 </div>
             </div>
         </main>
@@ -264,7 +361,8 @@
     <div id="import-json-popup" class="popup">
         <h3>Import History from JSON</h3>
         <p>Paste your JSON content below. This will overwrite your current history.</p>
-        <textarea id="import-json-textarea" placeholder='[{"avatarId":"avtr_...","userId":"usr_...","timestamp":...}]'></textarea>
+        <textarea id="import-json-textarea"
+            placeholder='[{"avatarId":"avtr_...","userId":"usr_...","timestamp":...}]'></textarea>
         <div id="import-error-message" style="color: #DC143C; margin-top: 10px; display: none;"></div>
         <div class="popup-buttons">
             <button class="action-button" onclick="importHistory()">Import</button>
@@ -275,7 +373,8 @@
     <!-- Unlock Tab Notice Popup -->
     <div id="unlock-notice-popup" class="popup notice-popup">
         <h3><i class="fa-solid fa-info-circle"></i> Notice</h3>
-        <p>The 'Unlock using Database' feature scans the avatar file against a database of known lock signatures. This can help unlock avatars even if the locking components are hidden, renamed, or scrambled.</p>
+        <p>The 'Unlock using Database' feature scans the avatar file against a database of known lock signatures. This
+            can help unlock avatars even if the locking components are hidden, renamed, or scrambled.</p>
         <div class="popup-timer">Closing in <span id="notice-timer">10</span>s...</div>
         <button onclick="closeUnlockNotice()">Close</button>
     </div>
@@ -294,4 +393,5 @@
     <!-- External script for all application logic -->
     <script src="AppScript.js"></script>
 </body>
+
 </html>

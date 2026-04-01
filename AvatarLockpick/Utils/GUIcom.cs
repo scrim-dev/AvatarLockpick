@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -94,12 +94,15 @@ namespace AvatarLockpick.Utils
                             AvatarUnlocker.Start(3, UserIDToken.ToString(), AviIDToken.ToString());
                             break;
                         case "Database Unlock":
-                            MessageBoxUtils.Show("Press OK to try unlocking the lock using the database", "Unlock via DB", 0x00000000U);
+                            MessageBoxUtils.Show("Press OK to try unlocking the lock using the SQL database", "Unlock via SQL DB", 0x00000000U);
                             AvatarUnlocker.Start(4, UserIDToken.ToString(), AviIDToken.ToString());
                             break;
-                        case "Beta Database Unlock":
-                            MessageBoxUtils.Show("Press OK to try unlocking using the new SQL database (Beta)", "Unlock via SQL DB", 0x00000000U);
-                            AvatarUnlocker.Start(5, UserIDToken.ToString(), AviIDToken.ToString());
+                        case "openAppDirectory":
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                            {
+                                FileName = AppDomain.CurrentDomain.BaseDirectory,
+                                UseShellExecute = true
+                            });
                             break;
                         default:
                             // Handle unknown action

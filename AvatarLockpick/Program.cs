@@ -8,7 +8,7 @@ namespace AvatarLockpick
 {
     internal class Program
     {
-        public const string AppVersion = "2.4";
+        public const string AppVersion = "2.4"; //Global Version Set
         public static HttpUtils HttpC { get; private set; } = new();
         public static Size AppSize { get; private set; } = new Size(1300, 800);
 
