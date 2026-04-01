@@ -19,7 +19,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\{#MyAppName}
+DefaultDirName={userpf}\{#MyAppName}
 DisableDirPage=yes
 UninstallDisplayIcon={app}\{#MyAppExeName}
 ; "ArchitecturesAllowed=x64compatible" specifies that Setup cannot run
@@ -58,4 +58,78 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "https://discord.com/invite/5fc2BWuFWU"; Description: "Join our Community Discord!"; Flags: shellexec runasoriginaluser postinstall unchecked
 
+[Code]
+function IsDotNetDesktopRuntimeInstalled(Version: string): Boolean;
+var
+  Cmd, Args: string;
+  FileName: string;
+  Output: AnsiString;
+  ResultCode: Integer;
+begin
+  Result := False;
+  FileName := ExpandConstant('{tmp}\dotnet_runtimes.txt');
+  
+  Cmd := ExpandConstant('{cmd}');
+  Args := '/C dotnet --list-runtimes > "' + FileName + '" 2>&1';
+  
+  if Exec(Cmd, Args, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+  begin
+    if LoadStringFromFile(FileName, Output) then
+    begin
+      if Pos('Microsoft.WindowsDesktop.App ' + Version, Output) > 0 then
+      begin
+        Result := True;
+      end;
+    end;
+  end;
+  
+  DeleteFile(FileName);
+end;
+
+var
+  DownloadPage: TDownloadWizardPage;
+
+function OnDownloadProgress(const Url, FileName: String; const Progress, ProgressMax: Int64): Boolean;
+begin
+  if Progress = ProgressMax then
+    Log(Format('Successfully downloaded file to {FileName}: %s', [FileName]));
+  Result := True;
+end;
+
+procedure InitializeWizard;
+begin
+  DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), @OnDownloadProgress);
+end;
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := True;
+
+  if CurPageID = wpReady then
+  begin
+    if not IsDotNetDesktopRuntimeInstalled('8.0.') then
+    begin
+      DownloadPage.Clear;
+      DownloadPage.Add('https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe', 'windowsdesktop-runtime-8-win-x64.exe', '');
+      DownloadPage.Show;
+      try
+        try
+          DownloadPage.Download;
+          Exec(ExpandConstant('{tmp}\windowsdesktop-runtime-8-win-x64.exe'), '/quiet /norestart', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+        except
+          if DownloadPage.AbortedByUser then
+            Log('Aborted by user.')
+          else
+            SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbCriticalError, MB_OK, IDOK);
+          Result := False;
+        end;
+      finally
+        DownloadPage.Hide;
+      end;
+    end;
+  end;
+end;
