@@ -188,6 +188,8 @@ function initialize() {
         userIdInput.value = savedUserId;
     }
 
+    initLinuxSettings();
+
     const savedHistory = localStorage.getItem('avatarHistory');
     if (savedHistory) {
         try {
@@ -294,6 +296,43 @@ function triggerRestart(restartType) {
         popupMessage.textContent = `Requesting ${popupTitle.textContent}...`;
         actionPopup.classList.add('show');
     }
+}
+
+// --- Custom / Linux Settings Functions ---
+function initLinuxSettings() {
+    const savedLinuxPath = localStorage.getItem('customLinuxPath');
+    if (savedLinuxPath && document.getElementById('custom-linux-cache-path')) {
+        document.getElementById('custom-linux-cache-path').value = savedLinuxPath;
+        sendLinuxSettingsToBackend(savedLinuxPath);
+    }
+}
+
+function saveLinuxSettings() {
+    const linuxPath = document.getElementById('custom-linux-cache-path').value.trim();
+    localStorage.setItem('customLinuxPath', linuxPath);
+    sendLinuxSettingsToBackend(linuxPath);
+    
+    popupTitle.textContent = "Linux Settings Saved";
+    popupMessage.textContent = "Custom cache path has been updated.";
+    actionPopup.classList.add('show');
+}
+
+function resetLinuxSettings() {
+    document.getElementById('custom-linux-cache-path').value = '';
+    localStorage.removeItem('customLinuxPath');
+    sendLinuxSettingsToBackend("");
+    
+    popupTitle.textContent = "Linux Settings Reset";
+    popupMessage.textContent = "Now using default Proton cache path.";
+    actionPopup.classList.add('show');
+}
+
+function sendLinuxSettingsToBackend(linuxPath) {
+    const message = {
+        type: 'linuxSettings',
+        path: linuxPath
+    };
+    sendMessageToDotNet(message);
 }
 
 function resetTheme() {

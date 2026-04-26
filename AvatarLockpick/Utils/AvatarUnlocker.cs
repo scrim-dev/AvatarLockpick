@@ -11,7 +11,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Windows.System;
 using static System.Net.WebRequestMethods;
 
 namespace AvatarLockpick.Utils
@@ -63,18 +62,53 @@ namespace AvatarLockpick.Utils
             }
         }
 
+        // Linux Custom Cache Path
+        public static string LinuxCustomPath = "";
+
+        public static void SetLinuxCachePath(string path)
+        {
+            LinuxCustomPath = path ?? "";
+        }
+
         private static string GetVRChatAvatarPath(string userId)
         {
-            // Get the path to AppData
-            string appDataPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                "AppData",
-                "LocalLow"
-            );
+            if (OSCheck.IsLinux())
+            {
+                string vrchatPath;
+                if (!string.IsNullOrEmpty(LinuxCustomPath))
+                {
+                    vrchatPath = Path.Combine(LinuxCustomPath, "LocalAvatarData", userId);
+                }
+                else
+                {
+                    vrchatPath = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                        ".steam", "root", "steamapps", "compatdata", "438100", "pfx", "drive_c",
+                        "users", "steamuser", "AppData", "LocalLow", "VRChat", "VRChat", "LocalAvatarData", userId);
+                }
 
-            string vrchatPath = Path.Combine(appDataPath, "VRChat", "VRChat", "LocalAvatarData", userId);
-            AppLog.Log("Path", $"Checking VRChat path: {vrchatPath}");
-            return vrchatPath;
+                if (!Directory.Exists(Path.GetDirectoryName(vrchatPath)))
+                {
+                    AppLog.Error("Path", "Proton prefix or Linux VRChat Cache path not found.");
+                    MessageBoxUtils.ShowError("Linux VRChat Cache path not found! Please set your custom path in the GUI Settings tab under 'Linux Compatibility'.", "Path Error");
+                }
+                
+                AppLog.Log("Path", $"Checking VRChat path: {vrchatPath}");
+                return vrchatPath;
+            }
+            else
+            {
+                // Get the path to AppData
+                string appDataPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    "AppData",
+                    "LocalLow"
+                );
+
+                string vrchatPath = Path.Combine(appDataPath, "VRChat", "VRChat", "LocalAvatarData", userId);
+                AppLog.Log("Path", $"Checking VRChat path: {vrchatPath}");
+                return vrchatPath;
+            }
         }
 
         private static void Unlock(string UID, string AID)

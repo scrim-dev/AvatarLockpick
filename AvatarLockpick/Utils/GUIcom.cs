@@ -76,6 +76,13 @@ namespace AvatarLockpick.Utils
                     AppLog.Log("GUIcom", $"Custom database settings updated - URL: {(string.IsNullOrEmpty(customUrl) ? "(default)" : customUrl)}, Path: {(string.IsNullOrEmpty(customPath) ? "(default)" : customPath)}");
                 }
 
+                if ((string)jsonData["type"] == "linuxSettings")
+                {
+                    string linuxPath = (string)jsonData["path"] ?? "";
+                    AvatarUnlocker.SetLinuxCachePath(linuxPath);
+                    AppLog.Log("GUIcom", $"Linux custom cache path updated: {(string.IsNullOrEmpty(linuxPath) ? "(default)" : linuxPath)}");
+                }
+
                 if (actionToken != null && actionToken.Type == JTokenType.String)
                 {
                     string action = actionToken.ToString();

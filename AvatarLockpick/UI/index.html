@@ -248,6 +248,16 @@
                                 class="fa-solid fa-rotate-left"></i> <span id="settings-db-reset">Reset to
                                 Default</span></button>
                     </div>
+                    <h3 id="settings-linux-h3">Linux Compatibility</h3>
+                    <div class="setting-option">
+                        <p id="settings-linux-p">If you play VRChat on Linux/Proton your VRChat LocalLow Cache won't be easily queried. If your avatar path is in a non-standard Proton prefix, declare it below to replace the default.</p>
+                        <label for="custom-linux-cache-path" id="settings-linux-path-label">Linux Cache Path (Optional)</label>
+                        <input type="text" id="custom-linux-cache-path" placeholder="/home/user/.steam/root/steamapps/compatdata/438100/pfx/drive_c/users/steamuser/AppData/LocalLow/VRChat/VRChat">
+                        <button class="action-button" onclick="saveLinuxSettings()"><i class="fa-solid fa-save"></i>
+                            <span id="settings-linux-save">Save Cache Path</span></button>
+                        <button class="action-button secondary-action" onclick="resetLinuxSettings()"><i
+                                class="fa-solid fa-rotate-left"></i> <span id="settings-linux-reset">Reset Path</span></button>
+                    </div>
                     <h3 id="settings-adv-h3">Advanced</h3>
                     <div class="setting-option">
                         <p id="settings-adv-p1">Clearing cache will reset theme settings, sidebar state, and User ID
