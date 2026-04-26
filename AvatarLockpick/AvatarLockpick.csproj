@@ -38,6 +38,12 @@
   </ItemGroup>
   
   <ItemGroup>
+    <None Update="ALP.desktop">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="UI\AppStyle.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
