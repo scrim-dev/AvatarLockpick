@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices; // Added for DllImport
 
 namespace AvatarLockpick.Utils
@@ -34,6 +35,12 @@ namespace AvatarLockpick.Utils
         /// <returns>Result code from the WinAPI call (e.g., IDOK, IDCANCEL).</returns>
         public static int Show(string text, string caption, uint buttonsAndIcon)
         {
+            if (!OSCheck.IsWindows())
+            {
+                Console.WriteLine($"[{caption}] {text}");
+                return 0;
+            }
+
             // Pass IntPtr.Zero for the owner window handle (no owner)
             return MessageBox(IntPtr.Zero, text, caption, buttonsAndIcon);
         }

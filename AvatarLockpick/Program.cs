@@ -20,6 +20,8 @@ namespace AvatarLockpick
         [STAThread]
         static void Main(string[] args)
         {
+            Console.WriteLine(AppMutexName + " app start/entry");
+
             AppLog.SetupLogFile();
 
             AppLog.Warn("Startup", "Loading Application...");
@@ -34,11 +36,11 @@ namespace AvatarLockpick
                     return; // Exit the application
                 }
 
-                if (!File.Exists($"UI\\no_startup_warn.scrim"))
+                if (!File.Exists($"UI/no_startup_warn.scrim"))
                 {
                     MessageBoxUtils.ShowWarning("If you run into any bugs, issues or crashes contact me on discord:\nscrimmane (679060175440707605)" +
                     "\nOr post an 'issue' on github!", "Hey!");
-                    try { File.WriteAllText($"UI\\no_startup_warn.scrim", "cached_startup"); } catch { }
+                    try { File.WriteAllText($"UI/no_startup_warn.scrim", "cached_startup"); } catch { }
                 }
 
                 HttpC.Load();
@@ -80,7 +82,7 @@ namespace AvatarLockpick
                         //Send data to be processed
                         GUIcom.Communication(message);
                     })
-                    .Load($"UI\\index.html"); // Can be used with relative path strings or "new URI()" instance to load a website.
+                    .Load($"UI/index.html"); // Can be used with relative path strings or "new URI()" instance to load a website.
 
                 // Wire up Logging to UI
                 AppLog.OnLogReceived += (type, task, msg) =>
@@ -133,26 +135,27 @@ namespace AvatarLockpick
 
                 AppLog.Success("Startup", "App Loaded!");
 
-                try { AppLog.ClearLogsOnExit = bool.Parse(File.ReadAllText($"UI\\ClearLogs.txt")); } catch { AppLog.ClearLogsOnExit = false; }
+                try { AppLog.ClearLogsOnExit = bool.Parse(File.ReadAllText($"UI/ClearLogs.txt")); } catch { AppLog.ClearLogsOnExit = false; }
 
-                if(!File.Exists($"UI\\ALP_History.json"))
+                if(!File.Exists($"UI/ALP_History.json"))
                 {
-                    try { File.WriteAllText($"UI\\ALP_History.json", "{}"); } catch { }
+                    try { File.WriteAllText($"UI/ALP_History.json", "{}"); } catch { }
                 }
 
                 VersionChecker.CheckForUpdates();
 
                 window.SetChromeless(false);
                 window.SetDevToolsEnabled(false);
-                window.SetIconFile($"UI\\unlockicon.ico");
+                window.SetIconFile($"UI/unlockicon.ico");
+
                 window.WaitForClose(); // Starts the application event loop
 
                 // Cleanup on exit
                 if (AppLog.ClearLogsOnExit)
                 {
-                    if (Directory.Exists($"UI\\Logs"))
+                    if (Directory.Exists($"UI/Logs"))
                     {
-                        try { Directory.Delete($"UI\\Logs", true); } catch { }
+                        try { Directory.Delete($"UI/Logs", true); } catch { }
                     }
                 }
             }

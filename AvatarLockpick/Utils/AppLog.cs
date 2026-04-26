@@ -1,4 +1,4 @@
-﻿using Pastel;
+using Pastel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,24 +35,24 @@ namespace AvatarLockpick.Utils
         {
             var LogFile = $"Log_{DateTime.Now:d}_{DateTime.Now:HH.mm.ss}.txt".Replace("/", "_");
 
-            if (!Directory.Exists($"UI\\Logs"))
+            if (!Directory.Exists($"UI/Logs"))
             {
-                try { Directory.CreateDirectory($"UI\\Logs"); } 
+                try { Directory.CreateDirectory($"UI/Logs"); } 
                 catch(Exception ex)
                 {
                     MessageBoxUtils.ShowError(ex.Message);
                 }
 
-                try { File.WriteAllText($"UI\\Logs\\{LogFile}", "LOGS:\n"); } catch { }
-                LogFilePath = $"UI\\Logs\\{LogFile}";
+                try { File.WriteAllText($"UI/Logs/{LogFile}", "LOGS:\n"); } catch { }
+                LogFilePath = $"UI/Logs/{LogFile}";
             }
             else
             {
-                try { File.WriteAllText($"UI\\Logs\\{LogFile}", "LOGS:\n"); } catch { }
-                LogFilePath = $"UI\\Logs\\{LogFile}";
+                try { File.WriteAllText($"UI/Logs/{LogFile}", "LOGS:\n"); } catch { }
+                LogFilePath = $"UI/Logs/{LogFile}";
             }
 
-            try { File.WriteAllText($"UI\\ClearLogs.txt", "false"); } catch { }
+            try { File.WriteAllText($"UI/ClearLogs.txt", "false"); } catch { }
         }
 
         public static void Log(string CurrentTask, string Message)

@@ -64,8 +64,8 @@ namespace AvatarLockpick.Utils
 
                 if((string)jsonData["type"] == "exportHistory")
                 {
-                    File.WriteAllText($"UI\\ALP_History.json", HistoryDataToken.ToString());
-                    AppLog.Success("GUIcom", "History data exported successfully to ..\\UI\\ALP_History.json");
+                    File.WriteAllText($"UI/ALP_History.json", HistoryDataToken.ToString());
+                    AppLog.Success("GUIcom", "History data exported successfully to UI/ALP_History.json");
                 }
 
                 if ((string)jsonData["type"] == "customDbSettings")
