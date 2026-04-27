@@ -1,7 +1,3 @@
-/**
- * AvatarLockpick GUI - Consolidated JavaScript
- */
-
 // --- Elements Cache ---
 let splashScreen, appWrapper, tabButtons, tabPanels, animationsToggle, userIdInput, censorUserIdToggle;
 let avatarIdInput, responseSpan, colorPickers, htmlElement, actionPopup, popupTitle, popupMessage;
@@ -9,6 +5,8 @@ let unlockNoticePopup, noticeTimerSpan, sidebarToggle, loadedAvatarInfoPanel, lo
 let loadedUserIdSpan, unlockActionButtons, unlockWarningPanel, confirmUnloadPopup, presetButtons;
 let historyListContainer, noHistoryMessage, importJsonPopup, importJsonTextarea, importErrorMessage;
 let netResponsePopup, netResponseContent, notePopup, noteTextarea, appLogsContainer, backendMessagesToggle;
+let apiStatusIcon, avatarInfoPopup, modalAvatarImg, modalAvatarName, modalAvatarAuthor, modalAvatarDesc;
+let loadedAvatarImg, loadedAvatarName, loadedAvatarAuthor, currentModalAvatarId;
 
 // --- Theme Objects ---
 const themes = {
@@ -48,7 +46,8 @@ let netLog = ["Waiting for messages from .NET..."];
 let currentEditingAvatarId = null;
 let noticeShownThisSession = false;
 let noticeTimerInterval = null;
-let showBackendMessages = false; // Toggle for showing backend communication popups
+let showBackendMessages = false;
+let toastNotificationsEnabled = false;
 
 // --- Photino Communication Wrapper ---
 function sendMessageToDotNet(messageObject) {
@@ -68,7 +67,7 @@ function applyTheme(themeSettings, saveToLocalStorage = true) {
             htmlElement.style.setProperty(key, themeSettings[key]);
         }
     });
-    if (themeSettings.hasOwnProperty('--accent-color')){
+    if (themeSettings.hasOwnProperty('--accent-color')) {
         updateAccentRgbVar(themeSettings['--accent-color']);
     }
     updateColorPickers();
@@ -156,6 +155,8 @@ function initialize() {
     }
     applyTheme(themeToApply, false);
 
+    sendMessageToDotNet({ type: 'checkPawStatus' });
+
     const sidebarExpandedStr = localStorage.getItem('sidebarExpanded');
     const sidebarExpanded = sidebarExpandedStr !== 'false';
     appWrapper.classList.toggle('sidebar-expanded', sidebarExpanded);
@@ -212,12 +213,34 @@ function updateSidebarToggleIcon(isExpanded) {
 }
 
 // --- Button Click Functions ---
-function callDotNetSendIDs() {
+function viewAvatarModal() {
     const avatarId = avatarIdInput.value;
-    const userId = userIdInput.value;
+    if (!avatarId) {
+        alert("Please enter an Avatar ID.");
+        return;
+    }
+    currentModalAvatarId = avatarId;
+    if (modalAvatarImg) modalAvatarImg.src = "https://placehold.co/400x300?text=Loading...";
+    if (modalAvatarName) modalAvatarName.textContent = "Loading...";
+    if (modalAvatarAuthor) modalAvatarAuthor.textContent = "Loading...";
+    if (modalAvatarDesc) modalAvatarDesc.textContent = "Loading...";
+    if (avatarInfoPopup) avatarInfoPopup.classList.add('show');
 
-    const message = { type: 'avatarInfo', avatarId, userId };
-    sendMessageToDotNet(message);
+    sendMessageToDotNet({ type: 'fetchAvatarInfo', avatarId: avatarId });
+}
+
+function openInBrowser() {
+    const avatarId = avatarIdInput.value;
+    if (!avatarId) {
+        alert("Please enter an Avatar ID.");
+        return;
+    }
+    sendMessageToDotNet({ type: 'openInBrowser', avatarId: avatarId, userId: userIdInput.value });
+}
+
+function closeAvatarInfoPopup() {
+    if (avatarInfoPopup) avatarInfoPopup.classList.remove('show');
+    currentModalAvatarId = null;
 }
 
 function loadAvatarInfo() {
@@ -235,12 +258,21 @@ function loadAvatarInfo() {
     loadedAvatarIdSpan.textContent = avatarId;
     loadedUserIdSpan.textContent = censorUserIdToggle.checked ? '********' : (userId || 'N/A');
 
+    // Reset PAW fields to loading
+    if (loadedAvatarImg) loadedAvatarImg.src = "https://placehold.co/100x100?text=Loading...";
+    if (loadedAvatarName) loadedAvatarName.textContent = "Loading...";
+    if (loadedAvatarAuthor) loadedAvatarAuthor.textContent = "Loading...";
+
     isAvatarLoaded = true;
     window.loadedAvatarId = avatarId;
     window.loadedUserId = userId;
 
     updateUnlockUI();
     addAvatarToHistory(avatarId, userId);
+    showToast(`Avatar loaded: ${avatarId}`, 'info', 'Avatar', 3500);
+
+    // Fetch PAW Info for loaded panel
+    sendMessageToDotNet({ type: 'fetchAvatarInfo', avatarId: avatarId });
 }
 
 function triggerPopup(actionType) {
@@ -266,6 +298,7 @@ function triggerPopup(actionType) {
         userId: window.loadedUserId || null
     };
     sendMessageToDotNet(message);
+    showToast(`${actionType} started...`, 'info', 'Unlock', 3000);
 
     // Auto-switch to Logs tab
     const logsTabBtn = document.querySelector('.tab-button[data-tab="logs"]');
@@ -311,7 +344,7 @@ function saveLinuxSettings() {
     const linuxPath = document.getElementById('custom-linux-cache-path').value.trim();
     localStorage.setItem('customLinuxPath', linuxPath);
     sendLinuxSettingsToBackend(linuxPath);
-    
+
     popupTitle.textContent = "Linux Settings Saved";
     popupMessage.textContent = "Custom cache path has been updated.";
     actionPopup.classList.add('show');
@@ -321,7 +354,7 @@ function resetLinuxSettings() {
     document.getElementById('custom-linux-cache-path').value = '';
     localStorage.removeItem('customLinuxPath');
     sendLinuxSettingsToBackend("");
-    
+
     popupTitle.textContent = "Linux Settings Reset";
     popupMessage.textContent = "Now using default Proton cache path.";
     actionPopup.classList.add('show');
@@ -357,14 +390,21 @@ function renderHistory() {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'history-item';
             const formattedDate = new Date(item.timestamp).toLocaleString();
-            const noteContent = item.note 
+            const noteContent = item.note
                 ? `<p class="history-item-note">${item.note}</p>`
                 : `<p class="history-item-note placeholder">Looks like this avatar is a mystery. Add a note so your future self knows what's up!</p>`;
 
             itemDiv.innerHTML = `
-                <h4>${item.avatarId}</h4>
-                <p><strong>User:</strong> ${item.userId || 'N/A'}</p>
-                <p><small>Loaded: ${formattedDate}</small></p>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 10px; text-align: center;">
+                    <img src="${item.imageUrl || 'https://placehold.co/400x300?text=No+Image'}" alt="Thumb" style="width: 100%; max-width: 400px; height: 200px; object-fit: cover; border-radius: 8px;">
+                    <div style="width: 100%; word-break: break-all;">
+                        <h4 style="margin: 0 0 5px 0;">${item.name || item.avatarId}</h4>
+                        <p style="margin: 0 0 5px 0;"><strong>Author:</strong> ${item.authorName || 'Unknown'}</p>
+                        <p style="margin: 0 0 5px 0; font-size: 0.8em; color: var(--text-color); opacity: 0.8;"><strong>ID:</strong> ${item.avatarId}</p>
+                        <p style="margin: 0;"><strong>User:</strong> ${item.userId || 'N/A'}</p>
+                        <p style="margin: 0;"><small>Loaded: ${formattedDate}</small></p>
+                    </div>
+                </div>
                 <div class="history-item-note-container">
                     ${noteContent}
                 </div>
@@ -381,9 +421,16 @@ function renderHistory() {
 
 function addAvatarToHistory(avatarId, userId) {
     let existingNote = null;
+    let existingImageUrl = null;
+    let existingName = null;
+    let existingAuthor = null;
+
     const existingIndex = avatarHistory.findIndex(item => item.avatarId === avatarId);
     if (existingIndex > -1) {
         existingNote = avatarHistory[existingIndex].note;
+        existingImageUrl = avatarHistory[existingIndex].imageUrl;
+        existingName = avatarHistory[existingIndex].name;
+        existingAuthor = avatarHistory[existingIndex].authorName;
         avatarHistory.splice(existingIndex, 1);
     }
 
@@ -391,7 +438,10 @@ function addAvatarToHistory(avatarId, userId) {
         avatarId: avatarId,
         userId: userId,
         timestamp: new Date().getTime(),
-        note: existingNote
+        note: existingNote,
+        imageUrl: existingImageUrl,
+        name: existingName,
+        authorName: existingAuthor
     });
 
     if (avatarHistory.length > 50) {
@@ -402,10 +452,24 @@ function addAvatarToHistory(avatarId, userId) {
     renderHistory();
 }
 
+function updateHistoryWithPawData(avatarId, name, authorName, imageUrl, description) {
+    const item = avatarHistory.find(i => i.avatarId === avatarId);
+    if (item) {
+        item.name = name;
+        item.authorName = authorName;
+        item.imageUrl = imageUrl;
+        if (!item.note && description && description !== 'Placeholder info (avatar not in API).') {
+            item.note = description;
+        }
+        localStorage.setItem('avatarHistory', JSON.stringify(avatarHistory));
+        renderHistory();
+    }
+}
+
 function loadFromHistory(avatarId, userId) {
     avatarIdInput.value = avatarId;
     userIdInput.value = userId;
-    
+
     localStorage.setItem('avatarId', avatarId);
     localStorage.setItem('userId', userId);
 
@@ -506,7 +570,52 @@ function closePopup() {
     }
 }
 
-// --- Logs Tab Functions ---
+function checkPawStatus() {
+    const apiStatusText = document.getElementById('api-status-text');
+    if (apiStatusText) apiStatusText.textContent = 'Checking...';
+    if (apiStatusIcon) {
+        apiStatusIcon.classList.remove('online', 'offline');
+        apiStatusIcon.classList.add('checking');
+    }
+    sendMessageToDotNet({ type: 'checkPawStatus' });
+}
+
+// --- Toast Notification System ---
+const _toastIcons = {
+    success: 'fa-solid fa-circle-check',
+    error: 'fa-solid fa-circle-xmark',
+    warn: 'fa-solid fa-triangle-exclamation',
+    info: 'fa-solid fa-circle-info'
+};
+
+function showToast(message, type = 'info', title = '', duration = 4000) {
+    if (!toastNotificationsEnabled) return;
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.style.position = 'relative';
+    toast.innerHTML = `
+        <i class="toast-icon ${_toastIcons[type] || _toastIcons.info}"></i>
+        <div class="toast-body">
+            ${title ? `<span class="toast-title">${title}</span>` : ''}
+            <span class="toast-message">${message}</span>
+        </div>
+        <div class="toast-progress" style="animation-duration: ${duration}ms;"></div>
+    `;
+
+    container.appendChild(toast);
+
+    const dismiss = () => {
+        toast.classList.add('toast-exit');
+        toast.addEventListener('animationend', () => toast.remove(), { once: true });
+    };
+
+    const timer = setTimeout(dismiss, duration);
+    toast.addEventListener('click', () => { clearTimeout(timer); dismiss(); });
+}
+
 function appendAppLog(logData) {
     const firstEntry = appLogsContainer.querySelector('.log-entry');
     if (firstEntry && firstEntry.textContent.includes("Waiting for logs...")) {
@@ -518,7 +627,7 @@ function appendAppLog(logData) {
 
     let color = 'var(--text-color)';
     let icon = '';
-    
+
     switch (logData.logType) {
         case 'success':
             color = '#00ff40';
@@ -682,7 +791,7 @@ function clearCacheAndReload() {
                 const cssVar = picker.getAttribute('data-var');
                 localStorage.removeItem(`customColor_${cssVar}`);
             });
-            
+
             window.location.reload();
         } catch (error) {
             console.error("Error clearing local storage or reloading:", error);
@@ -703,7 +812,7 @@ function clearInputFields() {
 }
 
 // --- DOM Ready & Event Listeners ---
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Cache all DOM elements
     splashScreen = document.getElementById('splash-screen');
     appWrapper = document.getElementById('app-wrapper');
@@ -740,6 +849,15 @@ document.addEventListener('DOMContentLoaded', function() {
     noteTextarea = document.getElementById('note-textarea');
     appLogsContainer = document.getElementById('app-logs-container');
     backendMessagesToggle = document.getElementById('backend-messages-toggle');
+    apiStatusIcon = document.getElementById('api-status-icon');
+    avatarInfoPopup = document.getElementById('avatar-info-popup');
+    modalAvatarImg = document.getElementById('modal-avatar-img');
+    modalAvatarName = document.getElementById('modal-avatar-name');
+    modalAvatarAuthor = document.getElementById('modal-avatar-author');
+    modalAvatarDesc = document.getElementById('modal-avatar-desc');
+    loadedAvatarImg = document.getElementById('loaded-avatar-img');
+    loadedAvatarName = document.getElementById('loaded-avatar-name');
+    loadedAvatarAuthor = document.getElementById('loaded-avatar-author');
 });
 
 // --- Window Load Event ---
@@ -812,12 +930,24 @@ window.addEventListener('load', () => {
         showBackendMessages = JSON.parse(savedBackendMsgPref);
         backendMessagesToggle.checked = showBackendMessages;
     }
-    
     backendMessagesToggle.addEventListener('change', (event) => {
         showBackendMessages = event.target.checked;
         localStorage.setItem('showBackendMessages', JSON.stringify(showBackendMessages));
-        console.log(`Show backend messages: ${showBackendMessages}`);
     });
+
+    // Toast notifications toggle
+    const toastToggle = document.getElementById('toast-notifications-toggle');
+    const savedToastPref = localStorage.getItem('toastNotificationsEnabled');
+    if (savedToastPref !== null) {
+        toastNotificationsEnabled = JSON.parse(savedToastPref);
+        if (toastToggle) toastToggle.checked = toastNotificationsEnabled;
+    }
+    if (toastToggle) {
+        toastToggle.addEventListener('change', (event) => {
+            toastNotificationsEnabled = event.target.checked;
+            localStorage.setItem('toastNotificationsEnabled', JSON.stringify(toastNotificationsEnabled));
+        });
+    }
 
     colorPickers.forEach(picker => {
         picker.addEventListener('input', (event) => {
@@ -900,6 +1030,51 @@ window.addEventListener('load', () => {
                     closeDownloadProgress();
                     return;
                 }
+                if (data && data.type === 'pawStatus') {
+                    const isOnline = data.isOnline;
+                    const apiStatusText = document.getElementById('api-status-text');
+                    if (apiStatusIcon) {
+                        apiStatusIcon.classList.remove('online', 'offline', 'checking');
+                        apiStatusIcon.classList.add(isOnline ? 'online' : 'offline');
+                    }
+                    if (apiStatusText) {
+                        apiStatusText.textContent = isOnline ? 'Online' : 'Offline';
+                    }
+                    if (!isOnline) {
+                        showToast('PAW API is unreachable. Avatar info may be unavailable.', 'warn', 'API Status', 6000);
+                    }
+                    return;
+                }
+                if (data && data.type === 'pawAvatarInfo') {
+                    const found = data.found;
+                    const name = found ? (data.name || 'Unknown') : 'Not Found in PAW';
+                    const author = found ? (data.authorName || 'Unknown') : 'Not Found';
+                    const desc = found ? (data.description || 'No description provided.') : 'Placeholder info (avatar not in API).';
+                    const imgUrl = found ? (data.imageUrl || 'https://placehold.co/400x300?text=No+Image') : 'https://placehold.co/400x300?text=Not+Found';
+
+                    // Update Modal
+                    if (currentModalAvatarId === data.avatarId) {
+                        if (modalAvatarImg) modalAvatarImg.src = imgUrl;
+                        if (modalAvatarName) modalAvatarName.textContent = name;
+                        if (modalAvatarAuthor) modalAvatarAuthor.textContent = author;
+                        if (modalAvatarDesc) modalAvatarDesc.textContent = desc;
+                    }
+                    // Update Loaded Avatar Panel
+                    if (window.loadedAvatarId === data.avatarId) {
+                        if (loadedAvatarImg) loadedAvatarImg.src = imgUrl;
+                        if (loadedAvatarName) loadedAvatarName.textContent = name;
+                        if (loadedAvatarAuthor) loadedAvatarAuthor.textContent = author;
+                    }
+                    // Update History
+                    updateHistoryWithPawData(data.avatarId, name, author, imgUrl, desc);
+                    // Toast on result
+                    if (found) {
+                        showToast(`${name} by ${author}`, 'success', 'Avatar Found', 4000);
+                    } else {
+                        showToast(`Avatar not found in PAW database.`, 'warn', 'PAW Lookup', 4000);
+                    }
+                    return;
+                }
             } catch (e) {
                 // Not JSON or failed to parse, treat as plain text
             }
@@ -908,14 +1083,14 @@ window.addEventListener('load', () => {
 
             const timestamp = new Date().toLocaleTimeString();
             const logEntry = `[${timestamp}] ${message}`;
-            
+
             if (netLog.length === 1 && netLog[0] === "Waiting for messages from .NET...") {
                 netLog = [logEntry];
             } else {
                 netLog.push(logEntry);
             }
 
-            if(netResponseContent) {
+            if (netResponseContent) {
                 netResponseContent.textContent = netLog.join('\n');
                 netResponseContent.scrollTop = netResponseContent.scrollHeight;
             }
@@ -933,7 +1108,7 @@ function showDownloadProgress(title) {
     const titleSpan = document.getElementById('download-title');
     const progressBar = document.getElementById('download-progress-bar');
     const statusText = document.getElementById('download-status');
-    
+
     if (popup) {
         if (titleSpan) titleSpan.textContent = title || 'Downloading...';
         if (progressBar) progressBar.style.width = '0%';
@@ -947,12 +1122,12 @@ function updateDownloadProgress(progress, status, title) {
     const titleSpan = document.getElementById('download-title');
     const progressBar = document.getElementById('download-progress-bar');
     const statusText = document.getElementById('download-status');
-    
+
     // Show popup if not already visible
     if (popup && !popup.classList.contains('show')) {
         popup.classList.add('show');
     }
-    
+
     if (titleSpan && title) titleSpan.textContent = title;
     if (progressBar) progressBar.style.width = `${progress}%`;
     if (statusText) statusText.textContent = status || `${progress}%`;
@@ -971,11 +1146,11 @@ let customDbUrlInput, customDbPathInput;
 function initCustomDbSettings() {
     customDbUrlInput = document.getElementById('custom-db-url');
     customDbPathInput = document.getElementById('custom-db-path');
-    
+
     // Load saved settings
     const savedUrl = localStorage.getItem('customDbUrl');
     const savedPath = localStorage.getItem('customDbPath');
-    
+
     if (savedUrl && customDbUrlInput) customDbUrlInput.value = savedUrl;
     if (savedPath && customDbPathInput) customDbPathInput.value = savedPath;
 }
@@ -983,10 +1158,10 @@ function initCustomDbSettings() {
 function saveCustomDbSettings() {
     const url = customDbUrlInput ? customDbUrlInput.value.trim() : '';
     const path = customDbPathInput ? customDbPathInput.value.trim() : '';
-    
+
     localStorage.setItem('customDbUrl', url);
     localStorage.setItem('customDbPath', path);
-    
+
     // Send to .NET backend
     const message = {
         type: 'customDbSettings',
@@ -994,22 +1169,22 @@ function saveCustomDbSettings() {
         path: path
     };
     sendMessageToDotNet(message);
-    
+
     // Show confirmation
     popupTitle.textContent = "Settings Saved";
     popupMessage.innerHTML = '<i class="fa-solid fa-check-circle" style="color: #2ECC71; margin-right: 8px;"></i> Custom database settings have been saved.';
     actionPopup.classList.add('show');
-    
+
     console.log(`Custom DB settings saved - URL: ${url}, Path: ${path}`);
 }
 
 function resetCustomDbSettings() {
     if (customDbUrlInput) customDbUrlInput.value = '';
     if (customDbPathInput) customDbPathInput.value = '';
-    
+
     localStorage.removeItem('customDbUrl');
     localStorage.removeItem('customDbPath');
-    
+
     // Notify backend to use default
     const message = {
         type: 'customDbSettings',
@@ -1017,13 +1192,15 @@ function resetCustomDbSettings() {
         path: ''
     };
     sendMessageToDotNet(message);
-    
+
     popupTitle.textContent = "Settings Reset";
     popupMessage.innerHTML = '<i class="fa-solid fa-rotate-left" style="color: var(--accent-color); margin-right: 8px;"></i> Database settings reset to default.';
     actionPopup.classList.add('show');
-    
+
     console.log("Custom DB settings reset to default");
-}// --- Localization Logic ---
+}
+
+// --- Localization Logic ---
 const translations = {
     "en": {
         ".tab-button[data-tab='avatar'] .tab-text": "Avatar",
@@ -1037,7 +1214,7 @@ const translations = {
         "label[for='avatar-id']": "Avatar ID",
         "label[for='user-id']": "User ID",
         "label[for='censor-user-id']": "Censor User ID",
-        "button[onclick='callDotNetSendIDs()']": "<i class=\"fa-solid fa-eye\"></i> View Avatar",
+        "button[onclick='viewAvatarModal()']": "<i class=\"fa-solid fa-eye\"></i> View Avatar",
         "button[onclick='loadAvatarInfo()']": "<i class=\"fa-solid fa-download\"></i> Load Avatar",
         "button[onclick='clearInputFields()']": "<i class=\"fa-solid fa-eraser\"></i> Clear Fields",
         "#unlock-tab h2": "<i class=\"fa-solid fa-lock-open\"></i> Unlock Actions",
@@ -1067,7 +1244,8 @@ const translations = {
         "#settings-tab h2": "<i class=\"fa-solid fa-gear\"></i> Settings",
         "label[for='animations-toggle']": "Enable UI Animations",
         "label[for='backend-messages-toggle']": "Show Backend Communication Popups",
-        "button[onclick='clearCacheAndReload()']": "<i class=\"fa-solid fa-trash-can\"></i> Clear Cache & Reload GUI",
+        "#settings-toast-label": "Show Toast Notifications",
+        "#settings-adv-btn-clear": "Clear Cache & Reload GUI",
         "#help-tab h2": "<i class=\"fa-solid fa-circle-question\"></i> Help Guide",
         "#help-yt-text": "For an in-depth visual tutorial, be sure to head over to my YouTube channel <strong>@ScrimDev</strong>!",
         "#help-step1-title": "<i class=\"fa-solid fa-clipboard-list\" style=\"margin-right:8px;\"></i> Step 1: Preparation",
@@ -1129,6 +1307,112 @@ const translations = {
         "#no-history-message": "No recent avatars loaded. Load an avatar in the 'Avatar' tab to see it here.",
         "button[onclick='closePopup()']": "Close"
     },
+    "de": {
+        ".tab-button[data-tab='avatar'] .tab-text": "Avatar",
+        ".tab-button[data-tab='unlock'] .tab-text": "Entsperren",
+        ".tab-button[data-tab='recents'] .tab-text": "Verlauf",
+        ".tab-button[data-tab='logs'] .tab-text": "Protokoll",
+        ".tab-button[data-tab='settings'] .tab-text": "Einstellungen",
+        ".tab-button[data-tab='help'] .tab-text": "Hilfe",
+        ".tab-button[data-tab='info'] .tab-text": "Info",
+        "#avatar-tab h2": "<i class=\"fa-solid fa-user\"></i> Avatar",
+        "label[for='avatar-id']": "Avatar-ID",
+        "label[for='user-id']": "Benutzer-ID",
+        "label[for='censor-user-id']": "Benutzer-ID ausblenden",
+        "button[onclick='viewAvatarModal()']": "<i class=\"fa-solid fa-eye\"></i> Avatar ansehen",
+        "button[onclick='loadAvatarInfo()']": "<i class=\"fa-solid fa-download\"></i> Avatar laden",
+        "button[onclick='clearInputFields()']": "<i class=\"fa-solid fa-eraser\"></i> Felder leeren",
+        "#unlock-tab h2": "<i class=\"fa-solid fa-lock-open\"></i> Entsperroptionen",
+        "#unlock-warning-panel p": "<i class=\"fa-solid fa-triangle-exclamation\"></i> Bitte zuerst einen Avatar im Avatar-Tab laden.",
+        "button[onclick=\"triggerPopup('Unlock')\"]": "<i class=\"fa-solid fa-unlock\"></i> Entsperren",
+        "button[onclick=\"triggerPopup('Unlock')\"] + p": "Verwendet die allgemeine Methode zum Entsperren von Avataren.",
+        "button[onclick=\"triggerPopup('Unlock (VRCFury)')\"]": "<i class=\"fa-solid fa-bolt\"></i> Entsperren (VRCFury)",
+        "button[onclick=\"triggerPopup('Unlock (VRCFury)')\"] + p": "Versucht VRCFury-Parameter zu entsperren.",
+        "button[onclick=\"triggerPopup('Database Unlock')\"]": "<i class=\"fa-solid fa-database\"></i> Datenbank-Entsperrung",
+        "button[onclick=\"triggerPopup('Database Unlock')\"] + p": "Scannt die Avatar-Sperren gegen die SQL-Datenbank, um eine Übereinstimmung zu finden.",
+        "button[onclick=\"triggerRestart('restart-novr')\"]": "<i class=\"fa-solid fa-arrows-rotate\"></i> Neustart",
+        "button[onclick=\"triggerRestart('restart-novr')\"] + p": "Startet VRChat neu.",
+        "button[onclick=\"triggerRestart('restart-vr')\"]": "<i class=\"fa-solid fa-arrows-rotate\"></i> Neustart (VR)",
+        "button[onclick=\"triggerRestart('restart-vr')\"] + p": "Startet VRChat im VR-Modus neu.",
+        "#loaded-avatar-info-panel h3": "Geladener Avatar",
+        "#history-h3": "Verlauf",
+        "#manage-history-h3": "Verlauf verwalten",
+        "#loaded-avi-id-label": "Avatar-ID:",
+        "#loaded-user-id-label": "Benutzer-ID:",
+        "button[onclick=\"showUnloadConfirmation()\"]": "<i class=\"fa-solid fa-times-circle\"></i> Avatar entladen",
+        "#recents-tab h2": "<i class=\"fa-solid fa-history\"></i> Verlauf",
+        "button[onclick='exportHistory()']": "<i class=\"fa-solid fa-file-export\"></i> Als JSON exportieren",
+        "button[onclick='showImportPopup()']": "<i class=\"fa-solid fa-file-import\"></i> JSON importieren",
+        "#logs-tab h2": "<i class=\"fa-solid fa-file-lines\"></i> Anwendungsprotokolle",
+        "button[onclick='clearAppLogs()']": "<i class=\"fa-solid fa-trash\"></i> Protokoll leeren",
+        "button[onclick='copyAppLogs()']": "<i class=\"fa-solid fa-copy\"></i> Kopieren",
+        "#settings-tab h2": "<i class=\"fa-solid fa-gear\"></i> Einstellungen",
+        "label[for='animations-toggle']": "UI-Animationen aktivieren",
+        "label[for='backend-messages-toggle']": "Backend-Meldungen anzeigen",
+        "#settings-toast-label": "Toast-Benachrichtigungen anzeigen",
+        "#settings-adv-btn-clear": "Cache leeren & GUI neu laden",
+        "#help-tab h2": "<i class=\"fa-solid fa-circle-question\"></i> Hilfeführer",
+        "#help-yt-text": "Für ein ausführliches visuelles Tutorial besuche meinen YouTube-Kanal <strong>@ScrimDev</strong>!",
+        "#help-step1-title": "<i class=\"fa-solid fa-clipboard-list\" style=\"margin-right:8px;\"></i> Schritt 1: Vorbereitung",
+        "#help-step1-text": "Starte VRChat und wechsle zu dem Avatar, den du entsperren möchtest. Warte, bis der Avatar vollständig geladen ist. Gib dann deine VRChat-Benutzer-ID und die Avatar-ID in die Anwendung ein.",
+        "#help-step2-title": "<i class=\"fa-solid fa-lock-open\" style=\"margin-right:8px;\"></i> Schritt 2: Entsperren",
+        "#help-step2-text": "Versuche den Avatar mit der Standard-Methode <strong>Entsperren</strong> zu entsperren. Bei VRCFury-Sperren verwende <strong>Entsperren (VRCFury)</strong> oder <strong>Datenbank-Entsperrung</strong>.",
+        "#help-step3-title": "<i class=\"fa-solid fa-flag-checkered\" style=\"margin-right:8px;\"></i> Zuletzt: Neustart",
+        "#help-step3-text": "Starte das Spiel über die Neustart-Schaltflächen neu. Genieße deinen freigeschalteten Avatar!",
+        "#info-p1": "AvatarLockpick",
+        "#info-p2": "GUI erstellt mit Photino.NET",
+        "#info-p3": "Entwickelt von Scrimmane / ScrimDev",
+        "#info-p4": "App-Symbol von Kmg Design",
+        "#info-btn1": ".NET-Protokoll anzeigen",
+        "#info-p5": "<strong>Hinweis:</strong> Du kannst diese Oberfläche anpassen! Bearbeite die Dateien im 'UI'-Ordner der Anwendung.",
+        "#info-btn2": "Hilfeseite",
+        "#settings-theme-h3": "Designanpassung",
+        "#settings-presets-h4": "Voreinstellungen",
+        "#settings-preset-default": "Standard (Blau)",
+        "#settings-custom-colors-h4": "Benutzerdefinierte Farben",
+        "#settings-bg-label": "Hintergrundfarbe:",
+        "#settings-panel-label": "Panel/Sekundärer Hintergrund:",
+        "#settings-text-label": "Textfarbe:",
+        "#settings-accent-label": "Akzentfarbe:",
+        "#settings-accent-hover-label": "Akzentfarbe (Hover):",
+        "#settings-reset-theme": "Design zurücksetzen",
+        "#settings-prefs-h3": "Einstellungen",
+        "#settings-services-h3": "Dienste",
+        "#settings-lang-h3": "Sprache",
+        "#settings-lang-p": "Bevorzugte Sprache auswählen.",
+        "#settings-db-h3": "Benutzerdefinierte Datenbank",
+        "#settings-db-p": "Eigene Sperrdatenbank per URL oder lokalem Dateipfad laden. Leer lassen für die Standarddatenbank.",
+        "#settings-db-url-label": "Datenbank-URL",
+        "#settings-db-path-label": "Oder lokaler Dateipfad",
+        "#settings-db-save": "Datenbankeinstellungen speichern",
+        "#settings-db-reset": "Auf Standard zurücksetzen",
+        "#settings-linux-h3": "Linux-Kompatibilität",
+        "#settings-adv-h3": "Erweitert",
+        "#settings-adv-p1": "Das Leeren des Caches setzt Designeinstellungen, Sidebar-Status und Benutzer-ID-Einstellungen zurück.",
+        "#settings-adv-btn-dir": "App-Verzeichnis öffnen",
+        "#confirm-popup-title": "Avatar entladen?",
+        "#confirm-popup-message": "Bist du sicher, dass du den aktuellen Avatar entladen möchtest?",
+        "button[onclick='confirmUnloadAvatar()']": "Ja, entladen",
+        "button[onclick='cancelUnloadAvatar()']": "Abbrechen",
+        "#note-popup h3": "<i class=\"fa-solid fa-note-sticky\"></i> Notiz bearbeiten",
+        "#note-popup p": "Notiz für diesen Avatar unten hinzufügen oder bearbeiten.",
+        "button[onclick='saveNote()']": "Notiz speichern",
+        "button[onclick='closeNotePopup()']": "Abbrechen",
+        "#net-response-popup h3": "<i class=\"fa-solid fa-terminal\"></i> .NET-Protokoll",
+        "button[onclick='closeNetResponsePopup()']": "Schließen",
+        "button[onclick='clearNetLog()']": "Protokoll leeren",
+        "#import-json-popup h3": "Verlauf aus JSON importieren",
+        "#import-json-popup p": "JSON-Inhalt unten einfügen. Dies überschreibt den aktuellen Verlauf.",
+        "button[onclick='importHistory()']": "Importieren",
+        "button[onclick='closeImportPopup()']": "Abbrechen",
+        "#unlock-notice-popup h3": "<i class=\"fa-solid fa-info-circle\"></i> Hinweis",
+        "#unlock-notice-popup p": "Die Funktion 'Datenbank-Entsperrung' scannt die Avatar-Datei gegen bekannte Sperrsignaturen. Dies kann auch bei versteckten oder umbenannten Komponenten helfen.",
+        "button[onclick='closeUnlockNotice()']": "Schließen",
+        "#download-title": "Datenbank wird heruntergeladen...",
+        "#download-status": "Download wird vorbereitet...",
+        "#no-history-message": "Keine kürzlich geladenen Avatare. Lade einen Avatar im 'Avatar'-Tab.",
+        "button[onclick='closePopup()']": "Schließen"
+    },
     "es": {
         ".tab-button[data-tab='avatar'] .tab-text": "Avatar",
         ".tab-button[data-tab='unlock'] .tab-text": "Desbloquear",
@@ -1141,7 +1425,7 @@ const translations = {
         "label[for='avatar-id']": "ID de Avatar",
         "label[for='user-id']": "ID de Usuario",
         "label[for='censor-user-id']": "Censurar ID de Usuario",
-        "button[onclick='callDotNetSendIDs()']": "<i class=\"fa-solid fa-eye\"></i> Ver Avatar",
+        "button[onclick='viewAvatarModal()']": "<i class=\"fa-solid fa-eye\"></i> Ver Avatar",
         "button[onclick='loadAvatarInfo()']": "<i class=\"fa-solid fa-download\"></i> Cargar Avatar",
         "button[onclick='clearInputFields()']": "<i class=\"fa-solid fa-eraser\"></i> Limpiar Campos",
         "#unlock-tab h2": "<i class=\"fa-solid fa-lock-open\"></i> Acciones de Desbloqueo",
@@ -1171,7 +1455,8 @@ const translations = {
         "#settings-tab h2": "<i class=\"fa-solid fa-gear\"></i> Ajustes",
         "label[for='animations-toggle']": "Activar animaciones de interfaz",
         "label[for='backend-messages-toggle']": "Mostrar mensajes de backend",
-        "button[onclick='clearCacheAndReload()']": "<i class=\"fa-solid fa-trash-can\"></i> Limpiar Caché y Recargar",
+        "#settings-toast-label": "Mostrar notificaciones emergentes",
+        "#settings-adv-btn-clear": "Borrar Caché y Recargar",
         "#help-tab h2": "<i class=\"fa-solid fa-circle-question\"></i> Guía de Ayuda",
         "#help-yt-text": "¡Para un tutorial visual detallado, asegúrate de visitar mi canal de YouTube <strong>@ScrimDev</strong>!",
         "#help-step1-title": "<i class=\"fa-solid fa-clipboard-list\" style=\"margin-right:8px;\"></i> Paso 1: Preparación",
@@ -1245,7 +1530,7 @@ const translations = {
         "label[for='avatar-id']": "替身 ID",
         "label[for='user-id']": "用户 ID",
         "label[for='censor-user-id']": "隐藏用户 ID",
-        "button[onclick='callDotNetSendIDs()']": "<i class=\"fa-solid fa-eye\"></i> 查看替身",
+        "button[onclick='viewAvatarModal()']": "<i class=\"fa-solid fa-eye\"></i> 查看替身",
         "button[onclick='loadAvatarInfo()']": "<i class=\"fa-solid fa-download\"></i> 加载替身",
         "button[onclick='clearInputFields()']": "<i class=\"fa-solid fa-eraser\"></i> 清除输入",
         "#unlock-tab h2": "<i class=\"fa-solid fa-lock-open\"></i> 解锁操作",
@@ -1275,7 +1560,8 @@ const translations = {
         "#settings-tab h2": "<i class=\"fa-solid fa-gear\"></i> 设置",
         "label[for='animations-toggle']": "启用 UI 动画",
         "label[for='backend-messages-toggle']": "显示后台通信弹出窗口",
-        "button[onclick='clearCacheAndReload()']": "<i class=\"fa-solid fa-trash-can\"></i> 清除缓存并重新加载",
+        "#settings-toast-label": "显示消息提示",
+        "#settings-adv-btn-clear": "清除缓存并重新加载",
         "#help-tab h2": "<i class=\"fa-solid fa-circle-question\"></i> 帮助指南",
         "#help-yt-text": "欲了解详细的视觉教程，请务必前往我的 YouTube 频道 <strong>@ScrimDev</strong>！",
         "#help-step1-title": "<i class=\"fa-solid fa-clipboard-list\" style=\"margin-right:8px;\"></i> 第一步：准备",
@@ -1349,7 +1635,7 @@ const translations = {
         "label[for='avatar-id']": "アバター ID",
         "label[for='user-id']": "ユーザー ID",
         "label[for='censor-user-id']": "ユーザー ID を隠す",
-        "button[onclick='callDotNetSendIDs()']": "<i class=\"fa-solid fa-eye\"></i> アバターを見る",
+        "button[onclick='viewAvatarModal()']": "<i class=\"fa-solid fa-eye\"></i> アバターを見る",
         "button[onclick='loadAvatarInfo()']": "<i class=\"fa-solid fa-download\"></i> アバターを読み込む",
         "button[onclick='clearInputFields()']": "<i class=\"fa-solid fa-eraser\"></i> 入力をクリア",
         "#unlock-tab h2": "<i class=\"fa-solid fa-lock-open\"></i> アンロック アクション",
@@ -1379,7 +1665,8 @@ const translations = {
         "#settings-tab h2": "<i class=\"fa-solid fa-gear\"></i> 設定",
         "label[for='animations-toggle']": "UI アニメーションを有効にする",
         "label[for='backend-messages-toggle']": "バックエンド通信を表示",
-        "button[onclick='clearCacheAndReload()']": "<i class=\"fa-solid fa-trash-can\"></i> キャッシュをクリアして再読み込み",
+        "#settings-toast-label": "トースト通知を表示",
+        "#settings-adv-btn-clear": "キャッシュをクリアして再読み込み",
         "#help-tab h2": "<i class=\"fa-solid fa-circle-question\"></i> ヘルプガイド",
         "#help-yt-text": "詳細なビジュアルチュートリアルについては、私の YouTube チャンネル <strong>@ScrimDev</strong> をぜひご覧ください！",
         "#help-step1-title": "<i class=\"fa-solid fa-clipboard-list\" style=\"margin-right:8px;\"></i> ステップ 1: 準備",
@@ -1453,7 +1740,7 @@ const translations = {
         "label[for='avatar-id']": "ID Аватара",
         "label[for='user-id']": "ID Пользователя",
         "label[for='censor-user-id']": "Скрыть ID Пользователя",
-        "button[onclick='callDotNetSendIDs()']": "<i class=\"fa-solid fa-eye\"></i> Посмотреть Аватар",
+        "button[onclick='viewAvatarModal()']": "<i class=\"fa-solid fa-eye\"></i> Посмотреть Аватар",
         "button[onclick='loadAvatarInfo()']": "<i class=\"fa-solid fa-download\"></i> Загрузить Аватар",
         "button[onclick='clearInputFields()']": "<i class=\"fa-solid fa-eraser\"></i> Очистить Поля",
         "#unlock-tab h2": "<i class=\"fa-solid fa-lock-open\"></i> Действия Разблокировки",
@@ -1483,7 +1770,8 @@ const translations = {
         "#settings-tab h2": "<i class=\"fa-solid fa-gear\"></i> Настройки",
         "label[for='animations-toggle']": "Включить Анимацию UI",
         "label[for='backend-messages-toggle']": "Показывать сообщения бэкенда",
-        "button[onclick='clearCacheAndReload()']": "<i class=\"fa-solid fa-trash-can\"></i> Очистить Кэш и Перезагрузить GUI",
+        "#settings-toast-label": "Показывать уведомления",
+        "#settings-adv-btn-clear": "Очистить Кэш и Перезагрузить GUI",
         "#help-tab h2": "<i class=\"fa-solid fa-circle-question\"></i> Руководство",
         "#help-yt-text": "Для подробного видеоурока обязательно зайдите на мой YouTube-канал <strong>@ScrimDev</strong>!",
         "#help-step1-title": "<i class=\"fa-solid fa-clipboard-list\" style=\"margin-right:8px;\"></i> Шаг 1: Подготовка",
@@ -1554,7 +1842,7 @@ function updateLanguage(lang) {
     currentLang = lang;
     localStorage.setItem('appLanguage', lang);
     const langDict = translations[lang];
-    
+
     for (const selector in langDict) {
         const el = document.querySelector(selector);
         if (el) {
@@ -1563,3 +1851,5 @@ function updateLanguage(lang) {
     }
 }
 function openAppDir() { sendMessageToDotNet({ action: 'openAppDirectory' }); }
+
+

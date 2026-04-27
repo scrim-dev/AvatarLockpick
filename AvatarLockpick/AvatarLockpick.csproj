@@ -38,6 +38,7 @@
     <PackageReference Include="Photino.NET" Version="4.0.16" />
   </ItemGroup>
   
+
   <ItemGroup>
     <None Update="ALP.desktop">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

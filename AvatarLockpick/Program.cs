@@ -8,7 +8,7 @@ namespace AvatarLockpick
 {
     internal class Program
     {
-        public const string AppVersion = "2.4"; //Global Version Set
+        public const string AppVersion = "2.5"; //Global Version Set
         public static HttpUtils HttpC { get; private set; } = new();
         public static Size AppSize { get; private set; } = new Size(1300, 800);
 
@@ -44,6 +44,7 @@ namespace AvatarLockpick
                 }
 
                 HttpC.Load();
+                PAWUtils.Init();
 
                 // Application logic starts here if this is the first instance
                 string windowTitle = "AvatarLockpick";
@@ -80,7 +81,7 @@ namespace AvatarLockpick
                         window.SendWebMessage(response);
 
                         //Send data to be processed
-                        GUIcom.Communication(message);
+                        GUIcom.Communication(message, window);
                     })
                     .Load($"UI/index.html"); // Can be used with relative path strings or "new URI()" instance to load a website.
 

@@ -9,23 +9,30 @@ html {
     /* Define theme variables on root for easier JS access */
     /* Darker Dark Theme Defaults */
     --bg-color: #121212;
-    --bg-secondary-color: #181818; /* Darker secondary BG */
+    --bg-secondary-color: #181818;
+    /* Darker secondary BG */
     --text-color: #ffffff;
-    --text-secondary-color: #b0b0b0; /* Adjusted secondary contrast slightly */
-    --accent-color: #1E90FF; /* Dodger Blue accent */
-    --accent-hover-color: #46A3FF; /* Dodger Blue hover */
+    --text-secondary-color: #b0b0b0;
+    /* Adjusted secondary contrast slightly */
+    --accent-color: #1E90FF;
+    /* Dodger Blue accent */
+    --accent-hover-color: #46A3FF;
+    /* Dodger Blue hover */
     --border-color: #333333;
     --panel-bg-color: #242424;
     --input-bg-color: #2d2d2d;
     --input-border-color: #454545;
-    --glow-color: #ff00ff; /* Magenta glow color */
+    --glow-color: #ff00ff;
+    /* Magenta glow color */
 }
 
-html, body {
+html,
+body {
     height: 100%;
     overflow: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 15px; /* Slightly smaller base */
+    font-size: 15px;
+    /* Slightly smaller base */
     line-height: 1.5;
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -43,11 +50,13 @@ body.no-animations * {
 body.theme-dark {
     /* Variables primarily set on :root / html */
 }
+
 body.theme-light {
     /* Variables primarily set on :root / html */
 }
+
 body.theme-default {
-     /* Variables primarily set on :root / html */
+    /* Variables primarily set on :root / html */
 }
 
 
@@ -71,8 +80,10 @@ body.theme-default {
 /* Container for splash content */
 .splash-content {
     display: flex;
-    flex-direction: column; /* Stack title and spinner vertically */
-    align-items: center; /* Center items horizontally */
+    flex-direction: column;
+    /* Stack title and spinner vertically */
+    align-items: center;
+    /* Center items horizontally */
 }
 
 #splash-screen.fade-out {
@@ -80,9 +91,12 @@ body.theme-default {
 }
 
 #splash-screen .app-title {
-    font-size: 3.0em; /* Slightly larger */
-    font-weight: 400; /* Slightly bolder */
-    display: flex; /* Use flex to layout spans */
+    font-size: 3.0em;
+    /* Slightly larger */
+    font-weight: 400;
+    /* Slightly bolder */
+    display: flex;
+    /* Use flex to layout spans */
     justify-content: center;
     /* Remove previous styles */
     /* background: ... */
@@ -97,8 +111,10 @@ body.theme-default {
 
 /* Style for individual characters */
 #splash-screen .app-title span {
-    display: inline-block; /* Needed for transform */
-    color: var(--accent-color); /* Use accent color */
+    display: inline-block;
+    /* Needed for transform */
+    color: var(--accent-color);
+    /* Use accent color */
     /* Apply wave animation */
     animation: text-wave 0.8s ease-in-out infinite alternate;
     /* Add staggered delay using CSS variable set inline later */
@@ -110,18 +126,23 @@ body.theme-default {
     from {
         transform: translateY(0);
     }
+
     to {
-        transform: translateY(-6px); /* Adjust vertical distance */
+        transform: translateY(-6px);
+        /* Adjust vertical distance */
     }
 }
 
 /* Spinner Styles */
 #splash-spinner {
-    margin-top: 2em; /* Space between title and spinner */
+    margin-top: 2em;
+    /* Space between title and spinner */
     width: 40px;
     height: 40px;
-    border: 4px solid rgba(var(--text-color-rgb, 255, 255, 255), 0.2); /* Light border */
-    border-top-color: var(--accent-color); /* Use accent color for spinner top */
+    border: 4px solid rgba(var(--text-color-rgb, 255, 255, 255), 0.2);
+    /* Light border */
+    border-top-color: var(--accent-color);
+    /* Use accent color for spinner top */
     border-radius: 50%;
     animation: spinner-spin 1s linear infinite;
 }
@@ -137,15 +158,18 @@ body.theme-default {
 #app-wrapper {
     display: flex;
     height: 100vh;
-    transition: padding-left 0.3s ease-out; /* Smooth transition when sidebar expands */
+    transition: padding-left 0.3s ease-out;
+    /* Smooth transition when sidebar expands */
 }
 
 /* --- Sidebar Toggle Button --- */
 #sidebar-toggle {
-    position: fixed; /* Keep it fixed relative to viewport */
+    position: fixed;
+    /* Keep it fixed relative to viewport */
     top: 10px;
     left: 10px;
-    z-index: 100; /* Above sidebar */
+    z-index: 100;
+    /* Above sidebar */
     background: none;
     border: none;
     color: var(--text-secondary-color);
@@ -161,8 +185,10 @@ body.theme-default {
 
 /* Adjust position when sidebar is expanded */
 .sidebar-expanded #sidebar-toggle {
-   left: 190px; /* Position next to expanded sidebar */
-   transform: rotate(180deg); /* Optional: rotate arrow */
+    left: 190px;
+    /* Position next to expanded sidebar */
+    transform: rotate(180deg);
+    /* Optional: rotate arrow */
 }
 
 
@@ -171,23 +197,28 @@ body.theme-default {
     width: 60px;
     background-color: var(--bg-secondary-color);
     padding: 1em 0;
-    padding-top: 50px; /* Make space for fixed toggle button */
+    padding-top: 50px;
+    /* Make space for fixed toggle button */
     height: 100%;
-    position: fixed; /* Fixed position */
+    position: fixed;
+    /* Fixed position */
     left: 0;
     top: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     border-right: 1px solid var(--border-color);
-    box-shadow: inset -2px 0 5px rgba(0,0,0,0.1);
-    transition: width 0.3s ease-out; /* Animate width change */
+    box-shadow: inset -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: width 0.3s ease-out;
+    /* Animate width change */
     z-index: 99;
-    overflow: hidden; /* Hide text when collapsed */
+    overflow: hidden;
+    /* Hide text when collapsed */
 }
 
 .sidebar-expanded .sidebar {
-    width: 180px; /* Expanded width */
+    width: 180px;
+    /* Expanded width */
 }
 
 .sidebar ul {
@@ -206,31 +237,39 @@ body.theme-default {
     align-items: center;
     width: 100%;
     height: 55px;
-    padding: 0 18px; /* Adjust padding for icon */
+    padding: 0 18px;
+    /* Adjust padding for icon */
     background: none;
     border: none;
     border-right: 4px solid transparent;
     color: var(--text-secondary-color);
-    font-size: 1.4em; /* Icon size */
+    font-size: 1.4em;
+    /* Icon size */
     cursor: pointer;
     transition: background-color 0.25s ease, border-right-color 0.25s ease, color 0.25s ease;
     position: relative;
-    justify-content: center; /* Center icon when collapsed */
+    justify-content: center;
+    /* Center icon when collapsed */
 }
 
 /* Expanded Tab Button Styles */
 .sidebar-expanded .tab-button {
-    justify-content: flex-start; /* Align items left */
-    padding: 0 20px; /* Adjust padding */
+    justify-content: flex-start;
+    /* Align items left */
+    padding: 0 20px;
+    /* Adjust padding */
 }
 
 .tab-button span.tab-text {
-    display: none; /* Hidden by default */
+    display: none;
+    /* Hidden by default */
     margin-left: 15px;
-    font-size: 0.7em; /* Text size relative to icon size */
+    font-size: 0.7em;
+    /* Text size relative to icon size */
     white-space: nowrap;
     opacity: 0;
-    transition: opacity 0.2s ease 0.1s; /* Fade in text */
+    transition: opacity 0.2s ease 0.1s;
+    /* Fade in text */
 }
 
 .sidebar-expanded .tab-button span.tab-text {
@@ -240,9 +279,11 @@ body.theme-default {
 
 /* Add Tooltips (Simple Example) */
 .tab-button::after {
-    content: attr(aria-label); /* Use aria-label for tooltip text */
+    content: attr(aria-label);
+    /* Use aria-label for tooltip text */
     position: absolute;
-    left: 110%; /* Position to the right */
+    left: 110%;
+    /* Position to the right */
     top: 50%;
     transform: translateY(-50%);
     background-color: #111;
@@ -267,8 +308,10 @@ body.theme-default {
     transition: transform 0.2s ease-out;
     z-index: 2;
     position: relative;
-    flex-shrink: 0; /* Prevent icon from shrinking */
-    width: 25px; /* Give icon a fixed width for alignment */
+    flex-shrink: 0;
+    /* Prevent icon from shrinking */
+    width: 25px;
+    /* Give icon a fixed width for alignment */
     text-align: center;
 }
 
@@ -280,7 +323,7 @@ body.theme-default {
 
 /* Apply tilt only if animations are enabled */
 body:not(.no-animations) .tab-button:hover i {
-     transform: rotate(25deg);
+    transform: rotate(25deg);
 }
 
 .tab-button.active {
@@ -291,21 +334,25 @@ body:not(.no-animations) .tab-button:hover i {
 }
 
 .tab-button.active i {
-    transform: none; /* Don't keep tilt when active */
+    transform: none;
+    /* Don't keep tilt when active */
 }
 
 /* --- Content Area --- */
 .content {
     flex-grow: 1;
     padding: 1.5em 2em;
-    padding-left: 80px; /* Initial padding to account for collapsed sidebar + toggle */
+    padding-left: 80px;
+    /* Initial padding to account for collapsed sidebar + toggle */
     overflow-y: auto;
     background-color: var(--bg-color);
-    transition: padding-left 0.3s ease-out; /* Match sidebar transition */
+    transition: padding-left 0.3s ease-out;
+    /* Match sidebar transition */
 }
 
 .sidebar-expanded .content {
-    padding-left: 200px; /* Padding when sidebar is expanded */
+    padding-left: 200px;
+    /* Padding when sidebar is expanded */
 }
 
 .tab-panel {
@@ -369,7 +416,8 @@ input[type="password"]:focus,
 select:focus {
     outline: none;
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb, 0, 120, 212), 0.3); /* Focus ring using accent */
+    box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb, 0, 120, 212), 0.3);
+    /* Focus ring using accent */
 }
 
 /* Convert accent hex to RGB for rgba - needs JS */
@@ -387,11 +435,13 @@ select:focus {
     margin-right: 0.7em;
     height: 18px;
     width: 18px;
-    accent-color: var(--accent-color); /* Style checkbox color */
+    accent-color: var(--accent-color);
+    /* Style checkbox color */
 }
 
 .checkbox-container label {
-    margin-bottom: 0; /* Reset margin for inline label */
+    margin-bottom: 0;
+    /* Reset margin for inline label */
     font-weight: normal;
     color: var(--text-secondary-color);
 }
@@ -407,18 +457,20 @@ select:focus {
 }
 
 .setting-option label {
-     color: var(--text-color);
+    color: var(--text-color);
 }
 
 .color-picker-container {
     display: flex;
     align-items: center;
-    gap: 10px; /* Space between label and picker */
+    gap: 10px;
+    /* Space between label and picker */
     margin-bottom: 0.8em;
 }
 
 .color-picker-container label {
-    flex-basis: 150px; /* Fixed width for labels */
+    flex-basis: 150px;
+    /* Fixed width for labels */
     flex-shrink: 0;
     margin-bottom: 0;
 }
@@ -427,20 +479,25 @@ input[type="color"] {
     width: 40px;
     height: 40px;
     border: none;
-    padding: 0; /* Remove default padding */
-    border-radius: 50%; /* Make it a circle */
+    padding: 0;
+    /* Remove default padding */
+    border-radius: 50%;
+    /* Make it a circle */
     cursor: pointer;
     background-color: transparent;
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
+
 /* Hide the actual color input square provided by the browser, showing only our styled circle */
 input[type="color"]::-webkit-color-swatch-wrapper {
     padding: 0;
 }
+
 input[type="color"]::-webkit-color-swatch {
     border: none;
     border-radius: 50%;
 }
+
 input[type="color"]::-moz-color-swatch {
     border: none;
     border-radius: 50%;
@@ -449,11 +506,14 @@ input[type="color"]::-moz-color-swatch {
 
 /* --- Buttons (Unlock Tab, etc.) --- */
 .action-button {
-    display: inline-flex; /* Use flex for icon + text */
+    display: inline-flex;
+    /* Use flex for icon + text */
     align-items: center;
-    gap: 0.6em; /* Space between icon and text */
+    gap: 0.6em;
+    /* Space between icon and text */
     background: var(--accent-color);
-    margin: 0.5em 0.5em 0.5em 0; /* Spacing between buttons */
+    margin: 0.5em 0.5em 0.5em 0;
+    /* Spacing between buttons */
     padding: 0.8em 1.5em;
     color: #fff;
     text-align: center;
@@ -467,9 +527,11 @@ input[type="color"]::-moz-color-swatch {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
-.action-button i { /* Style icon inside button */
+.action-button i {
+    /* Style icon inside button */
     font-size: 1.1em;
-    line-height: 1; /* Prevent extra space */
+    line-height: 1;
+    /* Prevent extra space */
     transition: transform 0.2s ease-out;
 }
 
@@ -480,13 +542,14 @@ input[type="color"]::-moz-color-swatch {
 
 /* Apply tilt to button icon on hover */
 body:not(.no-animations) .action-button:hover i {
-     transform: rotate(25deg);
+    transform: rotate(25deg);
 }
 
 /* Click animation for action buttons */
 body:not(.no-animations) .action-button:active {
     transform: scale(0.97);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Slightly reduce shadow */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    /* Slightly reduce shadow */
 }
 
 /* Adjust primary button from previous example if still used */
@@ -509,6 +572,7 @@ button.primary {
     font-weight: 500;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
+
 button.primary:hover {
     background: var(--accent-hover-color);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -517,8 +581,15 @@ button.primary:hover {
 
 /* --- Animations --- */
 @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 /* --- Simple Popup Placeholder Style --- */
@@ -533,13 +604,17 @@ button.primary:hover {
     padding: 2em;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     z-index: 1001;
-    display: none; /* Hidden by default */
-    min-width: 300px; /* Ensure minimum width */
-    max-width: 450px; /* Limit maximum width */
+    display: none;
+    /* Hidden by default */
+    min-width: 300px;
+    /* Ensure minimum width */
+    max-width: 450px;
+    /* Limit maximum width */
     text-align: center;
 }
+
 .popup.show {
     display: block;
     animation: popupZoomIn 0.25s ease-out forwards;
@@ -550,12 +625,15 @@ button.primary:hover {
         opacity: 0;
         transform: translate(-50%, -50%) scale(0.8);
     }
+
     100% {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
     }
 }
-.popup button:not(.action-button) { /* Avoid styling action buttons inside popups */
+
+.popup button:not(.action-button) {
+    /* Avoid styling action buttons inside popups */
     /* Style close button if needed */
     margin-top: 1em;
     background: var(--accent-color);
@@ -568,12 +646,14 @@ button.primary:hover {
 
 /* Warning Panel Style */
 .warning-panel {
-    background-color: rgba(255, 165, 0, 0.1); /* Light orange background */
+    background-color: rgba(255, 165, 0, 0.1);
+    /* Light orange background */
     border-color: orange;
 }
 
 .warning-panel p {
-    color: orange; /* Orange text */
+    color: orange;
+    /* Orange text */
     font-weight: 500;
 }
 
@@ -583,7 +663,8 @@ button.primary:hover {
 
 /* Styles for Confirmation Popup */
 .confirmation-popup h3 {
-    color: #DC143C; /* Crimson warning color */
+    color: #DC143C;
+    /* Crimson warning color */
     margin-bottom: 0.8em;
 }
 
@@ -604,11 +685,14 @@ button.primary:hover {
     background-color: #DC143C;
     color: white;
 }
+
 .confirmation-popup .action-button.primary-action:hover {
-    background-color: #E6395A; /* Lighter crimson for hover */
+    background-color: #E6395A;
+    /* Lighter crimson for hover */
 }
 
-.action-button.secondary-action { /* Keep this generic for cancel/other secondary */
+.action-button.secondary-action {
+    /* Keep this generic for cancel/other secondary */
     background-color: var(--input-bg-color);
     color: var(--text-secondary-color);
     border: 1px solid var(--input-border-color);
@@ -621,7 +705,8 @@ button.primary:hover {
 
 /* Styles for Unlock Action Buttons */
 .unlock-action-container {
-    margin-bottom: 1.5em; /* Space between each button group */
+    margin-bottom: 1.5em;
+    /* Space between each button group */
 }
 
 .unlock-action-container:last-child {
@@ -629,9 +714,12 @@ button.primary:hover {
 }
 
 .unlock-action-container .action-button {
-    width: 100%; /* Make button take full width */
-    justify-content: center; /* Center icon and text */
-    margin-bottom: 0.5em; /* Space between button and description */
+    width: 100%;
+    /* Make button take full width */
+    justify-content: center;
+    /* Center icon and text */
+    margin-bottom: 0.5em;
+    /* Space between button and description */
     margin-left: 0;
     margin-right: 0;
 }
@@ -640,20 +728,25 @@ button.primary:hover {
     font-size: 0.9em;
     color: var(--text-secondary-color);
     text-align: center;
-    padding: 0 1em; /* Give some horizontal padding */
+    padding: 0 1em;
+    /* Give some horizontal padding */
     margin: 0;
 }
 
 #net-response-content {
     background-color: var(--input-bg-color);
-    color: #2ECC71; /* Green text */
+    color: #2ECC71;
+    /* Green text */
     padding: 1em;
     border-radius: 5px;
     border: 1px solid var(--border-color);
-    max-height: 40vh; /* Limit height */
-    overflow-y: auto; /* Enable vertical scroll */
+    max-height: 40vh;
+    /* Limit height */
+    overflow-y: auto;
+    /* Enable vertical scroll */
     text-align: left;
-    white-space: pre-wrap; /* Wrap long lines */
+    white-space: pre-wrap;
+    /* Wrap long lines */
     word-break: break-all;
     font-family: 'Consolas', 'Monaco', monospace;
     font-size: 0.9em;
@@ -662,15 +755,18 @@ button.primary:hover {
 
 /* Style for unload button within info panel */
 #loaded-avatar-info-panel .secondary-action {
-    margin-top: 1em; /* Add some space above */
+    margin-top: 1em;
+    /* Add some space above */
 }
 
 /* Preset button styling */
 .preset-buttons {
     display: flex;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    flex-wrap: wrap;
+    /* Allow wrapping on smaller screens */
     gap: 0.8em;
-    margin-bottom: 1em; /* Space before HR */
+    margin-bottom: 1em;
+    /* Space before HR */
 }
 
 .preset-btn {
@@ -682,7 +778,8 @@ button.primary:hover {
 }
 
 .preset-btn:hover {
-    filter: brightness(1.15); /* Simple hover effect */
+    filter: brightness(1.15);
+    /* Simple hover effect */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
 }
 
@@ -691,29 +788,37 @@ button.primary:hover {
 
 /* Hide default scrollbar */
 ::-webkit-scrollbar {
-    width: 10px; /* Width of vertical scrollbar */
-    height: 10px; /* Height of horizontal scrollbar */
-    background-color: transparent; /* Make scrollbar track transparent */
+    width: 10px;
+    /* Width of vertical scrollbar */
+    height: 10px;
+    /* Height of horizontal scrollbar */
+    background-color: transparent;
+    /* Make scrollbar track transparent */
 }
 
 /* Scrollbar Handle (Thumb) */
 ::-webkit-scrollbar-thumb {
-    background-color: rgba(var(--accent-color-rgb, 30, 144, 255), 0.5); /* Use transparent accent color */
+    background-color: rgba(var(--accent-color-rgb, 30, 144, 255), 0.5);
+    /* Use transparent accent color */
     border-radius: 5px;
-    border: 2px solid transparent; /* Add padding */
-    background-clip: content-box; /* Clip background to content area */
+    border: 2px solid transparent;
+    /* Add padding */
+    background-clip: content-box;
+    /* Clip background to content area */
     transition: background-color 0.2s ease;
 }
 
 /* Scrollbar Handle on hover/active */
 ::-webkit-scrollbar-thumb:hover,
 ::-webkit-scrollbar-thumb:active {
-    background-color: rgba(var(--accent-color-rgb, 30, 144, 255), 0.8); /* Darker/more opaque on hover */
+    background-color: rgba(var(--accent-color-rgb, 30, 144, 255), 0.8);
+    /* Darker/more opaque on hover */
 }
 
 /* Scrollbar Track */
 ::-webkit-scrollbar-track {
-    background-color: rgba(0, 0, 0, 0.1); /* Very subtle track background */
+    background-color: rgba(0, 0, 0, 0.1);
+    /* Very subtle track background */
     border-radius: 5px;
 }
 
@@ -722,10 +827,12 @@ button.primary:hover {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1em;
-    max-height: 55vh; /* Adjust height as needed */
+    max-height: 55vh;
+    /* Adjust height as needed */
     overflow-y: auto;
     padding: 0.5em;
-    min-height: 100px; /* Ensure it doesn't collapse when empty */
+    min-height: 100px;
+    /* Ensure it doesn't collapse when empty */
 }
 
 .history-item {
@@ -748,14 +855,16 @@ body:not(.no-animations) .history-item:hover {
     color: var(--accent-color);
     margin-bottom: 0.5em;
     font-size: 1em;
-    word-break: break-all; /* Prevent long IDs from overflowing */
+    word-break: break-all;
+    /* Prevent long IDs from overflowing */
 }
 
 .history-item p {
     font-size: 0.9em;
     color: var(--text-secondary-color);
     word-break: break-all;
-    margin-bottom: 0.5em; /* Tighter spacing */
+    margin-bottom: 0.5em;
+    /* Tighter spacing */
 }
 
 .history-item p small {
@@ -766,15 +875,18 @@ body:not(.no-animations) .history-item:hover {
 .history-item-actions {
     display: flex;
     gap: 0.5em;
-    margin-top: auto; /* Pushes actions to the bottom */
+    margin-top: auto;
+    /* Pushes actions to the bottom */
     padding-top: 1em;
 }
 
 .history-item-actions .action-button {
     padding: 0.5em 1em;
     font-size: 0.9em;
-    flex-grow: 1; /* Make buttons fill space */
-    margin: 0; /* Override default margins */
+    flex-grow: 1;
+    /* Make buttons fill space */
+    margin: 0;
+    /* Override default margins */
 }
 
 #no-history-message {
@@ -785,7 +897,7 @@ body:not(.no-animations) .history-item:hover {
 }
 
 .history-item-note-container {
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
     border-left: 3px solid var(--accent-color);
     padding: 0.8em 1em;
     margin: 1em 0;
@@ -796,7 +908,8 @@ body:not(.no-animations) .history-item:hover {
     font-size: 0.9em;
     margin: 0;
     color: var(--text-color);
-    white-space: pre-wrap; /* Respect newlines in notes */
+    white-space: pre-wrap;
+    /* Respect newlines in notes */
     word-break: break-word;
 }
 
@@ -815,19 +928,23 @@ body:not(.no-animations) .history-item:hover {
 /* Firefox specific scrollbar styling (optional, less customizable) */
 /* For broader compatibility, though limited styling options */
 * {
-  scrollbar-width: thin; /* "auto" or "thin" */
-  scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.1); /* thumb and track color */
+    scrollbar-width: thin;
+    /* "auto" or "thin" */
+    scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.1);
+    /* thumb and track color */
 }
 
 /* Specific Styles for Notice Popup */
 .notice-popup h3 {
-    color: var(--accent-color); /* Use accent color for notice title */
+    color: var(--accent-color);
+    /* Use accent color for notice title */
     margin-bottom: 1em;
 }
 
 .notice-popup p {
     margin-bottom: 1.5em;
-    text-align: left; /* Align message text left */
+    text-align: left;
+    /* Align message text left */
 }
 
 .popup-timer {
@@ -969,8 +1086,13 @@ textarea:focus {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 #download-status {
@@ -978,4 +1100,230 @@ textarea:focus {
     color: var(--text-secondary-color);
     font-size: 0.9em;
     margin: 0;
+}
+
+/* --- PAW API Status Indicator --- */
+.paw-status-dot {
+    font-size: 0.85em;
+    color: gray;
+    transition: color 0.4s ease;
+    flex-shrink: 0;
+}
+
+.paw-status-dot.online {
+    color: #2ECC71;
+}
+
+.paw-status-dot.offline {
+    color: #DC143C;
+}
+
+.paw-status-dot.checking {
+    color: #f0c040;
+}
+
+/* Pulsing glow when online */
+body:not(.no-animations) .paw-status-dot.online {
+    animation: paw-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes paw-pulse {
+    0% {
+        filter: drop-shadow(0 0 0px #2ECC71);
+        opacity: 1;
+    }
+
+    50% {
+        filter: drop-shadow(0 0 6px #2ECC71);
+        opacity: 0.75;
+    }
+
+    100% {
+        filter: drop-shadow(0 0 0px #2ECC71);
+        opacity: 1;
+    }
+}
+
+.paw-status-text {
+    font-size: 0.9em;
+    color: var(--text-secondary-color);
+    white-space: nowrap;
+}
+
+/* --- Toast Notifications --- */
+#toast-container {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.toast {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 22px 20px;
+    /* extra bottom padding for the bar */
+    border-radius: 12px;
+    min-width: 280px;
+    max-width: 480px;
+    overflow: hidden;
+    /* keep bar inside rounded corners */
+    /* Glassmorphism */
+    background: rgba(30, 30, 40, 0.82);
+    backdrop-filter: blur(18px) saturate(1.6);
+    -webkit-backdrop-filter: blur(18px) saturate(1.6);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45),
+        0 1.5px 0 rgba(255, 255, 255, 0.06) inset;
+    color: #fff;
+    font-size: 0.95em;
+    font-weight: 500;
+    pointer-events: all;
+    animation: toast-in 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    will-change: transform, opacity;
+}
+
+.toast.toast-exit {
+    animation: toast-out 0.36s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
+.toast-icon {
+    font-size: 1.25em;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.toast-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-grow: 1;
+}
+
+.toast-title {
+    font-size: 0.85em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.75;
+    line-height: 1;
+}
+
+.toast-message {
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+/* Type colour accents */
+.toast.toast-success {
+    border-left: 4px solid #2ECC71;
+}
+
+.toast.toast-success .toast-icon {
+    color: #2ECC71;
+}
+
+.toast.toast-error {
+    border-left: 4px solid #DC143C;
+}
+
+.toast.toast-error .toast-icon {
+    color: #DC143C;
+}
+
+.toast.toast-warn {
+    border-left: 4px solid #f0c040;
+}
+
+.toast.toast-warn .toast-icon {
+    color: #f0c040;
+}
+
+.toast.toast-info {
+    border-left: 4px solid var(--accent-color);
+}
+
+.toast.toast-info .toast-icon {
+    color: var(--accent-color);
+}
+
+/* Progress bar — accent coloured, pinned to bottom of toast */
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--accent-color);
+    opacity: 0.8;
+    border-radius: 0 0 0 12px;
+    transform-origin: left center;
+    animation: toast-progress-shrink linear forwards;
+}
+
+.toast.toast-success .toast-progress {
+    background: #2ECC71;
+}
+
+.toast.toast-error .toast-progress {
+    background: #DC143C;
+}
+
+.toast.toast-warn .toast-progress {
+    background: #f0c040;
+}
+
+.toast.toast-info .toast-progress {
+    background: var(--accent-color);
+}
+
+@keyframes toast-in {
+    0% {
+        opacity: 0;
+        transform: translateY(24px) scale(0.92);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes toast-out {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scaleY(1);
+        max-height: 200px;
+        margin-bottom: 0;
+    }
+
+    40% {
+        opacity: 0;
+        transform: translateY(6px) scaleY(0.7);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(10px) scaleY(0);
+        max-height: 0;
+        margin-bottom: -10px;
+    }
+}
+
+@keyframes toast-progress-shrink {
+    from {
+        transform: scaleX(1);
+    }
+
+    to {
+        transform: scaleX(0);
+    }
 }

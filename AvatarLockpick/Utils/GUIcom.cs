@@ -11,7 +11,7 @@ namespace AvatarLockpick.Utils
 {
     internal class GUIcom
     {
-        public static void Communication(string s)
+        public static async void Communication(string s, Photino.NET.PhotinoWindow window = null)
         {
             try
             {
@@ -27,14 +27,52 @@ namespace AvatarLockpick.Utils
 
                 if ((string)jsonData["type"] == "avatarInfo")
                 {
+                    // Deprecated: UI now triggers modal and fetchAvatarInfo.
+                    // Kept for fallback if needed.
+                }
+
+                if ((string)jsonData["type"] == "openInBrowser")
+                {
                     var avatarInfo = new
                     {
                         AvatarId = (string)jsonData["avatarId"],
                         UserId = (string)jsonData["userId"]
                     };
-
                     URLStuff.OpenUrl($"https://vrchat.com/home/avatar/{avatarInfo.AvatarId}");
-                    //URLStuff.OpenUrl($"https://vrchat.com/home/user/{avatarInfo.UserId}");
+                }
+
+                if ((string)jsonData["type"] == "checkPawStatus")
+                {
+                    Task.Run(async () => {
+                        await PAWUtils.CheckApiStatus();
+                        if (window != null)
+                        {
+                            var statusData = new { type = "pawStatus", isOnline = PAWUtils.IsApiOnline };
+                            window.SendWebMessage(Newtonsoft.Json.JsonConvert.SerializeObject(statusData));
+                        }
+                    });
+                }
+
+                if ((string)jsonData["type"] == "fetchAvatarInfo")
+                {
+                    string aviId = AviIDToken?.ToString();
+                    Task.Run(async () => {
+                        var avatar = await PAWUtils.GetAvatarAsync(aviId);
+                        if (window != null)
+                        {
+                            var resp = new
+                            {
+                                type = "pawAvatarInfo",
+                                avatarId = aviId,
+                                found = avatar != null,
+                                name = avatar?.Name,
+                                authorName = avatar?.AuthorName,
+                                description = avatar?.Description,
+                                imageUrl = avatar?.ImageUrl ?? avatar?.ThumbnailUrl
+                            };
+                            window.SendWebMessage(Newtonsoft.Json.JsonConvert.SerializeObject(resp));
+                        }
+                    });
                 }
 
                 if ((string)jsonData["type"] == "openHelpUrl")

@@ -55,6 +55,7 @@
                             class="fa-solid fa-circle-question"></i><span class="tab-text">Help</span></button></li>
                 <li><button class="tab-button" data-tab="info" aria-label="Info"><i
                             class="fa-solid fa-circle-info"></i><span class="tab-text">Info</span></button></li>
+            </ul>
         </nav>
 
         <main class="content">
@@ -75,8 +76,10 @@
                         <label for="censor-user-id">Censor User ID</label>
                     </div>
 
-                    <button class="action-button" onclick="callDotNetSendIDs()"><i class="fa-solid fa-eye"></i> View
+                    <button class="action-button" onclick="viewAvatarModal()"><i class="fa-solid fa-eye"></i> View
                         Avatar</button>
+                    <button class="action-button secondary-action" onclick="openInBrowser()"><i
+                            class="fa-solid fa-globe"></i> Web Open</button>
                     <button class="action-button" onclick="loadAvatarInfo()"><i class="fa-solid fa-download"></i> Load
                         Avatar</button>
                     <button class="action-button secondary-action" onclick="clearInputFields()"><i
@@ -124,8 +127,19 @@
                 </div>
                 <div id="loaded-avatar-info-panel" class="tab-content-panel" style="display: none;">
                     <h3>Loaded Avatar</h3>
-                    <p><strong id="loaded-avi-id-label">Avatar ID:</strong> <span id="loaded-avatar-id">N/A</span></p>
-                    <p><strong id="loaded-user-id-label">User ID:</strong> <span id="loaded-user-id">N/A</span></p>
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-start;">
+                        <img id="loaded-avatar-img" src="https://placehold.co/100x100?text=No+Image"
+                            alt="Avatar Thumbnail"
+                            style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                        <div>
+                            <p><strong id="loaded-avi-id-label">Avatar ID:</strong> <span
+                                    id="loaded-avatar-id">N/A</span></p>
+                            <p><strong id="loaded-user-id-label">User ID:</strong> <span id="loaded-user-id">N/A</span>
+                            </p>
+                            <p><strong>Name:</strong> <span id="loaded-avatar-name">Loading...</span></p>
+                            <p><strong>Author:</strong> <span id="loaded-avatar-author">Loading...</span></p>
+                        </div>
+                    </div>
                     <button class="action-button secondary-action" onclick="showUnloadConfirmation()"><i
                             class="fa-solid fa-times-circle"></i> Unload Avatar</button>
                 </div>
@@ -218,6 +232,28 @@
                             <input type="checkbox" id="backend-messages-toggle">
                             <label for="backend-messages-toggle">Show Backend Communication Popups</label>
                         </div>
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="toast-notifications-toggle">
+                            <label for="toast-notifications-toggle" id="settings-toast-label">Show Toast
+                                Notifications</label>
+                        </div>
+                    </div>
+                    <h3 id="settings-services-h3">Services</h3>
+                    <div class="setting-option"
+                        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <p style="margin: 0;"><strong>PAW API Status</strong></p>
+                            <small style="opacity: 0.8;">Used for fetching avatar details and history
+                                thumbnails.</small>
+                        </div>
+                        <div id="api-status-indicator" class="api-status-container"
+                            style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fa-solid fa-circle paw-status-dot" id="api-status-icon"></i>
+                            <span class="paw-status-text" id="api-status-text">Checking...</span>
+                            <button class="action-button secondary-action" onclick="checkPawStatus()"
+                                style="padding: 5px 10px; font-size: 0.9em;"><i class="fa-solid fa-rotate"></i>
+                                Refresh</button>
+                        </div>
                     </div>
                     <h3 id="settings-lang-h3">Language</h3>
                     <div class="setting-option">
@@ -226,6 +262,7 @@
                             <select id="language-select"
                                 style="background-color: var(--input-bg-color); color: var(--text-color); border: 1px solid var(--input-border-color); padding: 8px; border-radius: 4px; width: 100%; max-width: 300px; font-family: inherit;">
                                 <option value="en">English (Default)</option>
+                                <option value="de">Deutsch (German)</option>
                                 <option value="es">Español (Spanish)</option>
                                 <option value="zh">中文 (Chinese)</option>
                                 <option value="ja">日本語 (Japanese)</option>
@@ -250,13 +287,18 @@
                     </div>
                     <h3 id="settings-linux-h3">Linux Compatibility</h3>
                     <div class="setting-option">
-                        <p id="settings-linux-p">If you play VRChat on Linux/Proton your VRChat LocalLow Cache won't be easily queried. If your avatar path is in a non-standard Proton prefix, declare it below to replace the default.</p>
-                        <label for="custom-linux-cache-path" id="settings-linux-path-label">Linux Cache Path (Optional)</label>
-                        <input type="text" id="custom-linux-cache-path" placeholder="/home/user/.steam/root/steamapps/compatdata/438100/pfx/drive_c/users/steamuser/AppData/LocalLow/VRChat/VRChat">
+                        <p id="settings-linux-p">If you play VRChat on Linux/Proton your VRChat LocalLow Cache won't be
+                            easily queried. If your avatar path is in a non-standard Proton prefix, declare it below to
+                            replace the default.</p>
+                        <label for="custom-linux-cache-path" id="settings-linux-path-label">Linux Cache Path
+                            (Optional)</label>
+                        <input type="text" id="custom-linux-cache-path"
+                            placeholder="/home/user/.steam/root/steamapps/compatdata/438100/pfx/drive_c/users/steamuser/AppData/LocalLow/VRChat/VRChat">
                         <button class="action-button" onclick="saveLinuxSettings()"><i class="fa-solid fa-save"></i>
                             <span id="settings-linux-save">Save Cache Path</span></button>
                         <button class="action-button secondary-action" onclick="resetLinuxSettings()"><i
-                                class="fa-solid fa-rotate-left"></i> <span id="settings-linux-reset">Reset Path</span></button>
+                                class="fa-solid fa-rotate-left"></i> <span id="settings-linux-reset">Reset
+                                Path</span></button>
                     </div>
                     <h3 id="settings-adv-h3">Advanced</h3>
                     <div class="setting-option">
@@ -315,6 +357,7 @@
                     <p id="info-p2">GUI made with Photino.NET</p>
                     <p id="info-p3">Developed by Scrimmane / ScrimDev</p>
                     <p id="info-p4">App Icon by Kmg Design</p>
+                    <p id="info-paw">Avatar search API provided by Amelia (PAW API)</p>
                     <hr style="border-color: var(--border-color); margin: 1.5em 0;">
                     <button class="action-button" onclick="showNetResponsePopup()"><i class="fa-solid fa-terminal"></i>
                         <span id="info-btn1">View .NET Log</span></button>
@@ -333,6 +376,25 @@
         <p id="popup-message">Placeholder message for the action.</p>
         <div class="popup-buttons">
             <button class="action-button" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+
+    <!-- Avatar Info Modal Popup -->
+    <div id="avatar-info-popup" class="popup" style="max-width: 500px;">
+        <h3><i class="fa-solid fa-user-circle"></i> Avatar Information</h3>
+        <div style="text-align: center; margin: 15px 0;">
+            <img id="modal-avatar-img" src="https://placehold.co/400x300?text=Loading..." alt="Avatar Image"
+                style="max-width: 100%; max-height: 250px; border-radius: 8px; object-fit: cover;">
+        </div>
+        <div style="margin-bottom: 15px; text-align: left;">
+            <p><strong>Name:</strong> <span id="modal-avatar-name">Loading...</span></p>
+            <p><strong>Author:</strong> <span id="modal-avatar-author">Loading...</span></p>
+            <p><strong>Description:</strong> <span id="modal-avatar-desc"
+                    style="white-space: pre-wrap; font-size: 0.9em; display: block; margin-top: 5px; max-height: 100px; overflow-y: auto; background: var(--input-bg-color); padding: 8px; border-radius: 4px; border: 1px solid var(--input-border-color);">Loading...</span>
+            </p>
+        </div>
+        <div class="popup-buttons">
+            <button class="action-button" onclick="closeAvatarInfoPopup()">Close</button>
         </div>
     </div>
 
@@ -402,6 +464,9 @@
     <script src="app://dynamic.js"></script>
     <!-- External script for all application logic -->
     <script src="AppScript.js"></script>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
 </body>
 
 </html>
