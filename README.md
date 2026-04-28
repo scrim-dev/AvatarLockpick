@@ -12,6 +12,9 @@
 > [!IMPORTANT]
 > This project uses [AI Assistance](https://github.com/scrim-dev/AvatarLockpick/blob/master/AI_Disclaimer.md).
 
+> [!NOTE]
+> Special thanks to [Amelia](https://github.com/Ameliaaaaaaa) for [PAW](https://paw.amelia.fun/).
+
 # AvatarLockpick
 Ever wanted to use a VRChat avatar but it was locked? Well now you can unlock it using AvatarLockpick!
 
