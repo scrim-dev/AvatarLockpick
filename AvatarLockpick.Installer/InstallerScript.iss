@@ -3,7 +3,7 @@
 ; Non-commercial use only
 
 #define MyAppName "AvatarLockpick"
-#define MyAppVersion "2.4"
+#define MyAppVersion "2.5"
 #define MyAppPublisher "Scrimmane"
 #define MyAppURL "https://scrim.cc/"
 #define MyAppExeName "AvatarLockpick.exe"
