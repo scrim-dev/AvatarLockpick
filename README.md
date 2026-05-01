@@ -1,12 +1,18 @@
 <div align="center">
-  <img src="https://github.com/scrim-dev/AvatarLockpick/blob/master/Showcase/logo_2.png" alt="BannerImg" width="700"><br>
-  <img src="https://img.shields.io/github/downloads/scrim-dev/AvatarLockpick/total?style=for-the-badge&color=blue" alt="Total Downloads"/>
+  <img src="https://github.com/scrim-dev/AvatarLockpick/blob/master/Showcase/logo_2.png" alt="BannerImg" width="600"> <!--Banner-->
   &ensp;
-  <a href="https://github.com/scrim-dev/AvatarLockpick/releases/latest"> <img src="https://img.shields.io/badge/Download-Latest-blue?style=for-the-badge&logoColor=white" alt="Download HERE"/></a>
+  <br>
+  <br>
+  <img src="https://img.shields.io/github/downloads/scrim-dev/AvatarLockpick/total?style=for-the-badge&color=dodgerblue" alt="Total Downloads"/>
   &ensp;
-  <a href="https://discord.gg/5fc2BWuFWU"> <img src="https://dcbadge.limes.pink/api/server/5fc2BWuFWU" alt="Download App"/></a>
-  
+  <img src="https://img.shields.io/github/stars/scrim-dev/AvatarLockpick?style=for-the-badge&color=yellow" alt="Total Stars"/>
   &ensp;
+  <a href="https://github.com/scrim-dev/AvatarLockpick/releases/latest"> <img src="https://img.shields.io/badge/Download-latest-dodgerblue?style=for-the-badge&logoColor=white" alt="Download HERE"/></a>
+  &ensp;
+  <a href="https://discord.gg/5fc2BWuFWU"> <img src="https://dcbadge.limes.pink/api/server/5fc2BWuFWU" alt="Discord Server"/></a>
+  &ensp;
+  <br>
+  <br>
 </div>
 
 > [!IMPORTANT]
