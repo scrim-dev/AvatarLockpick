@@ -38,8 +38,7 @@ namespace AvatarLockpick
 
                 if (!File.Exists($"UI/no_startup_warn.scrim"))
                 {
-                    MessageBoxUtils.ShowWarning("If you run into any bugs, issues or crashes contact me on discord:\nscrimmane (679060175440707605)" +
-                    "\nOr post an 'issue' on github!", "Hey!");
+                    MessageBoxUtils.ShowWarning("If you run into any bugs, issues or crashes contact me on discord or post an 'issue' on github!", "Hey!");
                     try { File.WriteAllText($"UI/no_startup_warn.scrim", "cached_startup"); } catch { }
                 }
 
