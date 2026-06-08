@@ -21,6 +21,11 @@ namespace AvatarLockpick.Utils
         // Event to notify when download is complete
         public static event Action? OnDownloadComplete;
 
+        // Event to send arbitrary JSON payloads to the UI
+        public static event Action<string>? OnRawSend;
+
+        public static void SendToUI(string jsonPayload) => OnRawSend?.Invoke(jsonPayload);
+
         public static void Progress(int percent, string status, string title = "Downloading...")
         {
             OnProgressReceived?.Invoke(percent, status, title);

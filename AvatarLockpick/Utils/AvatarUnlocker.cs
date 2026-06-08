@@ -70,6 +70,14 @@ namespace AvatarLockpick.Utils
             LinuxCustomPath = path ?? "";
         }
 
+        // Windows Custom Cache Path
+        public static string WindowsCustomPath = "";
+
+        public static void SetWindowsCachePath(string path)
+        {
+            WindowsCustomPath = path ?? "";
+        }
+
         private static string GetVRChatAvatarPath(string userId)
         {
             if (OSCheck.IsLinux())
@@ -98,16 +106,22 @@ namespace AvatarLockpick.Utils
             }
             else
             {
-                // Get the path to AppData
+                if (!string.IsNullOrEmpty(WindowsCustomPath))
+                {
+                    string vrchatPath = Path.Combine(WindowsCustomPath, "LocalAvatarData", userId);
+                    AppLog.Log("Path", $"Checking VRChat path (custom Windows): {vrchatPath}");
+                    return vrchatPath;
+                }
+
                 string appDataPath = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                     "AppData",
                     "LocalLow"
                 );
 
-                string vrchatPath = Path.Combine(appDataPath, "VRChat", "VRChat", "LocalAvatarData", userId);
-                AppLog.Log("Path", $"Checking VRChat path: {vrchatPath}");
-                return vrchatPath;
+                string vrchatPath2 = Path.Combine(appDataPath, "VRChat", "VRChat", "LocalAvatarData", userId);
+                AppLog.Log("Path", $"Checking VRChat path: {vrchatPath2}");
+                return vrchatPath2;
             }
         }
 
@@ -509,11 +523,14 @@ namespace AvatarLockpick.Utils
                     AppLog.Progress(0, "Connecting to server...", "Downloading SQL Database");
                     AppLog.Log("SQLDB", $"Downloading database from: {dbUrl}");
 
-                    // Delete old database file if it exists to avoid file locking issues
+                    // Close all pooled connections and delete old database file to prevent file locking
                     if (System.IO.File.Exists(dbPath))
                     {
                         try
                         {
+                            SqliteConnection.ClearAllPools();
+                            GC.Collect();
+                            GC.WaitForPendingFinalizers();
                             System.IO.File.Delete(dbPath);
                             AppLog.Log("SQLDB", "Deleted old database file");
                         }
@@ -615,7 +632,10 @@ namespace AvatarLockpick.Utils
                             }
                         }
                     }
+
+                    connection.Close();
                 }
+                SqliteConnection.ClearAllPools();
 
                 AppLog.Progress(100, $"Loaded {LockTypes.Count} lock types!", "Complete");
                 AppLog.Success("SQLDB", $"Loaded {LockTypes.Count} lock types from SQL database");
@@ -629,6 +649,102 @@ namespace AvatarLockpick.Utils
                 AppLog.DownloadComplete();
                 AppLog.Error("SQLDB", $"Error loading SQL database: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// Performs the DB unlock logic on a single avatar file path. Returns true if unlocked.
+        /// Requires LockTypes and LockUnlockValues to be pre-populated.
+        /// </summary>
+        public static bool PerformDbUnlockOnFile(string fullAvatarPath)
+        {
+            if (!System.IO.File.Exists(fullAvatarPath)) return false;
+
+            string jsonContent = System.IO.File.ReadAllText(fullAvatarPath);
+            bool wasUnlocked = false;
+
+            void ProcessParams(IEnumerable<JObject> items, Action<string> save)
+            {
+                foreach (JObject item in items)
+                {
+                    var nameProperty = item["name"]?.ToString();
+                    if (string.IsNullOrEmpty(nameProperty)) continue;
+
+                    string normalizedName = Regex.Replace(nameProperty, @"[^\u0000-\u007F]+", "", RegexOptions.None).Trim();
+
+                    foreach (var lockType in LockTypes)
+                    {
+                        if (normalizedName.Equals(lockType, StringComparison.OrdinalIgnoreCase) ||
+                            nameProperty.Equals(lockType, StringComparison.OrdinalIgnoreCase) ||
+                            nameProperty.Trim().Equals(lockType, StringComparison.OrdinalIgnoreCase))
+                        {
+                            var valueToken = item["value"];
+                            if (valueToken != null)
+                            {
+                                int unlockValue = LockUnlockValues.ContainsKey(lockType) ? LockUnlockValues[lockType] : 0;
+                                item["value"] = new JValue(unlockValue);
+                                wasUnlocked = true;
+                            }
+                        }
+                    }
+
+                    if (normalizedName.Contains("_SecurityLockSync") || nameProperty.Contains("_SecurityLockSync"))
+                    { item["value"] = new JValue(1); wasUnlocked = true; }
+
+                    if (normalizedName.Contains("_SecurityLockMenu") || nameProperty.Contains("_SecurityLockMenu"))
+                    { item["value"] = new JValue(1); wasUnlocked = true; }
+                }
+            }
+
+            try
+            {
+                JObject jsonObj = JObject.Parse(jsonContent);
+                var animParams = jsonObj["animationParameters"] as JArray;
+                if (animParams != null) ProcessParams(animParams.Children<JObject>(), _ => { });
+                if (wasUnlocked) System.IO.File.WriteAllText(fullAvatarPath, jsonObj.ToString(Newtonsoft.Json.Formatting.None));
+            }
+            catch (JsonReaderException)
+            {
+                try
+                {
+                    JArray jsonArray = JArray.Parse(jsonContent);
+                    ProcessParams(jsonArray.Children<JObject>(), _ => { });
+                    if (wasUnlocked) System.IO.File.WriteAllText(fullAvatarPath, jsonArray.ToString(Newtonsoft.Json.Formatting.None));
+                }
+                catch { }
+            }
+
+            return wasUnlocked;
+        }
+
+        /// <summary>
+        /// Gets the VRChat LocalAvatarData base folder (without userId). Used by auto-unlock scanner.
+        /// </summary>
+        public static string GetVRChatAvatarBaseFolder()
+        {
+            if (OSCheck.IsLinux())
+            {
+                if (!string.IsNullOrEmpty(LinuxCustomPath))
+                    return Path.Combine(LinuxCustomPath, "LocalAvatarData");
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    ".steam", "root", "steamapps", "compatdata", "438100", "pfx", "drive_c",
+                    "users", "steamuser", "AppData", "LocalLow", "VRChat", "VRChat", "LocalAvatarData");
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(WindowsCustomPath))
+                    return Path.Combine(WindowsCustomPath, "LocalAvatarData");
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    "AppData", "LocalLow", "VRChat", "VRChat", "LocalAvatarData");
+            }
+        }
+
+        /// <summary>
+        /// Ensures lock types are loaded. Returns true if ready.
+        /// </summary>
+        public static bool EnsureLockTypesLoaded()
+        {
+            if (LockTypes.Count == 0) LoadLockTypes();
+            return LockTypes.Count > 0;
         }
 
         private static void UnlockDB(string UID, string AID)

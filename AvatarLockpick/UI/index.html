@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,30 +6,48 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AvatarLockpick</title>
-    <!-- IMPORTANT: Add an icon library like Font Awesome here -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="AppStyle.css" />
-    <!-- Add any required font imports here, e.g., Google Fonts -->
 </head>
 
 <body>
 
-    <!-- Splash Screen -->
-    <div id="splash-screen">
-        <div class="splash-content">
-            <h1 class="app-title">
-                <!-- Wrap each character in a span with calculated delay -->
-                <span style="--delay: 0.0s">A</span><span style="--delay: 0.05s">v</span><span
-                    style="--delay: 0.1s">a</span><span style="--delay: 0.15s">t</span><span
-                    style="--delay: 0.2s">a</span><span style="--delay: 0.25s">r</span><span
-                    style="--delay: 0.3s">L</span><span style="--delay: 0.35s">o</span><span
-                    style="--delay: 0.4s">c</span><span style="--delay: 0.45s">k</span><span
-                    style="--delay: 0.5s">p</span><span style="--delay: 0.55s">i</span><span
-                    style="--delay: 0.6s">c</span><span style="--delay: 0.65s">k</span>
-            </h1>
-            <div id="splash-spinner"></div>
+    <!-- Service Close Confirmation Modal -->
+    <div id="service-close-modal" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true">
+        <div class="modal-box">
+            <div class="modal-box-icon"><i class="fa-solid fa-gear"></i></div>
+            <h3>Service is Running</h3>
+            <p>AvatarLockpick.Service is still active in the background.<br>What would you like to do?</p>
+            <div class="modal-box-actions">
+                <button class="action-button" style="background:color-mix(in srgb, #e74c3c 80%, var(--accent-color))" onclick="closeWithStopService()">
+                    <i class="fa-solid fa-stop"></i> Stop Service &amp; Close
+                </button>
+                <button class="action-button secondary-action" onclick="closeLeaveService()">
+                    <i class="fa-solid fa-arrow-right"></i> Leave Running &amp; Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Title Bar -->
+    <div id="titlebar">
+        <div id="titlebar-drag">
+            <i class="fa-solid fa-lock-open" id="titlebar-icon"></i>
+            <span id="titlebar-title">AvatarLockpick</span>
+            <span id="titlebar-version">v3.0</span>
+        </div>
+        <div id="titlebar-controls">
+            <button class="titlebar-btn" id="btn-minimize" onclick="windowMinimize()" title="Minimize">
+                <i class="fa-solid fa-minus"></i>
+            </button>
+            <button class="titlebar-btn" id="btn-maximize" onclick="toggleMaximize()" title="Maximize">
+                <i class="fa-regular fa-square"></i>
+            </button>
+            <button class="titlebar-btn close-btn" id="btn-close" onclick="windowClose()" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
     </div>
 
@@ -37,24 +55,21 @@
     <button id="sidebar-toggle" aria-label="Toggle Sidebar"><i class="fa-solid fa-bars"></i></button>
 
     <!-- Main Application Wrapper -->
-    <div id="app-wrapper" class="sidebar-expanded" style="display: none;"> <!-- Initially hidden -->
+    <div id="app-wrapper" class="sidebar-expanded">
         <nav class="sidebar">
             <ul>
-                <!-- Replaced text with icons and added aria-label for tooltip -->
-                <li><button class="tab-button active" data-tab="avatar" aria-label="Avatar"><i
-                            class="fa-solid fa-user"></i><span class="tab-text">Avatar</span></button></li>
-                <li><button class="tab-button" data-tab="unlock" aria-label="Unlock"><i
-                            class="fa-solid fa-lock-open"></i><span class="tab-text">Unlock</span></button></li>
-                <li><button class="tab-button" data-tab="recents" aria-label="Recents"><i
-                            class="fa-solid fa-history"></i><span class="tab-text">Recents</span></button></li>
-                <li><button class="tab-button" data-tab="logs" aria-label="Logs"><i
-                            class="fa-solid fa-file-lines"></i><span class="tab-text">Logs</span></button></li>
-                <li><button class="tab-button" data-tab="settings" aria-label="Settings"><i
-                            class="fa-solid fa-gear"></i><span class="tab-text">Settings</span></button></li>
-                <li><button class="tab-button" data-tab="help" aria-label="Help"><i
-                            class="fa-solid fa-circle-question"></i><span class="tab-text">Help</span></button></li>
-                <li><button class="tab-button" data-tab="info" aria-label="Info"><i
-                            class="fa-solid fa-circle-info"></i><span class="tab-text">Info</span></button></li>
+                <li><button class="tab-button active" data-tab="avatar" aria-label="Avatar">
+                    <i class="fa-solid fa-user"></i><span class="tab-text">Avatar</span></button></li>
+                <li><button class="tab-button" data-tab="unlock" aria-label="Unlock">
+                    <i class="fa-solid fa-lock-open"></i><span class="tab-text">Unlock</span></button></li>
+                <li><button class="tab-button" data-tab="recents" aria-label="Recents">
+                    <i class="fa-solid fa-history"></i><span class="tab-text">Recents</span></button></li>
+                <li><button class="tab-button" data-tab="logs" aria-label="Logs">
+                    <i class="fa-solid fa-file-lines"></i><span class="tab-text">Logs</span></button></li>
+                <li><button class="tab-button" data-tab="extras" aria-label="Extras">
+                    <i class="fa-solid fa-star"></i><span class="tab-text">Extras</span></button></li>
+                <li><button class="tab-button" data-tab="settings" aria-label="Settings">
+                    <i class="fa-solid fa-gear"></i><span class="tab-text">Settings</span></button></li>
             </ul>
         </nav>
 
@@ -89,62 +104,282 @@
 
             <div id="unlock-tab" class="tab-panel">
                 <h2><i class="fa-solid fa-lock-open"></i> Unlock Actions</h2>
-                <!-- Warning Panel -->
+
+                <!-- Warning Panel — shown when no avatar is loaded -->
                 <div id="unlock-warning-panel" class="tab-content-panel warning-panel" style="display: block;">
-                    <!-- Initially visible -->
-                    <p><i class="fa-solid fa-triangle-exclamation"></i> Please load an avatar from the Avatar tab first.
-                    </p>
+                    <p><i class="fa-solid fa-triangle-exclamation"></i> Please load an avatar from the Avatar tab first.</p>
                 </div>
-                <div class="tab-content-panel">
-                    <!-- Buttons for unlock actions -->
-                    <div class="unlock-action-container">
-                        <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock')" disabled><i
-                                class="fa-solid fa-unlock"></i> Unlock</button>
-                        <p class="unlock-action-description">Will use the general unlock method to unlock avatars.</p>
-                    </div>
-                    <div class="unlock-action-container">
-                        <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock (VRCFury)')"
-                            disabled><i class="fa-solid fa-bolt"></i> Unlock (VRCFury)</button>
-                        <p class="unlock-action-description">Will attempt to unlock VRCFury parameters.</p>
-                    </div>
-                    <div class="unlock-action-container">
-                        <button class="action-button unlock-action-btn" onclick="triggerPopup('Database Unlock')"
-                            disabled><i class="fa-solid fa-database"></i> Database Unlock</button>
-                        <p class="unlock-action-description">Scans avatar's locks against the SQL database of parameters
-                            to find a match and unlock.</p>
-                    </div>
-                    <!-- New Restart Buttons -->
-                    <div class="unlock-action-container">
-                        <button class="action-button unlock-action-btn" onclick="triggerRestart('restart-novr')"
-                            disabled><i class="fa-solid fa-arrows-rotate"></i> Restart</button>
-                        <p class="unlock-action-description">Restarts VRChat.</p>
-                    </div>
-                    <div class="unlock-action-container">
-                        <button class="action-button unlock-action-btn" onclick="triggerRestart('restart-vr')"
-                            disabled><i class="fa-solid fa-arrows-rotate"></i> Restart (VR)</button>
-                        <p class="unlock-action-description">Restarts VRChat in VR mode.</p>
-                    </div>
-                </div>
+
+                <!-- Loaded Avatar Info (shown when avatar is loaded) -->
                 <div id="loaded-avatar-info-panel" class="tab-content-panel" style="display: none;">
-                    <h3>Loaded Avatar</h3>
-                    <div style="display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-start;">
-                        <img id="loaded-avatar-img" src="https://placehold.co/100x100?text=No+Image"
+                    <div style="display: flex; gap: 15px; align-items: flex-start;">
+                        <img id="loaded-avatar-img" src="https://placehold.co/80x80?text=..."
                             alt="Avatar Thumbnail"
-                            style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
-                        <div>
-                            <p><strong id="loaded-avi-id-label">Avatar ID:</strong> <span
-                                    id="loaded-avatar-id">N/A</span></p>
-                            <p><strong id="loaded-user-id-label">User ID:</strong> <span id="loaded-user-id">N/A</span>
-                            </p>
-                            <p><strong>Name:</strong> <span id="loaded-avatar-name">Loading...</span></p>
-                            <p><strong>Author:</strong> <span id="loaded-avatar-author">Loading...</span></p>
+                            style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink:0;">
+                        <div style="flex:1; min-width:0;">
+                            <p style="margin-bottom:4px;"><i class="fa-solid fa-id-badge" style="color:var(--accent-color);width:16px;"></i> <strong id="loaded-avi-id-label">Avatar ID:</strong> <span id="loaded-avatar-id" style="word-break:break-all;">N/A</span></p>
+                            <p style="margin-bottom:4px;"><i class="fa-solid fa-user" style="color:var(--accent-color);width:16px;"></i> <strong id="loaded-user-id-label">User ID:</strong> <span id="loaded-user-id">N/A</span></p>
+                            <p style="margin-bottom:4px;"><i class="fa-solid fa-tag" style="color:var(--accent-color);width:16px;"></i> <strong>Name:</strong> <span id="loaded-avatar-name">Loading...</span></p>
+                            <p style="margin-bottom:8px;"><i class="fa-solid fa-pen-nib" style="color:var(--accent-color);width:16px;"></i> <strong>Author:</strong> <span id="loaded-avatar-author">Loading...</span></p>
+                            <button class="action-button secondary-action" onclick="showUnloadConfirmation()" style="padding:5px 12px; font-size:0.85em;">
+                                <i class="fa-solid fa-circle-xmark"></i> Unload
+                            </button>
                         </div>
                     </div>
-                    <button class="action-button secondary-action" onclick="showUnloadConfirmation()"><i
-                            class="fa-solid fa-times-circle"></i> Unload Avatar</button>
                 </div>
-            </div>
 
+                <!-- ACCORDION: Unlock Methods -->
+                <div class="acc-section">
+                    <button class="acc-header" onclick="toggleAccordion('acc-unlock-methods')">
+                        <span><i class="fa-solid fa-unlock"></i> Unlock Methods</span>
+                        <i class="fa-solid fa-chevron-down acc-chevron rotated" id="chevron-acc-unlock-methods"></i>
+                    </button>
+                    <div id="acc-unlock-methods" class="acc-body open">
+                        <div class="acc-body-inner">
+                            <div class="unlock-action-container">
+                                <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock')" disabled>
+                                    <i class="fa-solid fa-unlock"></i> Unlock
+                                </button>
+                                <p class="unlock-action-description">General unlock — removes the standard lock parameter.</p>
+                            </div>
+                            <div class="unlock-action-container">
+                                <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock (VRCFury)')" disabled>
+                                    <i class="fa-solid fa-bolt"></i> Unlock (VRCFury)
+                                </button>
+                                <p class="unlock-action-description">Targets VRCFury lock parameters specifically.</p>
+                            </div>
+                            <div class="unlock-action-container">
+                                <button class="action-button unlock-action-btn" onclick="triggerPopup('Database Unlock')" disabled>
+                                    <i class="fa-solid fa-database"></i> Database Unlock
+                                </button>
+                                <p class="unlock-action-description">Scans avatar parameters against the SQL lock database to find and unlock known locks.</p>
+                            </div>
+                            <hr style="border-color:var(--border-color); margin:10px 0;">
+                            <div class="unlock-action-container">
+                                <button class="action-button unlock-action-btn" onclick="triggerRestart('restart-novr')" disabled>
+                                    <i class="fa-solid fa-arrows-rotate"></i> Restart VRChat
+                                </button>
+                                <p class="unlock-action-description">Closes and relaunches VRChat (desktop mode).</p>
+                            </div>
+                            <div class="unlock-action-container">
+                                <button class="action-button unlock-action-btn secondary-action" onclick="triggerRestart('restart-vr')" disabled>
+                                    <i class="fa-solid fa-vr-cardboard"></i> Restart VRChat (VR)
+                                </button>
+                                <p class="unlock-action-description">Closes and relaunches VRChat in VR mode.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCORDION: Auto Unlock -->
+                <div class="acc-section">
+                    <button class="acc-header" onclick="toggleAccordion('acc-auto-unlock')">
+                        <span><i class="fa-solid fa-rotate"></i> Auto Unlock</span>
+                        <i class="fa-solid fa-chevron-down acc-chevron" id="chevron-acc-auto-unlock"></i>
+                    </button>
+                    <div id="acc-auto-unlock" class="acc-body">
+                        <div class="acc-body-inner">
+                            <p style="font-size:0.9em; opacity:0.75; margin-bottom:14px;">Automatically scan and unlock avatar files using the database method. Choose in-app polling or an external Windows service.</p>
+
+                            <div class="checkbox-container" style="margin-bottom:16px;">
+                                <input type="checkbox" id="auto-unlock-enabled">
+                                <label for="auto-unlock-enabled" style="font-weight:600;">Enable Auto Unlock</label>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:380px; margin-bottom:16px;">
+                                <div>
+                                    <label for="auto-unlock-mode" style="display:block; margin-bottom:5px; font-size:0.85em; opacity:0.75; text-transform:uppercase; letter-spacing:0.04em;"><i class="fa-solid fa-sliders"></i> Mode</label>
+                                    <select id="auto-unlock-mode" style="width:100%; background-color:var(--input-bg-color); color:var(--text-color); border:1px solid var(--input-border-color); padding:7px 10px; border-radius:4px; font-family:inherit;">
+                                        <option value="inapp">In-App</option>
+                                        <option value="service">Windows Service</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="auto-unlock-interval" style="display:block; margin-bottom:5px; font-size:0.85em; opacity:0.75; text-transform:uppercase; letter-spacing:0.04em;"><i class="fa-solid fa-clock"></i> Interval (sec)</label>
+                                    <input type="number" id="auto-unlock-interval" value="30" min="5" max="3600"
+                                        style="width:100%; background-color:var(--input-bg-color); color:var(--text-color); border:1px solid var(--input-border-color); padding:7px 10px; border-radius:4px; font-family:inherit;">
+                                </div>
+                            </div>
+
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px; padding:8px 12px; background:var(--input-bg-color); border:1px solid var(--input-border-color); border-radius:6px; width:fit-content; min-width:200px;">
+                                <i class="fa-solid fa-circle" id="auto-unlock-status-dot" style="font-size:0.65em; color:var(--border-color);"></i>
+                                <span id="auto-unlock-status-label" style="font-size:0.9em;">Status: Stopped</span>
+                            </div>
+
+                            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:18px;">
+                                <button class="action-button" onclick="saveAutoUnlockSettings()">
+                                    <i class="fa-solid fa-check"></i> Apply
+                                </button>
+                                <button class="action-button" id="btn-force-stop" onclick="forceStopAutoUnlock()"
+                                    style="background-color:#c0392b; border-color:#a93226; display:none;">
+                                    <i class="fa-solid fa-ban"></i> Force Stop
+                                </button>
+                                <button class="action-button secondary-action" id="btn-view-log" onclick="openServiceLog()" style="display:none;">
+                                    <i class="fa-solid fa-file-lines"></i> View Log
+                                </button>
+                            </div>
+
+                            <!-- Nested Accordion: Unlock Settings -->
+                            <div class="acc-section acc-nested">
+                                <button class="acc-header acc-header-sm" onclick="toggleAccordion('acc-unlock-settings')">
+                                    <span><i class="fa-solid fa-sliders"></i> Unlock Settings</span>
+                                    <i class="fa-solid fa-chevron-down acc-chevron" id="chevron-acc-unlock-settings"></i>
+                                </button>
+                                <div id="acc-unlock-settings" class="acc-body">
+                                    <div class="acc-body-inner">
+                                        <p style="font-size:0.82em; font-weight:600; opacity:0.7; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;"><i class="fa-solid fa-database"></i> Database</p>
+                                        <p style="font-size:0.88em; opacity:0.75; margin-bottom:8px;">Override the default lock database URL or point to a local .db file.</p>
+                                        <label style="display:block; margin-bottom:4px; font-size:0.85em; opacity:0.75;">Database URL (optional)</label>
+                                        <input type="text" id="custom-db-url2" placeholder="https://example.com/locks.db"
+                                            style="width:100%; background-color:var(--input-bg-color); color:var(--text-color); border:1px solid var(--input-border-color); padding:7px 10px; border-radius:4px; font-family:inherit; margin-bottom:8px;">
+                                        <label style="display:block; margin-bottom:4px; font-size:0.85em; opacity:0.75;">Local DB Path (optional)</label>
+                                        <input type="text" id="custom-db-path2" placeholder="C:\path\to\VRC_LOCKS.db"
+                                            style="width:100%; background-color:var(--input-bg-color); color:var(--text-color); border:1px solid var(--input-border-color); padding:7px 10px; border-radius:4px; font-family:inherit; margin-bottom:10px;">
+                                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
+                                            <button class="action-button" onclick="saveCustomDbSettings2()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                                            <button class="action-button secondary-action" onclick="resetCustomDbSettings2()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                                        </div>
+
+                                        <p style="font-size:0.82em; font-weight:600; opacity:0.7; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;"><i class="fa-brands fa-windows"></i> Windows Cache Path</p>
+                                        <p style="font-size:0.88em; opacity:0.75; margin-bottom:8px;">Override the default VRChat LocalLow cache location.</p>
+                                        <label style="display:block; margin-bottom:4px; font-size:0.85em; opacity:0.75;">VRChat Cache Path (optional)</label>
+                                        <input type="text" id="custom-win-cache-path2" placeholder="D:\VRChat\AppData\LocalLow\VRChat\VRChat"
+                                            style="width:100%; background-color:var(--input-bg-color); color:var(--text-color); border:1px solid var(--input-border-color); padding:7px 10px; border-radius:4px; font-family:inherit; margin-bottom:10px;">
+                                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
+                                            <button class="action-button" onclick="saveWindowsCacheSettings2()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                                            <button class="action-button secondary-action" onclick="resetWindowsCacheSettings2()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                                        </div>
+
+                                        <p style="font-size:0.82em; font-weight:600; opacity:0.7; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;"><i class="fa-brands fa-linux"></i> Linux / Proton Cache Path</p>
+                                        <p style="font-size:0.88em; opacity:0.75; margin-bottom:8px;">Set if VRChat runs under a non-default Proton prefix on Linux.</p>
+                                        <label style="display:block; margin-bottom:4px; font-size:0.85em; opacity:0.75;">Linux Cache Path (optional)</label>
+                                        <input type="text" id="custom-linux-cache-path2" placeholder="/home/user/.steam/root/steamapps/compatdata/438100/pfx/..."
+                                            style="width:100%; background-color:var(--input-bg-color); color:var(--text-color); border:1px solid var(--input-border-color); padding:7px 10px; border-radius:4px; font-family:inherit; margin-bottom:10px;">
+                                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                            <button class="action-button" onclick="saveLinuxSettings2()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                                            <button class="action-button secondary-action" onclick="resetLinuxSettings2()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCORDION: Quest / Android Unlock via ADB -->
+                <div class="acc-section">
+                    <button class="acc-header" onclick="toggleAccordion('acc-quest-unlock')">
+                        <span><i class="fa-solid fa-mobile-screen-button"></i> Quest &amp; Android Unlock</span>
+                        <i class="fa-solid fa-chevron-down acc-chevron" id="chevron-acc-quest-unlock"></i>
+                    </button>
+                    <div id="acc-quest-unlock" class="acc-body">
+                        <div class="acc-body-inner">
+                            <div class="adb-info-banner">
+                                <i class="fa-solid fa-circle-info" style="color:var(--accent-color); font-size:1.1em; flex-shrink:0; margin-top:2px;"></i>
+                                <div>
+                                    <strong>How it works</strong>
+                                    <p style="margin:4px 0 0; font-size:0.87em; opacity:0.85; line-height:1.5;">
+                                        Connects to your Quest or Android device via <strong>ADB</strong> (Android Debug Bridge) over USB.
+                                        ADB pulls avatar cache files from <code style="font-size:0.9em;">/sdcard/Android/data/com.vrchat.oculus.quest/files/LocalAvatarData/</code>,
+                                        runs the database unlock on each file, then pushes them back.
+                                        Enable <strong>Developer Mode / USB Debugging</strong> on your headset before connecting.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
+                                <button class="action-button" onclick="adbRefreshDevices()" id="btn-adb-refresh">
+                                    <i class="fa-solid fa-rotate"></i> Refresh Devices
+                                </button>
+                                <span id="adb-device-count" style="font-size:0.88em; opacity:0.65;"></span>
+                            </div>
+
+                            <div id="adb-device-list" style="margin-bottom:16px;">
+                                <p style="font-size:0.88em; opacity:0.5; font-style:italic;">No devices found. Click Refresh Devices.</p>
+                            </div>
+
+                            <div id="adb-controls" style="display:none;">
+                                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                                    <button class="action-button" id="btn-adb-scan" onclick="adbScanSelected()">
+                                        <i class="fa-solid fa-magnifying-glass"></i> Scan &amp; Unlock
+                                    </button>
+                                    <button class="action-button secondary-action" id="btn-adb-find-path" onclick="adbFindPath()">
+                                        <i class="fa-solid fa-folder-open"></i> Find VRChat Path
+                                    </button>
+                                </div>
+                                <div id="adb-path-result" style="display:none; font-size:0.85em; padding:6px 10px; background:var(--input-bg-color); border:1px solid var(--input-border-color); border-radius:5px; margin-bottom:10px; word-break:break-all;">
+                                    <i class="fa-solid fa-folder" style="color:var(--accent-color); margin-right:6px;"></i>
+                                    <span id="adb-path-text"></span>
+                                </div>
+                            </div>
+
+                            <div id="adb-scan-result" style="display:none;" class="adb-result-box">
+                                <i class="fa-solid fa-circle-check" style="color:#2ECC71; margin-right:8px;"></i>
+                                <span id="adb-scan-result-text"></span>
+                            </div>
+
+                            <div id="adb-status" style="font-size:0.85em; opacity:0.6; margin-top:8px; min-height:1.4em;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                            <!-- ACCORDION: Cache Management -->
+                <div class="acc-section">
+                    <button class="acc-header" onclick="toggleAccordion('acc-cache-mgmt')">
+                        <span><i class="fa-solid fa-folder-open"></i> Cache Management</span>
+                        <i class="fa-solid fa-chevron-down acc-chevron" id="chevron-acc-cache-mgmt"></i>
+                    </button>
+                    <div id="acc-cache-mgmt" class="acc-body">
+                        <div class="acc-body-inner">
+                            <p style="font-size:0.9em; opacity:0.75; margin-bottom:14px;">Manage the VRChat <code>LocalAvatarData</code> folder on this PC. This folder contains cached avatar files used for unlocking.</p>
+                            <div id="cache-path-info" style="font-size:0.85em; padding:8px 12px; background:var(--input-bg-color); border:1px solid var(--input-border-color); border-radius:5px; margin-bottom:12px; word-break:break-all;">
+                                <i class="fa-solid fa-folder" style="color:var(--accent-color); margin-right:6px;"></i>
+                                <span id="cache-path-text" style="opacity:0.7;">Click "Check Size" to load path info.</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+                                <div style="padding:8px 14px; background:var(--input-bg-color); border:1px solid var(--input-border-color); border-radius:5px; font-size:0.9em;">
+                                    <i class="fa-solid fa-weight-hanging" style="color:var(--accent-color); margin-right:6px;"></i>
+                                    Size: <strong id="cache-size-label">--</strong>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button class="action-button secondary-action" id="btn-cache-check" onclick="checkCacheSize()">
+                                    <i class="fa-solid fa-magnifying-glass"></i> Check Size
+                                </button>
+                                <button class="action-button" id="btn-cache-delete" onclick="deleteCacheData()" style="background-color:color-mix(in srgb, #e74c3c 80%, var(--accent-color)); border-color:#a93226;">
+                                    <i class="fa-solid fa-trash"></i> Delete Cache
+                                </button>
+                            </div>
+                            <div id="cache-action-result" style="display:none; margin-top:10px; padding:8px 12px; border-radius:5px; font-size:0.88em;"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ACCORDION: Explorer -->
+                <div class="acc-section">
+                    <button class="acc-header" onclick="toggleAccordion('acc-explorer')">
+                        <span><i class="fa-solid fa-compass"></i> Explorer</span>
+                        <i class="fa-solid fa-chevron-down acc-chevron" id="chevron-acc-explorer"></i>
+                    </button>
+                    <div id="acc-explorer" class="acc-body">
+                        <div class="acc-body-inner">
+                            <p style="font-size:0.9em; opacity:0.75; margin-bottom:14px;">Compare your avatar's saved parameters against its OSC configuration and send live OSC commands directly to VRChat.</p>
+                            <div id="explorer-no-avatar">
+                                <p style="font-size:0.88em; opacity:0.55; font-style:italic;"><i class="fa-solid fa-triangle-exclamation" style="color:#ffcc00; margin-right:5px;"></i>Load an avatar first to use the Explorer.</p>
+                            </div>
+                            <div id="explorer-launch" style="display:none;">
+                                <div style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; background:var(--input-bg-color); border:1px solid var(--input-border-color); border-radius:8px; margin-bottom:14px;">
+                                    <i class="fa-solid fa-circle-info" style="color:var(--accent-color); font-size:1.1em; flex-shrink:0; margin-top:2px;"></i>
+                                    <p style="font-size:0.87em; opacity:0.85; line-height:1.5; margin:0;">Opens a dedicated Explorer for <code id="explorer-avatar-label" style="font-size:0.9em;">this avatar</code>. Reads <code>LocalAvatarData</code> &amp; <code>OSC</code> configs, lets you inspect values and fire custom OSC commands.</p>
+                                </div>
+                                <button class="action-button" onclick="openExplorer()">
+                                    <i class="fa-solid fa-compass"></i> Open Explorer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+</div>
             <div id="recents-tab" class="tab-panel">
                 <h2><i class="fa-solid fa-history"></i> Recents</h2>
                 <div class="tab-content-panel">
@@ -176,6 +411,100 @@
                                 class="fa-solid fa-trash"></i> Clear Logs</button>
                         <button class="action-button" onclick="copyAppLogs()"><i class="fa-solid fa-copy"></i> Copy to
                             Clipboard</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ EXTRAS TAB (Help + Info + Feedback) ═══ -->
+            <div id="extras-tab" class="tab-panel">
+                <h2><i class="fa-solid fa-star"></i> <span id="extras-tab-h2">Extras</span></h2>
+
+                <!-- Help Section -->
+                <div class="extras-section">
+                    <button class="extras-section-header" onclick="toggleExtrasSection('extras-help')">
+                        <span><i class="fa-solid fa-circle-question"></i> <span id="extras-help-title">Help Guide</span></span>
+                        <i class="fa-solid fa-chevron-down extras-chevron" id="chevron-extras-help"></i>
+                    </button>
+                    <div id="extras-help" class="extras-section-body open">
+                        <div class="tab-content-panel">
+                            <div class="info-badge" style="margin-bottom: 20px; align-items: center;">
+                                <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 1.5em; margin-right: 15px;"></i>
+                                <p id="help-yt-text" style="margin: 0;">For an in-depth visual tutorial, be sure to head over to my YouTube channel <strong>@ScrimDev</strong>!</p>
+                            </div>
+                            <div class="info-badge" style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px;">
+                                <h4 id="help-step1-title" style="margin: 0; display: flex; align-items: center;"><i class="fa-solid fa-clipboard-list" style="margin-right:8px;"></i> Step 1: Preparation</h4>
+                                <p id="help-step1-text" style="margin-top: 0; margin-bottom: 5px;">Launch VRChat and switch into the avatar you wish to unlock. Wait for the avatar to load completely, then enter your VRChat User ID and the Avatar's ID into the application.</p>
+                                <h4 id="help-step2-title" style="margin: 0; display: flex; align-items: center;"><i class="fa-solid fa-lock-open" style="margin-right:8px;"></i> Step 2: Unlocking</h4>
+                                <p id="help-step2-text" style="margin-top: 0; margin-bottom: 5px;">Attempt to unlock the avatar using the standard <strong>Unlock</strong> method. If the avatar uses VRCFury locks, use <strong>Unlock (VRCFury)</strong> or <strong>Database Unlock</strong> instead.</p>
+                                <h4 id="help-step3-title" style="margin: 0; display: flex; align-items: center;"><i class="fa-solid fa-flag-checkered" style="margin-right:8px;"></i> Step 3: Restart</h4>
+                                <p id="help-step3-text" style="margin-top: 0; margin-bottom: 5px;">Restart your game using the restart buttons within the app. Enjoy your newly unlocked avatar!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Section -->
+                <div class="extras-section">
+                    <button class="extras-section-header" onclick="toggleExtrasSection('extras-info')">
+                        <span><i class="fa-solid fa-circle-info"></i> <span id="extras-info-title">App Info</span></span>
+                        <i class="fa-solid fa-chevron-down extras-chevron" id="chevron-extras-info"></i>
+                    </button>
+                    <div id="extras-info" class="extras-section-body">
+                        <div class="tab-content-panel">
+                            <p id="info-p1">AvatarLockpick</p>
+                            <p id="info-p2">GUI made with Photino.NET</p>
+                            <p id="info-p3">Developed by Scrimmane / ScrimDev</p>
+                            <p id="info-p4">App Icon by Kmg Design</p>
+                            <p id="info-paw">Avatar search API provided by Amelia (PAW API)</p>
+                            <hr style="border-color: var(--border-color); margin: 1.5em 0;">
+                            <button class="action-button" onclick="showNetResponsePopup()"><i class="fa-solid fa-terminal"></i> <span id="info-btn1">View .NET Log</span></button>
+                            <p id="info-p5" style="margin-top: 12px;"><strong>Note:</strong> You can customize this interface! Feel free to edit the files in the application's 'UI' folder.</p>
+                            <button class="action-button" onclick="openHelpUrl()"><i class="fa-solid fa-question-circle"></i> <span id="info-btn2">Help Page</span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Section -->
+                <div class="extras-section">
+                    <button class="extras-section-header" onclick="toggleExtrasSection('extras-feedback')">
+                        <span><i class="fa-solid fa-message"></i> <span id="extras-feedback-title">Feedback</span></span>
+                        <i class="fa-solid fa-chevron-down extras-chevron" id="chevron-extras-feedback"></i>
+                    </button>
+                    <div id="extras-feedback" class="extras-section-body">
+                        <div class="tab-content-panel">
+                            <p id="extras-feedback-desc" style="font-size:0.9em; opacity:0.75; margin-bottom:18px;">Found a bug or have an idea? Let me know — all submissions go directly to the developer.</p>
+                            <div style="margin-bottom:16px;">
+                                <label id="extras-fb-type-label" style="display:block; margin-bottom:8px; font-size:0.85em; opacity:0.75; text-transform:uppercase; letter-spacing:0.04em;">Type</label>
+                                <div style="display:flex; gap:8px; flex-wrap:wrap;" id="feedback-category-group">
+                                    <button class="feedback-cat-btn active" data-cat="bug" onclick="selectFeedbackCategory(this)"><i class="fa-solid fa-bug"></i> <span id="fb-cat-bug">Bug Report</span></button>
+                                    <button class="feedback-cat-btn" data-cat="feedback" onclick="selectFeedbackCategory(this)"><i class="fa-solid fa-lightbulb"></i> <span id="fb-cat-suggestion">Suggestion</span></button>
+                                    <button class="feedback-cat-btn" data-cat="general" onclick="selectFeedbackCategory(this)"><i class="fa-solid fa-comment"></i> <span id="fb-cat-general">General</span></button>
+                                </div>
+                            </div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:480px; margin-bottom:12px;">
+                                <div>
+                                    <label for="fb-name" id="fb-name-label" style="display:block; margin-bottom:4px; font-size:0.85em; opacity:0.75; text-transform:uppercase; letter-spacing:0.04em;">Your Name</label>
+                                    <input type="text" id="fb-name" placeholder="Optional" style="width:100%; background:var(--input-bg-color); color:var(--text-color); border:1px solid var(--input-border-color); padding:8px 10px; border-radius:6px; font-family:inherit;">
+                                </div>
+                                <div>
+                                    <label for="fb-email" id="fb-email-label" style="display:block; margin-bottom:4px; font-size:0.85em; opacity:0.75; text-transform:uppercase; letter-spacing:0.04em;">Contact Email <span style="opacity:0.5;" id="fb-email-opt">(optional)</span></label>
+                                    <input type="email" id="fb-email" placeholder="So I can follow up" style="width:100%; background:var(--input-bg-color); color:var(--text-color); border:1px solid var(--input-border-color); padding:8px 10px; border-radius:6px; font-family:inherit;">
+                                </div>
+                            </div>
+                            <div style="max-width:480px; margin-bottom:12px;">
+                                <label for="fb-subject" id="fb-subject-label" style="display:block; margin-bottom:4px; font-size:0.85em; opacity:0.75; text-transform:uppercase; letter-spacing:0.04em;">Subject</label>
+                                <input type="text" id="fb-subject" placeholder="Short summary" style="width:100%; background:var(--input-bg-color); color:var(--text-color); border:1px solid var(--input-border-color); padding:8px 10px; border-radius:6px; font-family:inherit;">
+                            </div>
+                            <div style="max-width:480px; margin-bottom:16px;">
+                                <label for="fb-body" id="fb-body-label" style="display:block; margin-bottom:4px; font-size:0.85em; opacity:0.75; text-transform:uppercase; letter-spacing:0.04em;">Message</label>
+                                <textarea id="fb-body" rows="5" placeholder="Describe the issue or your suggestion in detail..." style="width:100%; background:var(--input-bg-color); color:var(--text-color); border:1px solid var(--input-border-color); padding:8px 10px; border-radius:6px; font-family:inherit; resize:vertical;"></textarea>
+                            </div>
+                            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                                <button class="action-button" id="fb-submit-btn" onclick="submitFeedback()"><i class="fa-solid fa-paper-plane"></i> <span id="fb-submit-label">Submit</span></button>
+                                <button class="action-button secondary-action" onclick="clearFeedbackForm()"><i class="fa-solid fa-eraser"></i> <span id="fb-clear-label">Clear</span></button>
+                            </div>
+                            <div id="fb-status" style="margin-top:14px; padding:10px 14px; border-radius:6px; font-size:0.9em; display:none;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -285,6 +614,16 @@
                                 class="fa-solid fa-rotate-left"></i> <span id="settings-db-reset">Reset to
                                 Default</span></button>
                     </div>
+                    <h3 id="settings-wincache-h3">Windows Cache Path</h3>
+                    <div class="setting-option">
+                        <p id="settings-wincache-p">If your VRChat cache is stored in a non-default location (e.g., another drive), set the VRChat folder path here to override the default.</p>
+                        <label for="custom-win-cache-path" id="settings-wincache-path-label">VRChat Cache Path (Optional)</label>
+                        <input type="text" id="custom-win-cache-path" placeholder="D:\VRChat\AppData\LocalLow\VRChat\VRChat">
+                        <button class="action-button" onclick="saveWindowsCacheSettings()"><i class="fa-solid fa-save"></i>
+                            <span id="settings-wincache-save">Save Cache Path</span></button>
+                        <button class="action-button secondary-action" onclick="resetWindowsCacheSettings()"><i
+                                class="fa-solid fa-rotate-left"></i> <span id="settings-wincache-reset">Reset Path</span></button>
+                    </div>
                     <h3 id="settings-linux-h3">Linux Compatibility</h3>
                     <div class="setting-option">
                         <p id="settings-linux-p">If you play VRChat on Linux/Proton your VRChat LocalLow Cache won't be
@@ -315,58 +654,6 @@
                 </div>
             </div>
 
-            <div id="help-tab" class="tab-panel">
-                <h2><i class="fa-solid fa-circle-question"></i> Help Guide</h2>
-                <div class="tab-content-panel">
-                    <div class="info-badge" style="margin-bottom: 20px; align-items: center;">
-                        <i class="fa-brands fa-youtube"
-                            style="color: #ff0000; font-size: 1.5em; margin-right: 15px;"></i>
-                        <p id="help-yt-text" style="margin: 0;">For an in-depth visual tutorial, be sure to head over to
-                            my YouTube channel <strong>@ScrimDev</strong>!</p>
-                    </div>
-
-                    <div class="info-badge"
-                        style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px;">
-                        <h4 id="help-step1-title" style="margin: 0; display: flex; align-items: center;"><i
-                                class="fa-solid fa-clipboard-list" style="margin-right:8px;"></i> Step 1: Preparation
-                        </h4>
-                        <p id="help-step1-text" style="margin-top: 0; margin-bottom: 5px;">Launch VRChat and switch into
-                            the avatar you wish to unlock. Wait for the avatar to load completely (I recommend waiting
-                            a few extra seconds to ensure it is fully cached). Then, enter your VRChat User ID and the
-                            Avatar's ID into the application.</p>
-
-                        <h4 id="help-step2-title" style="margin: 0; display: flex; align-items: center;"><i
-                                class="fa-solid fa-lock-open" style="margin-right:8px;"></i> Step 2: Unlocking</h4>
-                        <p id="help-step2-text" style="margin-top: 0; margin-bottom: 5px;">Attempt to unlock the avatar
-                            using the standard <strong>Unlock</strong> method. If the avatar utilizes custom or VRCFury
-                            locks, use <strong>Unlock (VRCFury)</strong> or <strong>Database Unlock</strong> instead.
-                        </p>
-
-                        <h4 id="help-step3-title" style="margin: 0; display: flex; align-items: center;"><i
-                                class="fa-solid fa-flag-checkered" style="margin-right:8px;"></i> Finally: Restart</h4>
-                        <p id="help-step3-text" style="margin-top: 0; margin-bottom: 5px;">Restart your game using the
-                            restart buttons within the app. Enjoy your newly unlocked avatar!</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="info-tab" class="tab-panel">
-                <h2><i class="fa-solid fa-circle-info"></i> Info</h2>
-                <div class="tab-content-panel">
-                    <p id="info-p1">AvatarLockpick</p>
-                    <p id="info-p2">GUI made with Photino.NET</p>
-                    <p id="info-p3">Developed by Scrimmane / ScrimDev</p>
-                    <p id="info-p4">App Icon by Kmg Design</p>
-                    <p id="info-paw">Avatar search API provided by Amelia (PAW API)</p>
-                    <hr style="border-color: var(--border-color); margin: 1.5em 0;">
-                    <button class="action-button" onclick="showNetResponsePopup()"><i class="fa-solid fa-terminal"></i>
-                        <span id="info-btn1">View .NET Log</span></button>
-                    <p id="info-p5"><strong>Note:</strong> You can customize this interface! Feel free to edit the files
-                        in the application's 'UI' folder to create your own look.</p>
-                    <button class="action-button" onclick="openHelpUrl()"><i class="fa-solid fa-question-circle"></i>
-                        <span id="info-btn2">Help Page</span></button>
-                </div>
-            </div>
         </main>
     </div>
 

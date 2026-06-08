@@ -1,4 +1,4 @@
-/* --- Base & Reset --- */
+﻿/* --- Base & Reset --- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -45,131 +45,92 @@ body.no-animations * {
     animation: none !important;
 }
 
-/* --- Themes (using JS to set variables now) --- */
-/* Keep classes for potential overrides if needed, but base is set on html */
-body.theme-dark {
-    /* Variables primarily set on :root / html */
-}
-
-body.theme-light {
-    /* Variables primarily set on :root / html */
-}
-
-body.theme-default {
-    /* Variables primarily set on :root / html */
-}
+/* --- Themes --- set via JS CSS custom properties on :root --- */
 
 
-/* --- Splash Screen --- */
-#splash-screen {
+/* --- Custom Title Bar --- */
+#titlebar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    /* Use secondary bg for splash */
-    background-color: var(--bg-secondary-color);
+    right: 0;
+    height: 36px;
+    background: var(--bg-secondary-color);
+    border-bottom: 1px solid var(--border-color);
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 1000;
-    opacity: 1;
-    transition: opacity 0.8s ease-out;
+    justify-content: space-between;
+    z-index: 200;
+    -webkit-app-region: drag;
+    user-select: none;
 }
 
-/* Container for splash content */
-.splash-content {
+#titlebar-drag {
     display: flex;
-    flex-direction: column;
-    /* Stack title and spinner vertically */
     align-items: center;
-    /* Center items horizontally */
+    gap: 8px;
+    padding-left: 14px;
+    flex: 1;
+    -webkit-app-region: drag;
 }
 
-#splash-screen.fade-out {
-    opacity: 0;
-}
-
-#splash-screen .app-title {
-    font-size: 3.0em;
-    /* Slightly larger */
-    font-weight: 400;
-    /* Slightly bolder */
-    display: flex;
-    /* Use flex to layout spans */
-    justify-content: center;
-    /* Remove previous styles */
-    /* background: ... */
-    /* background-size: ... */
-    /* -webkit-background-clip: ... */
-    /* background-clip: ... */
-    /* -webkit-text-fill-color: ... */
-    /* color: ... */
-    /* animation: gradient-flow ..., glow-pulse ...; */
-    /* text-shadow: ...; */
-}
-
-/* Style for individual characters */
-#splash-screen .app-title span {
-    display: inline-block;
-    /* Needed for transform */
+#titlebar-icon {
     color: var(--accent-color);
-    /* Use accent color */
-    /* Apply wave animation */
-    animation: text-wave 0.8s ease-in-out infinite alternate;
-    /* Add staggered delay using CSS variable set inline later */
-    animation-delay: var(--delay);
+    font-size: 0.9em;
 }
 
-/* New wave animation */
-@keyframes text-wave {
-    from {
-        transform: translateY(0);
-    }
-
-    to {
-        transform: translateY(-6px);
-        /* Adjust vertical distance */
-    }
+#titlebar-title {
+    font-size: 0.82em;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--text-color);
+    opacity: 0.85;
 }
 
-/* Spinner Styles */
-#splash-spinner {
-    margin-top: 2em;
-    /* Space between title and spinner */
-    width: 40px;
-    height: 40px;
-    border: 4px solid rgba(var(--text-color-rgb, 255, 255, 255), 0.2);
-    /* Light border */
-    border-top-color: var(--accent-color);
-    /* Use accent color for spinner top */
-    border-radius: 50%;
-    animation: spinner-spin 1s linear infinite;
+#titlebar-controls {
+    display: flex;
+    height: 100%;
+    -webkit-app-region: no-drag;
 }
 
-/* Spinner Animation */
-@keyframes spinner-spin {
-    to {
-        transform: rotate(360deg);
-    }
+.titlebar-btn {
+    width: 46px;
+    height: 36px;
+    background: none;
+    border: none;
+    color: var(--text-secondary-color);
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.titlebar-btn:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-color);
+}
+
+.titlebar-btn.close-btn:hover {
+    background: #c0392b;
+    color: #fff;
 }
 
 /* --- App Wrapper --- */
 #app-wrapper {
     display: flex;
     height: 100vh;
+    padding-top: 36px;
     transition: padding-left 0.3s ease-out;
-    /* Smooth transition when sidebar expands */
 }
 
 /* --- Sidebar Toggle Button --- */
 #sidebar-toggle {
     position: fixed;
-    /* Keep it fixed relative to viewport */
-    top: 10px;
+    top: 46px;
     left: 10px;
     z-index: 100;
-    /* Above sidebar */
     background: none;
     border: none;
     color: var(--text-secondary-color);
@@ -183,12 +144,9 @@ body.theme-default {
     color: var(--accent-color);
 }
 
-/* Adjust position when sidebar is expanded */
 .sidebar-expanded #sidebar-toggle {
     left: 190px;
-    /* Position next to expanded sidebar */
     transform: rotate(180deg);
-    /* Optional: rotate arrow */
 }
 
 
@@ -197,23 +155,19 @@ body.theme-default {
     width: 60px;
     background-color: var(--bg-secondary-color);
     padding: 1em 0;
-    padding-top: 50px;
-    /* Make space for fixed toggle button */
-    height: 100%;
+    padding-top: 56px;
+    height: calc(100vh - 36px);
     position: fixed;
-    /* Fixed position */
     left: 0;
-    top: 0;
+    top: 36px;
     display: flex;
     flex-direction: column;
     align-items: center;
     border-right: 1px solid var(--border-color);
-    box-shadow: inset -2px 0 5px rgba(0, 0, 0, 0.1);
-    transition: width 0.3s ease-out;
-    /* Animate width change */
+    box-shadow: 2px 0 12px rgba(0,0,0,0.18);
+    transition: width 0.3s cubic-bezier(.4,0,.2,1);
     z-index: 99;
     overflow: hidden;
-    /* Hide text when collapsed */
 }
 
 .sidebar-expanded .sidebar {
@@ -1326,4 +1280,460 @@ body:not(.no-animations) .paw-status-dot.online {
     to {
         transform: scaleX(0);
     }
+}
+
+/* --- Feedback Category Buttons --- */
+.feedback-cat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: var(--input-bg-color);
+    color: var(--text-secondary-color);
+    border: 1px solid var(--input-border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.88em;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.feedback-cat-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--text-color);
+}
+
+.feedback-cat-btn.active {
+    border-color: var(--accent-color);
+    background: color-mix(in srgb, var(--accent-color) 15%, var(--input-bg-color));
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+/* ═══ Tab Panel Enter Animation ═══ */
+@keyframes tab-enter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tab-panel.active {
+    animation: tab-enter 0.22s cubic-bezier(.4,0,.2,1) both;
+}
+
+body.no-animations .tab-panel.active {
+    animation: none;
+}
+
+/* ═══ Generic Accordion (.acc-section / .acc-header / .acc-body) ═══ */
+.acc-section {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    background: var(--panel-bg-color);
+    transition: border-color 0.2s ease;
+}
+
+.acc-section:focus-within,
+.acc-section:has(.acc-body.open) {
+    border-color: color-mix(in srgb, var(--accent-color) 40%, var(--border-color));
+}
+
+.acc-section.acc-nested {
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--input-bg-color) 60%, var(--panel-bg-color));
+    margin-bottom: 0;
+}
+
+.acc-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 0.95em;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.18s ease;
+    gap: 10px;
+}
+
+.acc-header:hover {
+    background: rgba(255,255,255,0.04);
+}
+
+.acc-header > span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.acc-header > span > i {
+    color: var(--accent-color);
+    width: 18px;
+    text-align: center;
+}
+
+.acc-header-sm {
+    padding: 11px 16px;
+    font-size: 0.9em;
+}
+
+.acc-chevron {
+    font-size: 0.8em;
+    opacity: 0.6;
+    transition: transform 0.25s cubic-bezier(.4,0,.2,1), opacity 0.2s ease;
+    flex-shrink: 0;
+}
+
+.acc-chevron.rotated {
+    transform: rotate(180deg);
+    opacity: 1;
+}
+
+.acc-section:has(.acc-body.open) .acc-chevron {
+    transform: rotate(180deg);
+    opacity: 1;
+}
+
+.acc-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.38s cubic-bezier(.4,0,.2,1), opacity 0.28s ease;
+    opacity: 0;
+}
+
+.acc-body.open {
+    max-height: 9999px;
+    opacity: 1;
+}
+
+.acc-body-inner {
+    padding: 4px 18px 18px;
+}
+
+.acc-section.acc-nested .acc-body-inner {
+    padding: 4px 14px 14px;
+}
+
+body.no-animations .acc-body {
+    transition: none !important;
+}
+
+/* ═══ ADB / Quest-Android UI ═══ */
+.adb-info-banner {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    background: color-mix(in srgb, var(--accent-color) 8%, var(--input-bg-color));
+    border: 1px solid color-mix(in srgb, var(--accent-color) 25%, var(--border-color));
+    border-radius: 8px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.adb-device-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 7px;
+    margin-bottom: 6px;
+    background: var(--input-bg-color);
+    transition: border-color 0.15s ease, background 0.15s ease;
+    user-select: none;
+}
+
+.adb-device-row:hover:not(.adb-device-disabled) {
+    border-color: var(--accent-color);
+    background: color-mix(in srgb, var(--accent-color) 8%, var(--input-bg-color));
+}
+
+.adb-device-row.adb-device-selected {
+    border-color: var(--accent-color);
+    background: color-mix(in srgb, var(--accent-color) 12%, var(--input-bg-color));
+}
+
+.adb-device-row.adb-device-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.adb-device-icon { flex-shrink: 0; width: 20px; text-align: center; }
+.adb-device-name { flex: 1; font-weight: 600; font-size: 0.92em; }
+.adb-device-id   { font-size: 0.78em; opacity: 0.55; font-family: monospace; }
+
+.adb-device-status {
+    font-size: 0.75em;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+.adb-status-device       { background: color-mix(in srgb,#2ECC71 18%,transparent); color:#2ECC71; }
+.adb-status-unauthorized { background: color-mix(in srgb,#f0c040 18%,transparent); color:#f0c040; }
+.adb-status-offline      { background: color-mix(in srgb,#e74c3c 18%,transparent); color:#e74c3c; }
+
+.adb-result-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border-radius: 7px;
+    background: color-mix(in srgb,#2ECC71 10%,var(--input-bg-color));
+    border: 1px solid color-mix(in srgb,#2ECC71 35%,var(--border-color));
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+
+.adb-result-box.adb-result-error {
+    background: color-mix(in srgb,#e74c3c 10%,var(--input-bg-color));
+    border-color: color-mix(in srgb,#e74c3c 35%,var(--border-color));
+}
+
+/* ═══ Extras Accordion ═══ */
+.extras-section {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    background: var(--panel-bg-color);
+    transition: border-color 0.2s ease;
+}
+
+.extras-section:focus-within,
+.extras-section:has(.extras-section-body.open) {
+    border-color: color-mix(in srgb, var(--accent-color) 40%, var(--border-color));
+}
+
+.extras-section-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 0.95em;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.18s ease;
+    gap: 10px;
+}
+
+.extras-section-header:hover {
+    background: rgba(255,255,255,0.04);
+}
+
+.extras-section-header span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.extras-section-header span i {
+    color: var(--accent-color);
+    width: 18px;
+    text-align: center;
+}
+
+.extras-chevron {
+    font-size: 0.8em;
+    opacity: 0.6;
+    transition: transform 0.25s cubic-bezier(.4,0,.2,1), opacity 0.2s ease;
+}
+
+.extras-section-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(.4,0,.2,1), opacity 0.25s ease;
+    opacity: 0;
+}
+
+.extras-section-body.open {
+    max-height: 9999px;
+    opacity: 1;
+}
+
+.extras-section-body.open ~ .extras-section-header .extras-chevron,
+.extras-section:has(.extras-section-body.open) .extras-chevron {
+    transform: rotate(180deg);
+    opacity: 1;
+}
+
+.extras-chevron.rotated {
+    transform: rotate(180deg);
+    opacity: 1;
+}
+
+body.no-animations .extras-section-body {
+    transition: none !important;
+}
+
+/* ═══ Modern Panel / Card Improvements ═══ */
+.tab-content-panel {
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    transition: box-shadow 0.2s ease;
+}
+
+.tab-content-panel:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+}
+
+/* Modern input focus glow */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 25%, transparent);
+}
+
+/* Subtle input transition */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+textarea,
+select {
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* Sidebar active tab modern indicator */
+.tab-button.active {
+    background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+    border-right-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+/* Button press feedback */
+.action-button:active {
+    transform: scale(0.97);
+}
+
+/* Smoother tab-button transitions */
+.tab-button {
+    transition: background-color 0.18s ease, border-right-color 0.18s ease,
+                color 0.18s ease, transform 0.1s ease;
+}
+
+.tab-button:hover:not(.active) {
+    background: rgba(255,255,255,0.05);
+    color: var(--text-color);
+}
+
+/* ═══ Info badge modern style ═══ */
+.info-badge {
+    border-radius: 8px;
+    border: 1px solid color-mix(in srgb, var(--accent-color) 30%, var(--border-color));
+    transition: border-color 0.2s ease;
+}
+
+/* ═══ Extras accordion — flatten inner panel to avoid double border-radius ═══ */
+.extras-section-body .tab-content-panel {
+    border-radius: 0 0 8px 8px;
+    box-shadow: none;
+    border: none;
+    margin: 0;
+}
+
+/* ═══ Rounded window (clips WebView content to match DWM corners) ═══ */
+html {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* ═══ Splash slogan ═══ */
+#splash-slogan {
+    margin: 14px 0 0;
+    font-size: 12px;
+    font-style: italic;
+    letter-spacing: 0.4px;
+    color: color-mix(in srgb, var(--text-color) 45%, transparent);
+    opacity: 0;
+    animation: fadeIn 0.6s ease 1.4s forwards;
+}
+
+/* ═══ Titlebar version badge ═══ */
+#titlebar-version {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent-color);
+    background: color-mix(in srgb, var(--accent-color) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent-color) 40%, transparent);
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-left: 6px;
+    letter-spacing: 0.3px;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* ═══ Service-close modal ═══ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.15s ease;
+}
+.modal-box {
+    background: var(--panel-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 28px 32px 24px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: slideUp 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+.modal-box-icon {
+    font-size: 32px;
+    color: var(--accent-color);
+    margin-bottom: 14px;
+}
+.modal-box h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+.modal-box p {
+    margin: 0 0 22px;
+    font-size: 13px;
+    color: color-mix(in srgb, var(--text-color) 75%, transparent);
+    line-height: 1.5;
+}
+.modal-box-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+@keyframes slideUp {
+    from { transform: translateY(20px) scale(0.97); opacity: 0; }
+    to   { transform: translateY(0)    scale(1);    opacity: 1; }
 }

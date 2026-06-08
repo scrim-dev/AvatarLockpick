@@ -1,16 +1,21 @@
 ﻿using AvatarLockpick.Utils;
 using Photino.NET;
+using Sentry;
 using System.Drawing;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace AvatarLockpick
 {
     internal class Program
     {
-        public const string AppVersion = "2.5"; //Global Version Set
+        public const string AppVersion = "3.0"; //Global Version Set
         public static HttpUtils HttpC { get; private set; } = new();
         public static Size AppSize { get; private set; } = new Size(1300, 800);
+
+        [DllImport("dwmapi.dll")]
+        private static extern int DwmSetWindowAttribute(nint hwnd, int attr, ref int attrValue, int attrSize);
 
         // Fixed mutex name to avoid conflicts with older instances
         private const string AppMutexName = $"AvatarLockpickRevised_{AppVersion}";
@@ -21,6 +26,16 @@ namespace AvatarLockpick
         static void Main(string[] args)
         {
             Console.WriteLine(AppMutexName + " app start/entry");
+
+            SentrySdk.Init(o =>
+            {
+                o.Dsn = "https://27dad4e1312a912b575cbb06ec9f04f9@o4511474449055744.ingest.us.sentry.io/4511474473566208";
+                o.Release = $"avatarlockpick@{AppVersion}";
+                o.Debug = false;
+                o.TracesSampleRate = 0.0;
+                o.AutoSessionTracking = true;
+                o.IsGlobalModeEnabled = true;
+            });
 
             AppLog.SetupLogFile();
 
@@ -51,13 +66,20 @@ namespace AvatarLockpick
                 // Creating a new PhotinoWindow instance with the fluent API
                 var window = new PhotinoWindow()
                     .SetTitle(windowTitle)
-                    // Resize to a percentage of the main monitor work area
+                    .SetChromeless(true)
                     .SetUseOsDefaultSize(false)
                     .SetSize(AppSize)
-                    // Center window in the middle of the screen
+                    .SetUseOsDefaultLocation(false)
                     .Center()
-                    // Users can resize windows by default.
                     .SetResizable(true)
+                    .RegisterWindowCreatedHandler((sender, _) =>
+                    {
+                        if (sender is PhotinoWindow w && OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
+                        {
+                            int pref = 2; // DWMWCP_ROUND
+                            DwmSetWindowAttribute(w.WindowHandle, 33, ref pref, sizeof(int));
+                        }
+                    })
                     .RegisterCustomSchemeHandler("app", (object sender, string scheme, string url, out string contentType) =>
                     {
                         contentType = "text/javascript";
@@ -121,6 +143,12 @@ namespace AvatarLockpick
                     catch { }
                 };
 
+                // Wire up raw JSON send to UI
+                AppLog.OnRawSend += (json) =>
+                {
+                    try { window.SendWebMessage(json); } catch { }
+                };
+
                 // Wire up Download Complete to UI
                 AppLog.OnDownloadComplete += () =>
                 {
@@ -144,7 +172,6 @@ namespace AvatarLockpick
 
                 VersionChecker.CheckForUpdates();
 
-                window.SetChromeless(false);
                 window.SetDevToolsEnabled(false);
                 window.SetIconFile($"UI/unlockicon.ico");
 

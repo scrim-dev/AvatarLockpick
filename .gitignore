@@ -364,10 +364,14 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-AvatarLockpick.Installer/Output
 linux_release
 PAW-CSharp-SDK
 linux_release.zip
 PAW_EDIT
-PAW-CSharp-SDK-clone
 ALP-Linux-Beta.zip
+.vscode
+publish/
+bin/
+bins/
+.devin
+.publish

@@ -10,6 +10,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvatarLockpick.Service", "AvatarLockpick.Service\AvatarLockpick.Service.csproj", "{D04CC88E-C375-4DA6-9402-E1972046C152}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvatarLockpick.Loader", "AvatarLockpick.Loader\AvatarLockpick.Loader.csproj", "{7A22272D-CB08-4D28-9DD3-B2B90718C04B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +24,14 @@ Global
 		{8D8AF4BF-0400-47AC-9E7D-003DD12C6816}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D8AF4BF-0400-47AC-9E7D-003DD12C6816}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D8AF4BF-0400-47AC-9E7D-003DD12C6816}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D04CC88E-C375-4DA6-9402-E1972046C152}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D04CC88E-C375-4DA6-9402-E1972046C152}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D04CC88E-C375-4DA6-9402-E1972046C152}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D04CC88E-C375-4DA6-9402-E1972046C152}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A22272D-CB08-4D28-9DD3-B2B90718C04B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A22272D-CB08-4D28-9DD3-B2B90718C04B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A22272D-CB08-4D28-9DD3-B2B90718C04B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A22272D-CB08-4D28-9DD3-B2B90718C04B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

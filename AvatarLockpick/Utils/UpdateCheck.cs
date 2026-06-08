@@ -27,6 +27,8 @@ namespace AvatarLockpick.Utils
                             $"AvatarLockpick: {result.RemoteVersion}\n\nDo you want to Update?", "Update", delegate
                         {
                             URLStuff.OpenUrl($"https://github.com/scrim-dev/AvatarLockpick/releases/tag/v{result.RemoteVersion}");
+							Thread.Sleep(1500);
+							Process.GetCurrentProcess().Kill();
                         });
 
                         break;
@@ -85,10 +87,6 @@ namespace AvatarLockpick.Utils
                 return version;
             }
 
-            /*// Fallback to assembly version
-            var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
-            var versionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
-            return new Version(versionInfo.FileVersion ?? "1.0.0.0");*/
             return null;
         }
 
