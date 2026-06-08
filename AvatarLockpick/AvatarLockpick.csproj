@@ -64,9 +64,6 @@
     <None Update="UI\translations.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="version.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="UI\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
