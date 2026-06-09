@@ -46,7 +46,7 @@ namespace AvatarLockpick.Utils
                 {
                     if (window != null)
                     {
-                        var infoData = new { type = "appInfo", version = Program.AppVersion };
+                        var infoData = new { type = "appInfo", version = Program.AppVersion, devMode = Program.IsDevMode };
                         window.SendWebMessage(Newtonsoft.Json.JsonConvert.SerializeObject(infoData));
                     }
                     Task.Run(async () => {
@@ -78,6 +78,27 @@ namespace AvatarLockpick.Utils
                             };
                             window.SendWebMessage(Newtonsoft.Json.JsonConvert.SerializeObject(resp));
                         }
+                    });
+                }
+
+                if ((string)jsonData["type"] == "openUrl")
+                {
+                    var url = (string)jsonData["url"];
+                    if (!string.IsNullOrWhiteSpace(url)) URLStuff.OpenUrl(url);
+                }
+
+                if ((string)jsonData["type"] == "checkForUpdates")
+                {
+                    Task.Run(() => VersionChecker.CheckForUpdates());
+                }
+
+                if ((string)jsonData["type"] == "downloadUpdate")
+                {
+                    URLStuff.OpenUrl("https://github.com/scrim-dev/AvatarLockpick/releases/latest");
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(1500);
+                        window?.Close();
                     });
                 }
 

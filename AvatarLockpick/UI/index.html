@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿<!-- Full App Frontend UI -->
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -26,6 +27,51 @@
                 </button>
                 <button class="action-button secondary-action" onclick="closeLeaveService()">
                     <i class="fa-solid fa-arrow-right"></i> Leave Running &amp; Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Available Modal -->
+    <div id="update-modal" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true">
+        <div class="modal-box" style="max-width:500px;">
+            <div class="modal-box-icon"><i class="fa-solid fa-circle-up"></i></div>
+            <h3>Update Available!</h3>
+            <div class="upd-modal-version-badge">
+                <i class="fa-solid fa-tag" style="opacity:0.7;"></i>
+                <span id="update-modal-versions">v? &rarr; v?</span>
+            </div>
+            <p id="update-modal-desc">A new version of AvatarLockpick is available. Download it from GitHub to get the latest features and fixes.</p>
+            <div class="modal-box-actions">
+                <button class="action-button" onclick="downloadUpdate()" style="background:color-mix(in srgb,#2ECC71 75%,var(--accent-color));">
+                    <i class="fa-solid fa-download"></i> Download Update
+                </button>
+                <button class="action-button secondary-action" onclick="skipVersionOneMonth()">
+                    <i class="fa-regular fa-moon"></i> Skip for 1 Month
+                </button>
+                <button class="action-button secondary-action" onclick="closeUpdateModal()">
+                    <i class="fa-solid fa-xmark"></i> Dismiss
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pre-Release Build Warning Modal -->
+    <div id="prerelease-modal" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true">
+        <div class="modal-box" style="max-width:480px;">
+            <div class="modal-box-icon" style="color:#DE3BFF;"><i class="fa-solid fa-flask"></i></div>
+            <h3>Pre-Release Build</h3>
+            <div class="upd-modal-version-badge" style="background:color-mix(in srgb,#DE3BFF 12%,transparent);border-color:color-mix(in srgb,#DE3BFF 35%,transparent);">
+                <i class="fa-solid fa-code-branch" style="opacity:0.7;"></i>
+                <span id="prerelease-modal-versions">v? &rarr; v?</span>
+            </div>
+            <p>You&rsquo;re running a build that&rsquo;s ahead of the latest published release. This version may include unfinished features, experimental changes, or instability. <strong>Expect bugs.</strong></p>
+            <div class="modal-box-actions">
+                <button class="action-button" onclick="closePreReleaseModal()" style="background:color-mix(in srgb,#DE3BFF 75%,var(--accent-color));">
+                    <i class="fa-solid fa-check"></i> Got It
+                </button>
+                <button class="action-button secondary-action" onclick="openReleasesPage(); closePreReleaseModal();">
+                    <i class="fa-brands fa-github"></i> View Releases
                 </button>
             </div>
         </div>
@@ -70,6 +116,8 @@
                     <i class="fa-solid fa-star"></i><span class="tab-text">Extras</span></button></li>
                 <li><button class="tab-button" data-tab="settings" aria-label="Settings">
                     <i class="fa-solid fa-gear"></i><span class="tab-text">Settings</span></button></li>
+                <li id="devmode-nav-item" style="display:none;"><button class="tab-button" data-tab="devmode" aria-label="Dev Mode">
+                    <i class="fa-solid fa-flask"></i><span class="tab-text">Dev Mode</span></button></li>
             </ul>
         </nav>
 
@@ -419,6 +467,45 @@
             <div id="extras-tab" class="tab-panel">
                 <h2><i class="fa-solid fa-star"></i> <span id="extras-tab-h2">Extras</span></h2>
 
+                <!-- Update Check Section -->
+                <div class="extras-section">
+                    <button class="extras-section-header" onclick="toggleExtrasSection('extras-update')">
+                        <span><i class="fa-solid fa-rotate"></i> <span>Update Check</span></span>
+                        <i class="fa-solid fa-chevron-down extras-chevron" id="chevron-extras-update"></i>
+                    </button>
+                    <div id="extras-update" class="extras-section-body">
+                        <div class="tab-content-panel">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+                                <div>
+                                    <p style="margin:0;font-weight:600;">Current Version: <span id="upd-current-ver">...</span></p>
+                                    <p style="margin:4px 0 0;font-size:0.85em;opacity:0.65;" id="upd-status-text">Click &ldquo;Check&rdquo; to check for updates.</p>
+                                </div>
+                                <button class="action-button secondary-action" id="btn-check-updates" onclick="requestUpdateCheck()" style="flex-shrink:0;">
+                                    <i class="fa-solid fa-rotate" id="btn-check-updates-icon"></i> Check
+                                </button>
+                            </div>
+                            <div id="upd-progress-wrap" style="display:none;margin-bottom:12px;">
+                                <div class="upd-progress-track"><div class="upd-progress-bar-indeterminate"></div></div>
+                                <p style="margin-top:6px;font-size:0.82em;opacity:0.6;">Checking for updates&hellip;</p>
+                            </div>
+                            <div id="upd-result-panel" style="display:none;">
+                                <div id="upd-result-badge" class="upd-result-badge">
+                                    <i id="upd-result-icon" class="fa-solid fa-circle-check"></i>
+                                    <span id="upd-result-text">Up to date!</span>
+                                </div>
+                                <div id="upd-action-buttons" style="display:none;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                                    <button class="action-button" onclick="downloadUpdate()">
+                                        <i class="fa-solid fa-download"></i> Download Update
+                                    </button>
+                                    <button class="action-button secondary-action" onclick="skipVersionOneMonth()">
+                                        <i class="fa-regular fa-moon"></i> Skip for 1 Month
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Help Section -->
                 <div class="extras-section">
                     <button class="extras-section-header" onclick="toggleExtrasSection('extras-help')">
@@ -651,6 +738,71 @@
                                 class="fa-solid fa-folder-open"></i> <span id="settings-adv-btn-dir">Open App
                                 Directory</span></button>
                     </div>
+                </div>
+            </div>
+
+            <!-- ═══ DEV MODE TAB ═══ -->
+            <div id="devmode-tab" class="tab-panel">
+                <h2><i class="fa-solid fa-flask"></i> Dev Mode</h2>
+                <div class="tab-content-panel">
+                    <div class="devmode-banner">
+                        <i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-color);margin-right:10px;font-size:1.1em;"></i>
+                        <span>Developer mode is active. Launched with <code style="background:var(--input-bg-color);padding:2px 7px;border-radius:4px;font-size:0.9em;">--devmode</code></span>
+                    </div>
+
+                    <h3 style="margin:20px 0 10px;">Modal Popup Testing</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+                        <button class="action-button" onclick="devTestUpdateModal()">
+                            <i class="fa-solid fa-circle-up"></i> Update Modal
+                        </button>
+                        <button class="action-button secondary-action" onclick="devTestActionPopup()">
+                            <i class="fa-solid fa-circle-info"></i> Action Popup
+                        </button>
+                        <button class="action-button secondary-action" onclick="devTestDownloadProgress()">
+                            <i class="fa-solid fa-download"></i> Download Progress
+                        </button>
+                        <button class="action-button secondary-action" onclick="devTestServiceModal()">
+                            <i class="fa-solid fa-gear"></i> Service Modal
+                        </button>
+                    </div>
+
+                    <h3 style="margin:0 0 10px;">Toast Testing</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+                        <button class="action-button secondary-action" onclick="devTestToast('success')">
+                            <i class="fa-solid fa-check"></i> Success
+                        </button>
+                        <button class="action-button secondary-action" onclick="devTestToast('error')">
+                            <i class="fa-solid fa-xmark"></i> Error
+                        </button>
+                        <button class="action-button secondary-action" onclick="devTestToast('warn')">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Warn
+                        </button>
+                        <button class="action-button secondary-action" onclick="devTestToast('info')">
+                            <i class="fa-solid fa-circle-info"></i> Info
+                        </button>
+                    </div>
+
+                    <h3 style="margin:0 0 10px;">Update Check Simulation</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+                        <button class="action-button" onclick="devSimulateUpdateAvailable()">
+                            <i class="fa-solid fa-circle-up"></i> Simulate Update Available
+                        </button>
+                        <button class="action-button secondary-action" onclick="devSimulateUpToDate()">
+                            <i class="fa-solid fa-circle-check"></i> Simulate Up To Date
+                        </button>
+                        <button class="action-button secondary-action" onclick="devSimulateLocalNewer()">
+                            <i class="fa-solid fa-flask"></i> Simulate Local Newer
+                        </button>
+                        <button class="action-button secondary-action" onclick="devSimulateFailed()">
+                            <i class="fa-solid fa-circle-xmark"></i> Simulate Failed
+                        </button>
+                        <button class="action-button secondary-action" onclick="devClearUpdateSkip()">
+                            <i class="fa-solid fa-trash"></i> Clear Skip
+                        </button>
+                    </div>
+
+                    <h3 style="margin:0 0 10px;">App Info</h3>
+                    <div id="devmode-app-info" class="devmode-info-box"></div>
                 </div>
             </div>
 

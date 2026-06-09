@@ -1,5 +1,4 @@
-﻿// --- Elements Cache ---
-
+﻿/* Full App Script */
 
 // --- Elements Cache ---
 let appWrapper, tabButtons, tabPanels, animationsToggle, userIdInput, censorUserIdToggle;
@@ -10,6 +9,8 @@ let historyListContainer, noHistoryMessage, importJsonPopup, importJsonTextarea,
 let netResponsePopup, netResponseContent, notePopup, noteTextarea, appLogsContainer, backendMessagesToggle;
 let apiStatusIcon, avatarInfoPopup, modalAvatarImg, modalAvatarName, modalAvatarAuthor, modalAvatarDesc;
 let loadedAvatarImg, loadedAvatarName, loadedAvatarAuthor, currentModalAvatarId;
+let _pendingUpdateVersion = null;
+let _updateCheckInProgress = false;
 
 // --- Theme Objects ---
 const themes = {
@@ -167,6 +168,8 @@ function initialize() {
     applyTheme(themeToApply, false);
 
     sendMessageToDotNet({ type: 'checkPawStatus' });
+    sendMessageToDotNet({ type: 'checkForUpdates' });
+    _updateExtrasUpdateUI('checking');
 
     const sidebarExpandedStr = localStorage.getItem('sidebarExpanded');
     const sidebarExpanded = sidebarExpandedStr !== 'false';
@@ -1360,6 +1363,13 @@ window.addEventListener('load', () => {
                 if (data && data.type === 'appInfo') {
                     const el = document.getElementById('titlebar-version');
                     if (el && data.version) el.textContent = 'v' + data.version;
+                    const updVerEl = document.getElementById('upd-current-ver');
+                    if (updVerEl && data.version) updVerEl.textContent = 'v' + data.version;
+                    if (data.devMode) _initDevMode(data);
+                    return;
+                }
+                if (data && data.type === 'updateCheckResult') {
+                    _handleUpdateCheckResult(data);
                     return;
                 }
                 if (data && data.type === 'feedbackResult') {
@@ -1811,5 +1821,218 @@ function _handleCacheDeleteResult(data) {
         showToast('Cache deleted successfully.', 'success', 'Cache', 4000);
     } else {
         showToast('Cache deletion failed: ' + data.message, 'error', 'Cache', 5000);
+    }
+}
+
+// ─── Update Check ─────────────────────────────────────────────────────────────
+
+function requestUpdateCheck() {
+    if (_updateCheckInProgress) return;
+    _updateCheckInProgress = true;
+    _updateExtrasUpdateUI('checking');
+    sendMessageToDotNet({ type: 'checkForUpdates' });
+}
+
+function _handleUpdateCheckResult(data) {
+    _updateCheckInProgress = false;
+    if (data.status === 'NewVersionAvailable') {
+        _pendingUpdateVersion = data.remoteVersion;
+        _updateExtrasUpdateUI('available', data);
+        if (!_isVersionSkipped(data.remoteVersion)) {
+            showUpdateModal(data.currentVersion, data.remoteVersion);
+        }
+    } else if (data.status === 'UpToDate') {
+        _updateExtrasUpdateUI('uptodate', data);
+    } else if (data.status === 'LocalIsNewer') {
+        _updateExtrasUpdateUI('localnewer', data);
+        showPreReleaseModal(data.currentVersion, data.remoteVersion);
+    } else {
+        _updateExtrasUpdateUI('failed', data);
+    }
+}
+
+function _isVersionSkipped(version) {
+    try {
+        const skip = JSON.parse(localStorage.getItem('updateSkip') || 'null');
+        if (!skip) return false;
+        return skip.version === version && Date.now() < skip.until;
+    } catch { return false; }
+}
+
+function _updateExtrasUpdateUI(state, data) {
+    const btn         = document.getElementById('btn-check-updates');
+    const icon        = document.getElementById('btn-check-updates-icon');
+    const statusText  = document.getElementById('upd-status-text');
+    const progressWrap= document.getElementById('upd-progress-wrap');
+    const resultPanel = document.getElementById('upd-result-panel');
+    const resultBadge = document.getElementById('upd-result-badge');
+    const resultIcon  = document.getElementById('upd-result-icon');
+    const resultText  = document.getElementById('upd-result-text');
+    const actionBtns  = document.getElementById('upd-action-buttons');
+
+    if (state === 'checking') {
+        if (btn)  { btn.disabled = true; }
+        if (icon) { icon.className = 'fa-solid fa-rotate fa-spin'; }
+        if (statusText)   statusText.textContent = 'Checking for updates\u2026';
+        if (progressWrap) progressWrap.style.display = 'block';
+        if (resultPanel)  resultPanel.style.display  = 'none';
+        return;
+    }
+
+    if (btn)  { btn.disabled = false; }
+    if (icon) { icon.className = 'fa-solid fa-rotate'; }
+    if (progressWrap) progressWrap.style.display = 'none';
+    if (resultPanel)  resultPanel.style.display  = 'block';
+    if (actionBtns)   actionBtns.style.display   = 'none';
+
+    if (state === 'uptodate') {
+        if (statusText) statusText.textContent = 'Last checked: ' + new Date().toLocaleTimeString();
+        if (resultBadge) { resultBadge.style.borderColor = '#2ECC71'; resultBadge.style.background = 'color-mix(in srgb, #2ECC71 8%, var(--input-bg-color))'; }
+        if (resultIcon)  { resultIcon.className = 'fa-solid fa-circle-check'; resultIcon.style.color = '#2ECC71'; }
+        if (resultText)    resultText.textContent = "You're up to date!";
+    } else if (state === 'available') {
+        if (statusText) statusText.textContent = 'Update available \u2014 v' + (data?.remoteVersion || '?');
+        if (resultBadge) { resultBadge.style.borderColor = '#f0c040'; resultBadge.style.background = 'color-mix(in srgb, #f0c040 8%, var(--input-bg-color))'; }
+        if (resultIcon)  { resultIcon.className = 'fa-solid fa-circle-arrow-up'; resultIcon.style.color = '#f0c040'; }
+        if (resultText)    resultText.textContent = 'v' + (data?.currentVersion || '?') + ' \u2192 v' + (data?.remoteVersion || '?');
+        if (actionBtns)    actionBtns.style.display = 'flex';
+    } else if (state === 'localnewer') {
+        if (statusText) statusText.textContent = 'Running a pre-release build';
+        if (resultBadge) { resultBadge.style.borderColor = '#DE3BFF'; resultBadge.style.background = 'color-mix(in srgb, #DE3BFF 8%, var(--input-bg-color))'; }
+        if (resultIcon)  { resultIcon.className = 'fa-solid fa-flask'; resultIcon.style.color = '#DE3BFF'; }
+        if (resultText)    resultText.textContent = 'Running a pre-release version';
+    } else {
+        if (statusText) statusText.textContent = 'Failed to check for updates';
+        if (resultBadge) { resultBadge.style.borderColor = '#e74c3c'; resultBadge.style.background = 'color-mix(in srgb, #e74c3c 8%, var(--input-bg-color))'; }
+        if (resultIcon)  { resultIcon.className = 'fa-solid fa-circle-xmark'; resultIcon.style.color = '#e74c3c'; }
+        if (resultText)    resultText.textContent = 'Failed to check \u2014 check your internet connection';
+    }
+}
+
+function showUpdateModal(currentVer, remoteVer) {
+    const modal      = document.getElementById('update-modal');
+    const versionsEl = document.getElementById('update-modal-versions');
+    if (versionsEl) versionsEl.textContent = 'v' + currentVer + ' \u2192 v' + remoteVer;
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeUpdateModal() {
+    const modal = document.getElementById('update-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+function showPreReleaseModal(currentVer, remoteVer) {
+    const modal      = document.getElementById('prerelease-modal');
+    const versionsEl = document.getElementById('prerelease-modal-versions');
+    if (versionsEl) versionsEl.textContent = 'v' + currentVer + ' → published v' + (remoteVer || '?');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closePreReleaseModal() {
+    const modal = document.getElementById('prerelease-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+function openReleasesPage() {
+    sendMessageToDotNet({ type: 'openUrl', url: 'https://github.com/scrim-dev/AvatarLockpick/releases' });
+}
+
+function downloadUpdate() {
+    closeUpdateModal();
+    sendMessageToDotNet({ type: 'downloadUpdate' });
+}
+
+function skipVersionOneMonth() {
+    if (!_pendingUpdateVersion) return;
+    const until = Date.now() + (30 * 24 * 60 * 60 * 1000);
+    localStorage.setItem('updateSkip', JSON.stringify({ version: _pendingUpdateVersion, until }));
+    closeUpdateModal();
+    showToast('v' + _pendingUpdateVersion + ' will be skipped for 1 month.', 'info', 'Updates', 5000);
+    const expiry = new Date(until).toLocaleDateString();
+    const resultBadge = document.getElementById('upd-result-badge');
+    const resultIcon  = document.getElementById('upd-result-icon');
+    const resultText  = document.getElementById('upd-result-text');
+    const actionBtns  = document.getElementById('upd-action-buttons');
+    const statusText  = document.getElementById('upd-status-text');
+    if (statusText)  statusText.textContent = 'v' + _pendingUpdateVersion + ' skipped until ' + expiry;
+    if (resultBadge) { resultBadge.style.borderColor = 'var(--border-color)'; resultBadge.style.background = 'var(--input-bg-color)'; }
+    if (resultIcon)  { resultIcon.className = 'fa-regular fa-moon'; resultIcon.style.color = 'var(--text-secondary-color, #b0b0b0)'; }
+    if (resultText)  resultText.textContent = 'v' + _pendingUpdateVersion + ' skipped until ' + expiry;
+    if (actionBtns)  actionBtns.style.display = 'none';
+}
+
+// ─── Dev Mode ─────────────────────────────────────────────────────────────────
+
+function _initDevMode(appInfoData) {
+    const navItem = document.getElementById('devmode-nav-item');
+    if (navItem) navItem.style.display = '';
+    const infoDiv = document.getElementById('devmode-app-info');
+    if (infoDiv) {
+        infoDiv.innerHTML =
+            '<div>Version: <strong>' + (appInfoData.version || '?') + '</strong></div>' +
+            '<div>Dev Mode: <strong style="color:var(--accent-color);">Active</strong></div>' +
+            '<div>User Agent: <strong>' + navigator.userAgent.substring(0, 80) + '</strong></div>' +
+            '<div>Timestamp: <strong>' + new Date().toISOString() + '</strong></div>' +
+            '<div>Update Skip: <strong>' + (localStorage.getItem('updateSkip') || 'none') + '</strong></div>';
+    }
+}
+
+function devTestUpdateModal() {
+    _pendingUpdateVersion = '99.9';
+    showUpdateModal('3.0', '99.9');
+}
+
+function devTestActionPopup() {
+    if (popupTitle)   popupTitle.textContent = 'Dev Mode Test';
+    if (popupMessage) popupMessage.innerHTML = '<i class="fa-solid fa-flask" style="color:var(--accent-color);margin-right:8px;"></i> This is a test of the action popup from Dev Mode.';
+    if (actionPopup)  actionPopup.classList.add('show');
+}
+
+function devTestDownloadProgress() {
+    showDownloadProgress('Test Download (Dev Mode)');
+    let p = 0;
+    const interval = setInterval(() => {
+        p += 6;
+        updateDownloadProgress(p, p + '% complete', 'Test Download (Dev Mode)');
+        if (p >= 100) { clearInterval(interval); setTimeout(closeDownloadProgress, 600); }
+    }, 80);
+}
+
+function devTestServiceModal() {
+    const modal = document.getElementById('service-close-modal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function devTestToast(type) {
+    const msgs = { success: 'Success toast test', error: 'Error toast test', warn: 'Warning toast test', info: 'Info toast test' };
+    const prev = toastNotificationsEnabled;
+    toastNotificationsEnabled = true;
+    showToast(msgs[type] || 'Toast test', type, 'Dev Mode', 3500);
+    toastNotificationsEnabled = prev;
+}
+
+function devSimulateUpdateAvailable() {
+    _handleUpdateCheckResult({ status: 'NewVersionAvailable', currentVersion: '3.0', remoteVersion: '99.9' });
+}
+
+function devSimulateUpToDate() {
+    _handleUpdateCheckResult({ status: 'UpToDate', currentVersion: '3.0', remoteVersion: '3.0' });
+}
+
+function devSimulateLocalNewer() {
+    _handleUpdateCheckResult({ status: 'LocalIsNewer', currentVersion: '3.0', remoteVersion: '2.0' });
+}
+
+function devSimulateFailed() {
+    _handleUpdateCheckResult({ status: 'FailedToCheck', currentVersion: '3.0' });
+}
+
+function devClearUpdateSkip() {
+    localStorage.removeItem('updateSkip');
+    showToast('Update skip cleared.', 'success', 'Dev Mode', 3000);
+    const infoDiv = document.getElementById('devmode-app-info');
+    if (infoDiv) {
+        const rows = infoDiv.querySelectorAll('div');
+        rows.forEach(r => { if (r.textContent.startsWith('Update Skip:')) r.querySelector('strong').textContent = 'none'; });
     }
 }

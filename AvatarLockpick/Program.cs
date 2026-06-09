@@ -13,6 +13,7 @@ namespace AvatarLockpick
         public const string AppVersion = "3.0"; //Global Version Set
         public static HttpUtils HttpC { get; private set; } = new();
         public static Size AppSize { get; private set; } = new Size(1300, 800);
+        public static bool IsDevMode { get; private set; }
 
         [DllImport("dwmapi.dll")]
         private static extern int DwmSetWindowAttribute(nint hwnd, int attr, ref int attrValue, int attrSize);
@@ -25,7 +26,9 @@ namespace AvatarLockpick
         [STAThread]
         static void Main(string[] args)
         {
+            IsDevMode = Array.Exists(args, a => a.Equals("--devmode", StringComparison.OrdinalIgnoreCase));
             Console.WriteLine(AppMutexName + " app start/entry");
+            if (IsDevMode) Console.WriteLine("[DevMode] Developer mode is active.");
 
             SentrySdk.Init(o =>
             {
@@ -169,8 +172,6 @@ namespace AvatarLockpick
                 {
                     try { File.WriteAllText($"UI/ALP_History.json", "{}"); } catch { }
                 }
-
-                VersionChecker.CheckForUpdates();
 
                 window.SetDevToolsEnabled(false);
                 window.SetIconFile($"UI/unlockicon.ico");

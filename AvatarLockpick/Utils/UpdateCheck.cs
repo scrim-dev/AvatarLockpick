@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Newtonsoft.Json;
 
 namespace AvatarLockpick.Utils
 {
@@ -23,28 +24,32 @@ namespace AvatarLockpick.Utils
                 {
                     case VersionStatus.NewVersionAvailable:
                         AppLog.Warn("UPDCheck", $"UPDATE AVAILABLE: {result.CurrentVersion} → {result.RemoteVersion}");
-                        MessageBoxUtils.ShowQuestion($"A new update is available!\n\nAvatarLockpick: {result.CurrentVersion} → " +
-                            $"AvatarLockpick: {result.RemoteVersion}\n\nDo you want to Update?", "Update", delegate
-                        {
-                            URLStuff.OpenUrl($"https://github.com/scrim-dev/AvatarLockpick/releases/tag/v{result.RemoteVersion}");
-							Thread.Sleep(1500);
-							Process.GetCurrentProcess().Kill();
-                        });
-
                         break;
-
                     case VersionStatus.UpToDate:
                         AppLog.Log("UPDCheck", "You have the latest version");
                         break;
-
                     case VersionStatus.LocalIsNewer:
                         AppLog.Warn("UPDCheck", "You're running a newer version than published");
                         break;
                 }
+
+                AppLog.SendToUI(JsonConvert.SerializeObject(new
+                {
+                    type = "updateCheckResult",
+                    status = result.Status.ToString(),
+                    currentVersion = result.CurrentVersion?.ToString(),
+                    remoteVersion = result.RemoteVersion?.ToString() ?? result.RemoteVersionStr
+                }));
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Version check failed: {ex.Message}");
+                AppLog.Warn("UPDCheck", $"Version check failed: {ex.Message}");
+                AppLog.SendToUI(JsonConvert.SerializeObject(new
+                {
+                    type = "updateCheckResult",
+                    status = "FailedToCheck",
+                    error = ex.Message
+                }));
             }
         }
 
