@@ -1918,3 +1918,83 @@ body.no-animations .upd-progress-bar-indeterminate {
     80%  { opacity: var(--p-op, 0.32); }
     100% { transform: translateY(-108vh) scale(0.2); opacity: 0; }
 }
+
+/* ===== Code Found Modal ===== */
+.code-found-sparkles {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+.code-found-sparkles::before,
+.code-found-sparkles::after {
+    content: '✦';
+    color: #ffd700;
+    font-size: 1em;
+    animation: cfSparkle 1.9s ease-in-out infinite;
+}
+.code-found-sparkles::after {
+    animation-delay: 0.95s;
+}
+@keyframes cfSparkle {
+    0%, 100% { opacity: 0.25; transform: scale(0.75) rotate(0deg); }
+    50%       { opacity: 1;    transform: scale(1.3)  rotate(20deg); }
+}
+.code-found-title {
+    font-size: 1.55em;
+    font-weight: 800;
+    color: #ffd700;
+    display: inline-block;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.35));
+}
+.code-found-caption {
+    font-size: 12.5px;
+    color: color-mix(in srgb, var(--text-color) 65%, transparent);
+    margin: 10px 0 18px;
+    line-height: 1.55;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.code-found-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: color-mix(in srgb, #ffd700 7%, var(--bg-color));
+    border: 1px solid color-mix(in srgb, #ffd700 30%, transparent);
+    border-radius: 8px;
+    padding: 11px 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 18px color-mix(in srgb, #ffd700 8%, transparent);
+}
+#code-found-value {
+    flex: 1;
+    font-family: 'Courier New', monospace;
+    font-size: 1.7em;
+    font-weight: 700;
+    color: #ffd700;
+    letter-spacing: 4px;
+    user-select: all;
+    text-shadow: 0 0 12px color-mix(in srgb, #ffd700 50%, transparent);
+}
+.code-found-copy-btn {
+    background: color-mix(in srgb, #ffd700 12%, transparent);
+    border: 1px solid color-mix(in srgb, #ffd700 40%, transparent);
+    color: #ffd700;
+    border-radius: 6px;
+    padding: 7px 13px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+    white-space: nowrap;
+}
+.code-found-copy-btn:hover {
+    background: color-mix(in srgb, #ffd700 22%, transparent);
+}
+.code-found-copy-btn.copied {
+    color: #2ecc71;
+    border-color: color-mix(in srgb, #2ecc71 45%, transparent);
+    background: color-mix(in srgb, #2ecc71 10%, transparent);
+}

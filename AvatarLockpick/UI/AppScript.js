@@ -437,6 +437,9 @@ function loadAvatarInfo() {
 
     // Fetch PAW Info for loaded panel
     sendMessageToDotNet({ type: 'fetchAvatarInfo', avatarId: avatarId });
+
+    // Check database for a known passkey tied to this avatar
+    sendMessageToDotNet({ type: 'checkAvatarCode', avatarId: avatarId });
 }
 
 function triggerPopup(actionType) {
@@ -1381,6 +1384,10 @@ window.addEventListener('load', () => {
                     if (data.success) clearFeedbackForm();
                     return;
                 }
+                if (data && data.type === 'avatarCodeFound') {
+                    showCodeFoundModal(data.code);
+                    return;
+                }
                 if (data && data.type === 'pawAvatarInfo') {
                     const found = data.found;
                     const name = found ? (data.name || 'Unknown') : 'Not Found in PAW';
@@ -1687,7 +1694,7 @@ function adbScanSelected() {
     if (!_adbSelectedDevice) { showToast('No device selected.', 'warn', 'ADB', 3000); return; }
     const btn = document.getElementById('btn-adb-scan');
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i> Scanning…'; }
-    document.getElementById('adb-status').textContent = 'Scanning device — this may take a moment…';
+    document.getElementById('adb-status').textContent = 'Scanning device, this may take a moment…';
     const resultDiv = document.getElementById('adb-scan-result');
     if (resultDiv) resultDiv.style.display = 'none';
     sendMessageToDotNet({ type: 'adbScanDevice', deviceId: _adbSelectedDevice });
@@ -2039,6 +2046,42 @@ function devClearUpdateSkip() {
         const rows = infoDiv.querySelectorAll('div');
         rows.forEach(r => { if (r.textContent.startsWith('Update Skip:')) r.querySelector('strong').textContent = 'none'; });
     }
+}
+
+// ─── Code Found Modal ────────────────────────────────────────────────────────
+
+function showCodeFoundModal(code) {
+    const modal = document.getElementById('code-found-modal');
+    const codeEl = document.getElementById('code-found-value');
+    if (!modal || !codeEl) return;
+    codeEl.textContent = code;
+    modal.style.display = 'flex';
+}
+
+function closeCodeFoundModal() {
+    const modal = document.getElementById('code-found-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+function copyFoundCode() {
+    const codeEl = document.getElementById('code-found-value');
+    const btn = document.getElementById('code-found-copy-btn');
+    if (!codeEl) return;
+    const text = codeEl.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        if (btn) {
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+        }
+    }).catch(() => {
+        const range = document.createRange();
+        range.selectNode(codeEl);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+    });
 }
 
 // ─── Splash Screen ────────────────────────────────────────────────────────────

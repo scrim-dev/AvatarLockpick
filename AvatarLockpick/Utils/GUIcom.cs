@@ -81,6 +81,24 @@ namespace AvatarLockpick.Utils
                     });
                 }
 
+                if ((string)jsonData["type"] == "checkAvatarCode")
+                {
+                    string aviId = AviIDToken?.ToString();
+                    if (!string.IsNullOrWhiteSpace(aviId) && window != null)
+                    {
+                        Task.Run(() =>
+                        {
+                            string code = AvatarUnlocker.CheckAvatarCode(aviId);
+                            if (!string.IsNullOrEmpty(code))
+                            {
+                                AppLog.Success("SQLDB", $"Known passkey found for {aviId}: {code}");
+                                var resp = new { type = "avatarCodeFound", avatarId = aviId, code = code };
+                                window.SendWebMessage(Newtonsoft.Json.JsonConvert.SerializeObject(resp));
+                            }
+                        });
+                    }
+                }
+
                 if ((string)jsonData["type"] == "openUrl")
                 {
                     var url = (string)jsonData["url"];

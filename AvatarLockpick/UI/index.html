@@ -93,12 +93,33 @@
         </div>
     </div>
 
+    <!-- Code Found Modal -->
+    <div id="code-found-modal" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true">
+        <div class="modal-box" style="max-width:420px; text-align:center;">
+            <div class="code-found-sparkles">
+                <span class="code-found-title"><i class="fa-solid fa-key"></i> Code Found!</span>
+            </div>
+            <p class="code-found-caption">A known passkey has been found for this avatar in the database! It&rsquo;s been seen before and its unlock code is on record.</p>
+            <div class="code-found-block">
+                <code id="code-found-value"></code>
+                <button class="code-found-copy-btn" id="code-found-copy-btn" onclick="copyFoundCode()">
+                    <i class="fa-solid fa-copy"></i> Copy
+                </button>
+            </div>
+            <div class="modal-box-actions">
+                <button class="action-button secondary-action" onclick="closeCodeFoundModal()">
+                    <i class="fa-solid fa-xmark"></i> Dismiss
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom Title Bar -->
     <div id="titlebar">
         <div id="titlebar-drag">
             <i class="fa-solid fa-lock-open" id="titlebar-icon"></i>
             <span id="titlebar-title">AvatarLockpick</span>
-            <span id="titlebar-version">v3.0</span>
+            <span id="titlebar-version">V3</span>
         </div>
         <div id="titlebar-controls">
             <button class="titlebar-btn" id="btn-minimize" onclick="windowMinimize()" title="Minimize">
@@ -204,7 +225,7 @@
                                 <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock')" disabled>
                                     <i class="fa-solid fa-unlock"></i> Unlock
                                 </button>
-                                <p class="unlock-action-description">General unlock — removes the standard lock parameter.</p>
+                                <p class="unlock-action-description">General unlock, removes the standard lock parameter.</p>
                             </div>
                             <div class="unlock-action-container">
                                 <button class="action-button unlock-action-btn" onclick="triggerPopup('Unlock (VRCFury)')" disabled>

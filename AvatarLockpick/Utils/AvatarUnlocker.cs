@@ -747,6 +747,80 @@ namespace AvatarLockpick.Utils
             return LockTypes.Count > 0;
         }
 
+        /// <summary>
+        /// Checks the locally cached database for a known passkey tied to the given avatar ID.
+        /// Only matches rows where AVID is a specific avatar (not "global") and KnownPass is non-zero.
+        /// Returns the passkey string if found, otherwise null.
+        /// </summary>
+        public static string CheckAvatarCode(string avatarId)
+        {
+            if (string.IsNullOrWhiteSpace(avatarId)) return null;
+
+            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UI", "VRC_LOCKS.db");
+            if (!System.IO.File.Exists(dbPath)) return null;
+
+            try
+            {
+                var connectionString = new SqliteConnectionStringBuilder
+                {
+                    DataSource = dbPath,
+                    Mode = SqliteOpenMode.ReadOnly
+                }.ToString();
+
+                using var connection = new SqliteConnection(connectionString);
+                connection.Open();
+
+                var listCmd = connection.CreateCommand();
+                listCmd.CommandText = "SELECT name FROM sqlite_master WHERE type='table'";
+                string tableName = null;
+                using (var r = listCmd.ExecuteReader())
+                {
+                    while (r.Read())
+                    {
+                        string t = r.GetString(0);
+                        if (t.Contains("LOCK", StringComparison.OrdinalIgnoreCase))
+                            tableName = t;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(tableName)) return null;
+
+                // Verify AVID and KnownPass columns exist
+                var pragmaCmd = connection.CreateCommand();
+                pragmaCmd.CommandText = $"PRAGMA table_info(\"{tableName}\")";
+                bool hasAvid = false, hasKnownPass = false;
+                using (var r = pragmaCmd.ExecuteReader())
+                {
+                    while (r.Read())
+                    {
+                        string col = r.GetString(1);
+                        if (col.Equals("AVID", StringComparison.OrdinalIgnoreCase)) hasAvid = true;
+                        if (col.Equals("KnownPass", StringComparison.OrdinalIgnoreCase)) hasKnownPass = true;
+                    }
+                }
+
+                if (!hasAvid || !hasKnownPass) return null;
+
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = $"SELECT KnownPass FROM \"{tableName}\" WHERE AVID = @avid AND AVID != 'global' LIMIT 1";
+                cmd.Parameters.AddWithValue("@avid", avatarId);
+
+                var result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    long code = Convert.ToInt64(result);
+                    if (code != 0) return code.ToString();
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                AppLog.Warn("SQLDB", $"Avatar code check failed: {ex.Message}");
+                return null;
+            }
+        }
+
         private static void UnlockDB(string UID, string AID)
         {
             AppLog.Warn("UnlockDB", "Preparing (SQL Database)...");
