@@ -1158,7 +1158,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // --- Window Load Event ---
 window.addEventListener('load', () => {
-    initSplashParticles();
     initialize();
     initCustomDbSettings();
 

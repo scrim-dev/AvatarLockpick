@@ -1826,7 +1826,6 @@ body.no-animations .upd-progress-bar-indeterminate {
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
     transition: opacity 0.55s ease;
 }
 #splash-screen.splash-hidden {
@@ -1834,8 +1833,6 @@ body.no-animations .upd-progress-bar-indeterminate {
     pointer-events: none;
 }
 .splash-content {
-    position: relative;
-    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1850,17 +1847,12 @@ body.no-animations .upd-progress-bar-indeterminate {
     border-radius: 50%;
     background: color-mix(in srgb, var(--accent-color) 14%, transparent);
     border: 2px solid color-mix(in srgb, var(--accent-color) 35%, transparent);
-    animation: splashPulse 2.2s ease-in-out infinite;
     margin-bottom: 6px;
 }
 .splash-icon {
     font-size: 2.5em;
     color: var(--accent-color);
     filter: drop-shadow(0 0 12px color-mix(in srgb, var(--accent-color) 55%, transparent));
-}
-@keyframes splashPulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-color) 22%, transparent); }
-    50%       { transform: scale(1.09); box-shadow: 0 0 32px 14px color-mix(in srgb, var(--accent-color) 9%, transparent); }
 }
 .splash-title {
     font-size: 2.1em;
@@ -1874,49 +1866,24 @@ body.no-animations .upd-progress-bar-indeterminate {
     opacity: 0.75;
     margin-top: -4px;
 }
-.splash-bar-track {
-    width: 240px;
-    height: 3px;
-    background: color-mix(in srgb, var(--accent-color) 18%, transparent);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-top: 10px;
+.splash-spinner {
+    width: 26px;
+    height: 26px;
+    border: 3px solid color-mix(in srgb, var(--accent-color) 22%, transparent);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: splashSpin 0.8s linear infinite;
+    margin-top: 6px;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--accent-color) 30%, transparent);
 }
-.splash-bar-fill {
-    height: 100%;
-    width: 45%;
-    background: var(--accent-color);
-    border-radius: 3px;
-    animation: splashBarSlide 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    box-shadow: 0 0 8px color-mix(in srgb, var(--accent-color) 65%, transparent);
-}
-@keyframes splashBarSlide {
-    0%   { transform: translateX(-155%); }
-    100% { transform: translateX(375%); }
+@keyframes splashSpin {
+    to { transform: rotate(360deg); }
 }
 .splash-status {
     font-size: 0.78em;
     color: var(--text-color, #fff);
     opacity: 0.38;
     margin-top: 2px;
-}
-#splash-particles {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-}
-.splash-particle {
-    position: absolute;
-    bottom: -12px;
-    border-radius: 50%;
-    background: var(--accent-color);
-    animation: splashParticleRise linear infinite;
-}
-@keyframes splashParticleRise {
-    0%   { transform: translateY(0) scale(1);   opacity: var(--p-op, 0.32); }
-    80%  { opacity: var(--p-op, 0.32); }
-    100% { transform: translateY(-108vh) scale(0.2); opacity: 0; }
 }
 
 /* ===== Code Found Modal ===== */
