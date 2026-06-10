@@ -1155,6 +1155,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // --- Window Load Event ---
 window.addEventListener('load', () => {
+    initSplashParticles();
     initialize();
     initCustomDbSettings();
 
@@ -1365,7 +1366,10 @@ window.addEventListener('load', () => {
                     if (el && data.version) el.textContent = 'v' + data.version;
                     const updVerEl = document.getElementById('upd-current-ver');
                     if (updVerEl && data.version) updVerEl.textContent = 'v' + data.version;
+                    const splashVer = document.getElementById('splash-version');
+                    if (splashVer && data.version) splashVer.textContent = 'v' + data.version;
                     if (data.devMode) _initDevMode(data);
+                    hideSplash();
                     return;
                 }
                 if (data && data.type === 'updateCheckResult') {
@@ -2035,4 +2039,35 @@ function devClearUpdateSkip() {
         const rows = infoDiv.querySelectorAll('div');
         rows.forEach(r => { if (r.textContent.startsWith('Update Skip:')) r.querySelector('strong').textContent = 'none'; });
     }
+}
+
+// ─── Splash Screen ────────────────────────────────────────────────────────────
+
+function initSplashParticles() {
+    const container = document.getElementById('splash-particles');
+    if (!container) return;
+    for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'splash-particle';
+        const size = 3 + Math.random() * 6;
+        p.style.cssText =
+            `left:${(Math.random() * 100).toFixed(1)}%;` +
+            `width:${size.toFixed(1)}px;height:${size.toFixed(1)}px;` +
+            `--p-op:${(0.1 + Math.random() * 0.3).toFixed(2)};` +
+            `animation-delay:${(Math.random() * 7).toFixed(2)}s;` +
+            `animation-duration:${(5 + Math.random() * 8).toFixed(1)}s`;
+        container.appendChild(p);
+    }
+}
+
+function hideSplash() {
+    const splash = document.getElementById('splash-screen');
+    if (!splash || splash.dataset.hidden) return;
+    splash.dataset.hidden = '1';
+    const status = document.getElementById('splash-status');
+    if (status) status.textContent = 'Ready!';
+    setTimeout(() => {
+        splash.classList.add('splash-hidden');
+        setTimeout(() => { splash.style.display = 'none'; }, 600);
+    }, 350);
 }

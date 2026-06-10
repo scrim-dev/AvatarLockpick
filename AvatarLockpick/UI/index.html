@@ -15,6 +15,22 @@
 
 <body>
 
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <div id="splash-particles"></div>
+        <div class="splash-content">
+            <div class="splash-icon-wrap">
+                <i class="fa-solid fa-lock-open splash-icon"></i>
+            </div>
+            <div class="splash-title">AvatarLockpick</div>
+            <div id="splash-version" class="splash-version">v3.0</div>
+            <div class="splash-bar-track">
+                <div class="splash-bar-fill"></div>
+            </div>
+            <div id="splash-status" class="splash-status">Initializing&hellip;</div>
+        </div>
+    </div>
+
     <!-- Service Close Confirmation Modal -->
     <div id="service-close-modal" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true">
         <div class="modal-box">
@@ -36,7 +52,7 @@
     <div id="update-modal" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true">
         <div class="modal-box" style="max-width:500px;">
             <div class="modal-box-icon"><i class="fa-solid fa-circle-up"></i></div>
-            <h3>Update Available!</h3>
+            <h3 id="update-modal-h3">Update Available!</h3>
             <div class="upd-modal-version-badge">
                 <i class="fa-solid fa-tag" style="opacity:0.7;"></i>
                 <span id="update-modal-versions">v? &rarr; v?</span>
@@ -65,7 +81,7 @@
                 <i class="fa-solid fa-code-branch" style="opacity:0.7;"></i>
                 <span id="prerelease-modal-versions">v? &rarr; v?</span>
             </div>
-            <p>You&rsquo;re running a build that&rsquo;s ahead of the latest published release. This version may include unfinished features, experimental changes, or instability. <strong>Expect bugs.</strong></p>
+            <p id="prerelease-modal-p">You&rsquo;re running a build that&rsquo;s ahead of the latest published release. This version may include unfinished features, experimental changes, or instability. <strong>Expect bugs.</strong></p>
             <div class="modal-box-actions">
                 <button class="action-button" onclick="closePreReleaseModal()" style="background:color-mix(in srgb,#DE3BFF 75%,var(--accent-color));">
                     <i class="fa-solid fa-check"></i> Got It
@@ -470,7 +486,7 @@
                 <!-- Update Check Section -->
                 <div class="extras-section">
                     <button class="extras-section-header" onclick="toggleExtrasSection('extras-update')">
-                        <span><i class="fa-solid fa-rotate"></i> <span>Update Check</span></span>
+                        <span><i class="fa-solid fa-rotate"></i> <span id="extras-update-title">Update Check</span></span>
                         <i class="fa-solid fa-chevron-down extras-chevron" id="chevron-extras-update"></i>
                     </button>
                     <div id="extras-update" class="extras-section-body">

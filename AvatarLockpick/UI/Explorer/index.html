@@ -20,16 +20,16 @@
     <div id="exp-header">
         <div id="exp-header-left">
             <button class="exp-btn exp-btn-secondary" id="btn-back" onclick="goBack()">
-                <i class="fa-solid fa-arrow-left"></i> Back to Main
+                <i class="fa-solid fa-arrow-left"></i> <span data-i18n="exp.back">Back to Main</span>
             </button>
             <div id="exp-title-block">
-                <span id="exp-title-text"><i class="fa-solid fa-compass" style="color:var(--accent-color);"></i> Explorer</span>
+                <span id="exp-title-text"><i class="fa-solid fa-compass" style="color:var(--accent-color);"></i> <span data-i18n="exp.title">Explorer</span></span>
                 <span id="exp-avatar-label" class="exp-subtitle"></span>
             </div>
         </div>
         <div id="exp-header-right">
-            <button class="exp-btn exp-btn-secondary" id="btn-refresh" onclick="refreshData()" title="Reload files from disk">
-                <i class="fa-solid fa-rotate"></i> Refresh
+            <button class="exp-btn exp-btn-secondary" id="btn-refresh" onclick="refreshData()" data-i18n-title="exp.refresh-title">
+                <i class="fa-solid fa-rotate"></i> <span data-i18n="exp.refresh">Refresh</span>
             </button>
         </div>
     </div>
@@ -38,26 +38,26 @@
     <div id="exp-status-bar">
         <div class="exp-status-item" id="sb-osc">
             <i class="fa-solid fa-file-code"></i>
-            <span>OSC Config</span>
+            <span data-i18n="exp.sb-osc">OSC Config</span>
             <span id="sb-osc-badge" class="exp-badge exp-badge-gray">-</span>
         </div>
         <div class="exp-status-item" id="sb-avi">
             <i class="fa-solid fa-file"></i>
-            <span>Avatar File</span>
+            <span data-i18n="exp.sb-avi">Avatar File</span>
             <span id="sb-avi-badge" class="exp-badge exp-badge-gray">-</span>
         </div>
         <div class="exp-status-divider"></div>
-        <div class="exp-stat-chip"><i class="fa-solid fa-list"></i> Total: <strong id="stat-total">-</strong></div>
-        <div class="exp-stat-chip" style="color:var(--accent-color);"><i class="fa-solid fa-link"></i> Matched: <strong id="stat-matched">-</strong></div>
-        <div class="exp-stat-chip" style="color:#f39c12;"><i class="fa-solid fa-triangle-exclamation"></i> OSC Only: <strong id="stat-osc-only">-</strong></div>
-        <div class="exp-stat-chip" style="color:#7f8c8d;"><i class="fa-solid fa-circle-question"></i> No OSC: <strong id="stat-avi-only">-</strong></div>
+        <div class="exp-stat-chip"><i class="fa-solid fa-list"></i> <span data-i18n="exp.stat-total">Total:</span> <strong id="stat-total">-</strong></div>
+        <div class="exp-stat-chip" style="color:var(--accent-color);"><i class="fa-solid fa-link"></i> <span data-i18n="exp.stat-matched">Matched:</span> <strong id="stat-matched">-</strong></div>
+        <div class="exp-stat-chip" style="color:#f39c12;"><i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="exp.stat-osc-only">OSC Only:</span> <strong id="stat-osc-only">-</strong></div>
+        <div class="exp-stat-chip" style="color:#7f8c8d;"><i class="fa-solid fa-circle-question"></i> <span data-i18n="exp.stat-no-osc">No OSC:</span> <strong id="stat-avi-only">-</strong></div>
     </div>
 
     <!-- Filter Bar -->
     <div id="exp-filter-bar">
         <button id="exp-search-btn" class="exp-search-trigger" onclick="openSearchModal()">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <span>Search</span>
+            <span data-i18n="exp.search">Search</span>
             <span id="exp-search-active-dot" class="search-active-dot" style="display:none;"></span>
         </button>
         <div id="exp-filter-summary" class="exp-filter-summary"></div>
@@ -70,7 +70,7 @@
         <!-- Loading state -->
         <div id="exp-loading">
             <i class="fa-solid fa-spinner fa-spin" style="font-size:2em; color:var(--accent-color);"></i>
-            <p style="margin-top:12px; opacity:0.6;">Loading avatar data...</p>
+            <p style="margin-top:12px; opacity:0.6;" data-i18n="exp.loading">Loading avatar data...</p>
         </div>
 
         <!-- Error state -->
@@ -78,7 +78,7 @@
             <i class="fa-solid fa-circle-exclamation" style="font-size:2em; color:#e74c3c;"></i>
             <p id="exp-error-msg" style="margin-top:12px; opacity:0.75;"></p>
             <button class="exp-btn exp-btn-primary" onclick="refreshData()" style="margin-top:14px;">
-                <i class="fa-solid fa-rotate"></i> Retry
+                <i class="fa-solid fa-rotate"></i> <span data-i18n="exp.retry">Retry</span>
             </button>
         </div>
 
@@ -87,20 +87,20 @@
             <table id="exp-table">
                 <thead>
                     <tr>
-                        <th class="col-name">Parameter Name</th>
-                        <th class="col-type">Type</th>
-                        <th class="col-value">Saved Value</th>
-                        <th class="col-status">Status</th>
-                        <th class="col-address">OSC Address</th>
-                        <th class="col-send">Custom Value</th>
-                        <th class="col-exec">Execute</th>
+                        <th class="col-name" data-i18n="exp.col-name">Parameter Name</th>
+                        <th class="col-type" data-i18n="exp.col-type">Type</th>
+                        <th class="col-value" data-i18n="exp.col-value">Saved Value</th>
+                        <th class="col-status" data-i18n="exp.col-status">Status</th>
+                        <th class="col-address" data-i18n="exp.col-address">OSC Address</th>
+                        <th class="col-send" data-i18n="exp.col-send">Custom Value</th>
+                        <th class="col-exec" data-i18n="exp.col-exec">Execute</th>
                     </tr>
                 </thead>
                 <tbody id="exp-table-body"></tbody>
             </table>
             <div id="exp-no-results" style="display:none; text-align:center; padding:40px 20px; opacity:0.45;">
                 <i class="fa-solid fa-filter-circle-xmark" style="font-size:1.8em;"></i>
-                <p style="margin-top:10px;">No parameters match your filters.</p>
+                <p style="margin-top:10px;" data-i18n="exp.no-results">No parameters match your filters.</p>
             </div>
         </div>
 
@@ -112,6 +112,7 @@
         <span id="exp-osc-result-text"></span>
     </div>
 
+    <script src="i18n_loader.js"></script>
     <script src="ExpScript.js"></script>
     <script src="ExpExt.js"></script>
 
@@ -120,8 +121,8 @@
         <div class="osc-warn-inner">
             <i class="fa-solid fa-triangle-exclamation osc-warn-icon"></i>
             <div class="osc-warn-body">
-                <strong>Some parameters cannot be changed through OSC.</strong>
-                Lock states and VRChat-controlled values are enforced by the avatar's animator and reset the moment you write them. For reliable unlocking, use the file-based unlock method from the main screen.
+                <strong data-i18n="exp.osc-warn-title">Some parameters cannot be changed through OSC.</strong>
+                <span data-i18n="exp.osc-warn-body"> Lock states and VRChat-controlled values are enforced by the avatar's animator and reset the moment you write them. For reliable unlocking, use the file-based unlock method from the main screen.</span>
             </div>
             <button class="osc-warn-close" onclick="dismissOscWarning()" title="Dismiss"><i class="fa-solid fa-xmark"></i></button>
         </div>
@@ -131,12 +132,12 @@
     <div id="exp-search-overlay">
         <div id="exp-search-modal">
             <div class="sm-header">
-                <div class="sm-title"><i class="fa-solid fa-magnifying-glass"></i> Search Parameters</div>
+                <div class="sm-title"><i class="fa-solid fa-magnifying-glass"></i> <span data-i18n="exp.search-title">Search Parameters</span></div>
                 <button class="sm-close" onclick="closeSearchModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="sm-body">
-                <input type="text" id="sm-query" class="sm-input" placeholder="Parameter name or OSC address..." oninput="updateModalCount()" autocomplete="off">
-                <div class="sm-section-label">Quick Search</div>
+                <input type="text" id="sm-query" class="sm-input" placeholder="Parameter name or OSC address..." data-i18n-ph="exp.sm-query-ph" oninput="updateModalCount()" autocomplete="off">
+                <div class="sm-section-label" data-i18n="exp.quick-search">Quick Search</div>
                 <div class="sm-presets">
                     <button class="sm-preset" onclick="presetSearch('lock')"><i class="fa-solid fa-lock"></i> lock</button>
                     <button class="sm-preset" onclick="presetSearch('unlock')"><i class="fa-solid fa-lock-open"></i> unlock</button>
@@ -147,25 +148,25 @@
                     <button class="sm-preset" onclick="presetSearch('vrc')">vrc</button>
                     <button class="sm-preset" onclick="presetSearch('anim')">anim</button>
                 </div>
-                <div class="sm-section-label">Type</div>
+                <div class="sm-section-label" data-i18n="exp.filter-type">Type</div>
                 <div class="sm-chips" id="sm-type-chips">
-                    <button class="sm-chip active" data-val="all"   onclick="setModalChip('type',this)">All</button>
-                    <button class="sm-chip"         data-val="float" onclick="setModalChip('type',this)">Float</button>
-                    <button class="sm-chip"         data-val="int"   onclick="setModalChip('type',this)">Int</button>
-                    <button class="sm-chip"         data-val="bool"  onclick="setModalChip('type',this)">Bool</button>
+                    <button class="sm-chip active" data-val="all"   onclick="setModalChip('type',this)" data-i18n="exp.chip-all">All</button>
+                    <button class="sm-chip"         data-val="float" onclick="setModalChip('type',this)" data-i18n="exp.chip-float">Float</button>
+                    <button class="sm-chip"         data-val="int"   onclick="setModalChip('type',this)" data-i18n="exp.chip-int">Int</button>
+                    <button class="sm-chip"         data-val="bool"  onclick="setModalChip('type',this)" data-i18n="exp.chip-bool">Bool</button>
                 </div>
-                <div class="sm-section-label">Status</div>
+                <div class="sm-section-label" data-i18n="exp.filter-status">Status</div>
                 <div class="sm-chips" id="sm-status-chips">
-                    <button class="sm-chip active" data-val="all"          onclick="setModalChip('status',this)">All</button>
-                    <button class="sm-chip"         data-val="matched"      onclick="setModalChip('status',this)"><i class="fa-solid fa-circle-check"></i> Synced</button>
-                    <button class="sm-chip"         data-val="osc-only"     onclick="setModalChip('status',this)"><i class="fa-solid fa-triangle-exclamation"></i> OSC Only</button>
-                    <button class="sm-chip"         data-val="avatar-only"  onclick="setModalChip('status',this)"><i class="fa-solid fa-circle-question"></i> No OSC</button>
+                    <button class="sm-chip active" data-val="all"          onclick="setModalChip('status',this)" data-i18n="exp.chip-all">All</button>
+                    <button class="sm-chip"         data-val="matched"      onclick="setModalChip('status',this)" data-i18n="exp.chip-synced"><i class="fa-solid fa-circle-check"></i> Synced</button>
+                    <button class="sm-chip"         data-val="osc-only"     onclick="setModalChip('status',this)" data-i18n="exp.chip-osc-only"><i class="fa-solid fa-triangle-exclamation"></i> OSC Only</button>
+                    <button class="sm-chip"         data-val="avatar-only"  onclick="setModalChip('status',this)" data-i18n="exp.chip-no-osc"><i class="fa-solid fa-circle-question"></i> No OSC</button>
                 </div>
-                <div id="sm-result-count" class="sm-result-count">Open to search</div>
+                <div id="sm-result-count" class="sm-result-count" data-i18n="exp.result-count-empty">Open to search</div>
             </div>
             <div class="sm-footer">
-                <button class="exp-btn exp-btn-secondary" onclick="clearSearchModal()"><i class="fa-solid fa-xmark"></i> Clear</button>
-                <button class="exp-btn exp-btn-primary"   onclick="applySearchModal()"><i class="fa-solid fa-check"></i> Apply</button>
+                <button class="exp-btn exp-btn-secondary" onclick="clearSearchModal()"><i class="fa-solid fa-xmark"></i> <span data-i18n="exp.clear">Clear</span></button>
+                <button class="exp-btn exp-btn-primary"   onclick="applySearchModal()"><i class="fa-solid fa-check"></i> <span data-i18n="exp.apply">Apply</span></button>
             </div>
         </div>
     </div>
