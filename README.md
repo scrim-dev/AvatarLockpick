@@ -28,6 +28,8 @@ AvatarLockpick is user friendly tool for unlocking VRChat avatars. It works by s
 
 🙏 Special thanks to [Amelia](https://github.com/Ameliaaaaaaa) for [PAW](https://paw.amelia.fun/).
 
+⚠️ [DUAL-LICENSE DISCLAIMER](https://github.com/scrim-dev/AvatarLockpick/blob/master/md/PAW-Notice.txt)
+
 ⚠️ [AI DISCLAIMER](https://github.com/scrim-dev/AvatarLockpick/blob/master/md/AI_Disclaimer.md)
 
 🤝 [SUPPORT](https://discord.gg/5fc2BWuFWU)
