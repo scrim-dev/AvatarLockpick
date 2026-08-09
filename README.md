@@ -1,11 +1,5 @@
 <div align="center">
   <img src="https://github.com/scrim-dev/AvatarLockpick/blob/master/Showcase/Logo.png" alt="BannerImg" width="600"> <!--Banner-->
-  &ensp;
-  <br>
-  <br>
-  <a href="https://github.com/scrim-dev/AvatarLockpick/releases/latest"> <img src="https://img.shields.io/badge/Download-latest-dodgerblue?style=for-the-badge&logoColor=white" alt="Download HERE"/></a>
-  <br>
-  <br>
 </div>
 
 > [!IMPORTANT]
