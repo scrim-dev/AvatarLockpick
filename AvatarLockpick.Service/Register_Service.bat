@@ -1,1 +1,0 @@
-sc.exe create AvatarLockpickService binPath= "AvatarLockpick.Service.exe" start= auto DisplayName= "AvatarLockpick's Auto Unlock Service"
