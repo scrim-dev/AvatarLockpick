@@ -383,4 +383,5 @@ bins/
 .publish
 _binary
 
-*.zip
+/_binary
+_binary/AvatarLockpick-win-x64.zip
