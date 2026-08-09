@@ -9,9 +9,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -27,6 +29,9 @@ const (
 	repository     = "scrim-dev/AvatarLockpick"
 	versionURL     = "https://raw.githubusercontent.com/" + repository + "/master/version.txt"
 	releaseAPIBase = "https://api.github.com/repos/" + repository + "/releases/tags/"
+	latestAPIURL   = "https://api.github.com/repos/" + repository + "/releases/latest"
+	releasesAPIURL = "https://api.github.com/repos/" + repository + "/releases?per_page=20"
+	tagsAPIURL     = "https://api.github.com/repos/" + repository + "/tags?per_page=20"
 	userAgent      = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0"
 )
 
@@ -42,6 +47,7 @@ type remoteInfo struct {
 	version    string
 	published  bool
 	preRelease bool
+	tagExists  bool
 }
 
 func main() {
@@ -69,7 +75,11 @@ func main() {
 	var info remoteInfo
 	installButton.OnTapped = func() {
 		if !info.published {
-			dialog.ShowConfirm("Pre-release build", fmt.Sprintf("Version %s does not have a GitHub Release. It is an unpublished pre-release. Continue?", info.version), func(ok bool) {
+			message := fmt.Sprintf("Version %s does not have a GitHub Release. It is an unpublished pre-release. Continue?", info.version)
+			if info.tagExists {
+				message = fmt.Sprintf("Version %s has a GitHub tag, but no GitHub Release was published for it. Continue?", info.version)
+			}
+			dialog.ShowConfirm("Pre-release build", message, func(ok bool) {
 				if ok {
 					install(w, status, progress, installButton, info, installDesktop.Checked)
 				}
@@ -102,7 +112,9 @@ func main() {
 		} else {
 			message += "\nInstalled version: " + local + " (update available)"
 		}
-		if !loaded.published {
+		if !loaded.published && loaded.tagExists {
+			message += "\nWarning: this version has a GitHub tag but no GitHub Release."
+		} else if !loaded.published {
 			message += "\nWarning: this is an unpublished pre-release."
 		}
 		if isDevMode() {
@@ -191,8 +203,12 @@ func getRemoteInfo() (remoteInfo, error) {
 		return remoteInfo{}, errors.New("version.txt is empty")
 	}
 
+	if latest, ok := latestPublishedVersion(client); ok && compareVersions(latest, version) > 0 {
+		version = latest
+	}
+
 	info := remoteInfo{version: version}
-	release, err := get(client, releaseAPIBase+version)
+	release, err := get(client, releaseAPIBase+url.PathEscape(version))
 	if err != nil {
 		return info, nil
 	} // GitHub availability must not prevent a package install.
@@ -204,6 +220,14 @@ func getRemoteInfo() (remoteInfo, error) {
 		if json.NewDecoder(release.Body).Decode(&metadata) == nil {
 			info.published, info.preRelease = true, metadata.Prerelease
 		}
+	}
+	if !info.published {
+		if published, prerelease := releaseExistsForVersionDate(client, version); published {
+			info.published, info.preRelease = true, prerelease
+		}
+	}
+	if !info.published {
+		info.tagExists = tagExists(client, version)
 	}
 	return info, nil
 }
@@ -290,6 +314,149 @@ func get(client *http.Client, url string) (*http.Response, error) {
 	request.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	request.Header.Set("Accept-Language", "en-US,en;q=0.5")
 	return client.Do(request)
+}
+
+func latestPublishedVersion(client *http.Client) (string, bool) {
+	best := ""
+	if response, err := get(client, latestAPIURL); err == nil {
+		defer response.Body.Close()
+		if response.StatusCode == http.StatusOK {
+			var release struct {
+				TagName string `json:"tag_name"`
+			}
+			if json.NewDecoder(response.Body).Decode(&release) == nil && isCalendarVersion(release.TagName) {
+				best = release.TagName
+			}
+		}
+	}
+
+	if response, err := get(client, tagsAPIURL); err == nil {
+		defer response.Body.Close()
+		if response.StatusCode == http.StatusOK {
+			var tags []struct {
+				Name string `json:"name"`
+			}
+			if json.NewDecoder(response.Body).Decode(&tags) == nil {
+				for _, tag := range tags {
+					if isCalendarVersion(tag.Name) && compareVersions(tag.Name, best) > 0 {
+						best = tag.Name
+					}
+				}
+			}
+		}
+	}
+
+	return best, best != ""
+}
+
+func releaseExistsForVersionDate(client *http.Client, version string) (bool, bool) {
+	date, ok := versionDate(version)
+	if !ok {
+		return false, false
+	}
+
+	response, err := get(client, releasesAPIURL)
+	if err != nil {
+		return false, false
+	}
+	defer response.Body.Close()
+	if response.StatusCode != http.StatusOK {
+		return false, false
+	}
+
+	var releases []struct {
+		Name       string `json:"name"`
+		TagName    string `json:"tag_name"`
+		Prerelease bool   `json:"prerelease"`
+	}
+	if json.NewDecoder(response.Body).Decode(&releases) != nil {
+		return false, false
+	}
+	for _, release := range releases {
+		if releaseMatchesDate(release.Name, date) || releaseMatchesDate(release.TagName, date) {
+			return true, release.Prerelease
+		}
+	}
+	return false, false
+}
+
+func releaseMatchesDate(value, date string) bool {
+	normalized := strings.TrimSpace(strings.ToLower(value))
+	normalized = strings.TrimPrefix(normalized, "version ")
+	return normalized == date
+}
+
+func tagExists(client *http.Client, version string) bool {
+	response, err := get(client, "https://api.github.com/repos/"+repository+"/git/ref/tags/"+url.PathEscape(version))
+	if err != nil {
+		return false
+	}
+	defer response.Body.Close()
+	return response.StatusCode == http.StatusOK
+}
+
+func compareVersions(left, right string) int {
+	leftParts, leftOK := parseCalendarVersion(left)
+	rightParts, rightOK := parseCalendarVersion(right)
+	if !leftOK && !rightOK {
+		return 0
+	}
+	if leftOK && !rightOK {
+		return 1
+	}
+	if !leftOK && rightOK {
+		return -1
+	}
+	for index := range leftParts {
+		if leftParts[index] > rightParts[index] {
+			return 1
+		}
+		if leftParts[index] < rightParts[index] {
+			return -1
+		}
+	}
+	return 0
+}
+
+func isCalendarVersion(value string) bool {
+	_, ok := parseCalendarVersion(value)
+	return ok
+}
+
+func versionDate(value string) (string, bool) {
+	dateAndBuild := strings.SplitN(strings.TrimSpace(value), "-", 2)
+	if len(dateAndBuild) != 2 {
+		return "", false
+	}
+	if _, ok := parseCalendarVersion(value); !ok {
+		return "", false
+	}
+	return dateAndBuild[0], true
+}
+
+func parseCalendarVersion(value string) ([4]int, bool) {
+	var result [4]int
+	dateAndBuild := strings.SplitN(strings.TrimSpace(value), "-", 2)
+	if len(dateAndBuild) != 2 {
+		return result, false
+	}
+	dateParts := strings.Split(dateAndBuild[0], ".")
+	if len(dateParts) != 3 {
+		return result, false
+	}
+	for index, part := range dateParts {
+		number, err := strconv.Atoi(part)
+		if err != nil {
+			return result, false
+		}
+		result[index] = number
+	}
+	build, err := strconv.Atoi(dateAndBuild[1])
+	if err != nil {
+		return result, false
+	}
+	result[3] = build
+	return result, true
 }
 
 func launchApp(path string) error {
