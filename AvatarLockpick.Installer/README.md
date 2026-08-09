@@ -13,6 +13,10 @@ whether the matching GitHub Release exists, and warns before installing an unpub
 Run `build.bat` from the repository root. Building the installer requires Go, CGO enabled, and a
 C compiler such as MinGW-w64, because Fyne's Windows renderer uses OpenGL.
 
+Use `build.bat --dev` to build a dev-mode installer. Dev mode downloads
+`https://file-examples.com/wp-content/storage/2017/02/zip_10MB.zip` with a Firefox User-Agent to test the
+installer download path, then stops without installing files or changing shortcuts.
+
 Build outputs:
 
 - Windows installer-managed app update zip: `..\_binary\AvatarLockpick-win-x64.zip`

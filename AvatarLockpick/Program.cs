@@ -5,12 +5,13 @@ using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Diagnostics;
 
 namespace AvatarLockpick
 {
     internal class Program
     {
-        public const string AppVersion = "2026.08.09-8"; //Global Version Set
+        public const string AppVersion = "2026.08.09-12"; //Global Version Set
         public static HttpUtils HttpC { get; private set; } = new();
         public static Size AppSize { get; private set; } = new Size(1300, 800);
         public static bool IsDevMode { get; private set; }
@@ -26,6 +27,9 @@ namespace AvatarLockpick
         [STAThread]
         static void Main(string[] args)
         {
+            EnsureAppWorkingDirectory();
+            EnsureStartMenuShortcut();
+
             IsDevMode = Array.Exists(args, a => a.Equals("--devmode", StringComparison.OrdinalIgnoreCase));
             Console.WriteLine(AppMutexName + " app start/entry");
             if (IsDevMode) Console.WriteLine("[DevMode] Developer mode is active.");
@@ -187,6 +191,84 @@ namespace AvatarLockpick
                     }
                 }
             }
+        }
+
+        private static void EnsureAppWorkingDirectory()
+        {
+            try
+            {
+                string? executablePath = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName;
+                string? appDirectory = Path.GetDirectoryName(executablePath);
+                if (!string.IsNullOrWhiteSpace(appDirectory) && Directory.Exists(appDirectory))
+                {
+                    Directory.SetCurrentDirectory(appDirectory);
+                }
+            }
+            catch { }
+        }
+
+        private static void EnsureStartMenuShortcut()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            try
+            {
+                string? executablePath = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName;
+                string? appDirectory = Path.GetDirectoryName(executablePath);
+                if (string.IsNullOrWhiteSpace(executablePath) || string.IsNullOrWhiteSpace(appDirectory))
+                {
+                    return;
+                }
+
+                string programsPath = Environment.GetFolderPath(Environment.SpecialFolder.Programs);
+                if (string.IsNullOrWhiteSpace(programsPath))
+                {
+                    return;
+                }
+
+                string shortcutPath = Path.Combine(programsPath, "AvatarLockpick.lnk");
+                string iconPath = Path.Combine(appDirectory, "UI", "unlockicon.ico");
+                CreateShortcut(shortcutPath, executablePath, appDirectory, File.Exists(iconPath) ? iconPath : executablePath);
+            }
+            catch { }
+        }
+
+        private static void CreateShortcut(string shortcutPath, string targetPath, string workingDirectory, string iconPath)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(shortcutPath)!);
+
+            string script = string.Join(Environment.NewLine,
+                "$shell = New-Object -ComObject WScript.Shell",
+                "$shortcut = $shell.CreateShortcut($args[0])",
+                "$shortcut.TargetPath = $args[1]",
+                "$shortcut.WorkingDirectory = $args[2]",
+                "$shortcut.IconLocation = $args[3]",
+                "$shortcut.Save()");
+
+            using Process process = Process.Start(new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                ArgumentList =
+                {
+                    "-NoProfile",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-Command",
+                    script,
+                    shortcutPath,
+                    targetPath,
+                    workingDirectory,
+                    iconPath + ",0"
+                },
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                WindowStyle = ProcessWindowStyle.Hidden
+            })!;
+
+            process.WaitForExit(5000);
         }
     }
 }

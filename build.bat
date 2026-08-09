@@ -17,6 +17,19 @@ set "BINARY_DIR=_binary"
 set "RELEASES_DIR=releases"
 set "INSTALLER_LOG=%RELEASES_DIR%\installer-build.log"
 set "INSTALLER_STEP_LOG=%RELEASES_DIR%\installer-build-step.log"
+set "DEV_MODE=false"
+set "INSTALLER_PACKAGE_URL=https://raw.githubusercontent.com/scrim-dev/AvatarLockpick/master/_binary/AvatarLockpick-win-x64.zip"
+
+if /i "%~1"=="--dev" (
+    set "DEV_MODE=true"
+    set "INSTALLER_PACKAGE_URL=https://file-examples.com/wp-content/storage/2017/02/zip_10MB.zip"
+)
+set "INSTALLER_LDFLAGS=-H=windowsgui -s -w -X main.devMode=%DEV_MODE% -X main.packageURL=%INSTALLER_PACKAGE_URL%"
+
+if "%DEV_MODE%"=="true" (
+    echo.
+    echo  DEV MODE enabled. Installer download URL: %INSTALLER_PACKAGE_URL%
+)
 
 echo.
 echo  Updating calendar version...
@@ -65,6 +78,8 @@ pushd "%INSTALLER_SRC_DIR%"
 echo  Capturing installer build details to ..\..\%INSTALLER_LOG%
 echo AvatarLockpick installer build log > "..\..\%INSTALLER_LOG%"
 echo Version: %VERSION% >> "..\..\%INSTALLER_LOG%"
+echo Dev mode: %DEV_MODE% >> "..\..\%INSTALLER_LOG%"
+echo Package URL: %INSTALLER_PACKAGE_URL% >> "..\..\%INSTALLER_LOG%"
 echo Started: %DATE% %TIME% >> "..\..\%INSTALLER_LOG%"
 echo. >> "..\..\%INSTALLER_LOG%"
 
@@ -135,10 +150,10 @@ echo.
 echo  [4/4] Compiling installer executable...
 echo  Verbose Go output is written to %INSTALLER_LOG%.
 echo  If it looks quiet here, the build may still be working; watch the log with the command shown above.
-echo Running: go build -v -x -trimpath -ldflags="-H=windowsgui -s -w"
+echo Running: go build -v -x -trimpath -ldflags="%INSTALLER_LDFLAGS%"
 echo. >> "..\..\%INSTALLER_LOG%"
 echo === go build === >> "..\..\%INSTALLER_LOG%"
-go build -v -x -trimpath -ldflags="-H=windowsgui -s -w" -o "..\..\%RELEASES_DIR%\AvatarLockpick-Installer.exe" . >> "..\..\%INSTALLER_LOG%" 2>&1
+go build -v -x -trimpath -ldflags="%INSTALLER_LDFLAGS%" -o "..\..\%RELEASES_DIR%\AvatarLockpick-Installer.exe" . >> "..\..\%INSTALLER_LOG%" 2>&1
 set "GO_BUILD_EXIT=%ERRORLEVEL%"
 if not "%GO_BUILD_EXIT%"=="0" (
     echo  [ERROR] Installer compile failed. See %INSTALLER_LOG%.

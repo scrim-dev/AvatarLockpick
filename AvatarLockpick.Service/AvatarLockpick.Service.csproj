@@ -8,9 +8,9 @@
     <ApplicationIcon>gear.ico</ApplicationIcon>
     <Authors>scrim-dev</Authors>
     <Company>scrim-dev</Company>
-    <AssemblyVersion>2026.8.9.8</AssemblyVersion>
-    <FileVersion>2026.8.9.8</FileVersion>
-    <InformationalVersion>2026.08.09-8</InformationalVersion>
+    <AssemblyVersion>2026.8.9.12</AssemblyVersion>
+    <FileVersion>2026.8.9.12</FileVersion>
+    <InformationalVersion>2026.08.09-12</InformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>
