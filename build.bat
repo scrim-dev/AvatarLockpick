@@ -52,11 +52,10 @@ if errorlevel 1 goto :ERROR
 echo.
 echo  [3/4] Creating distributable package layout...
 if exist "%LAYOUT%" rmdir /s /q "%LAYOUT%"
-mkdir "%LAYOUT%\UI_Fixer" "%LAYOUT%\libs" >nul
+mkdir "%LAYOUT%\libs" >nul
 xcopy /e /i /y /q "%OUT_WIN%\*" "%LAYOUT%\" >nul
 xcopy /e /i /y /q "%OUT_SVC%\*" "%LAYOUT%\" >nul
 xcopy /e /i /y /q "AvatarLockpick\libs\*" "%LAYOUT%\libs\" >nul
-if exist "AvatarLockpick.Cleaner\UI_Cleaner.bat" copy /y "AvatarLockpick.Cleaner\UI_Cleaner.bat" "%LAYOUT%\UI_Fixer\UI_Cleaner.bat" >nul
 copy /y "version.txt" "%LAYOUT%\version.txt" >nul
 if not exist "%BINARY_DIR%" mkdir "%BINARY_DIR%"
 if not exist "%RELEASES_DIR%" mkdir "%RELEASES_DIR%"
