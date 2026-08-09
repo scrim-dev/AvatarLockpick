@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/scrim-dev/AvatarLockpick/blob/master/Showcase/logo_2.png" alt="BannerImg" width="600"> <!--Banner-->
+  <img src="https://github.com/scrim-dev/AvatarLockpick/blob/master/Showcase/Logo.png" alt="BannerImg" width="600"> <!--Banner-->
   &ensp;
   <br>
   <br>
@@ -10,7 +10,7 @@
 
 > [!IMPORTANT]
 > This software is now archived and no longer maintained.
-> READ MORE beelow.
+> READ MORE below.
 
 # AvatarLockpick
 Ever wanted to use a VRChat avatar but it was locked? Well now you can unlock it using AvatarLockpick!
@@ -18,20 +18,15 @@ Ever wanted to use a VRChat avatar but it was locked? Well now you can unlock it
 ### What's this all about?
 AvatarLockpick is user friendly tool for unlocking VRChat avatars. It works by scanning through your VRChat cache and editing locally saved avatar config data to unlock avatars. Pretty neat, right?
 
-# Preview
-<div align="center">
-  <img src="https://github.com/scrim-dev/AvatarLockpick/blob/master/Showcase/screenshot.png" width="1200" alt="Simple Preview">
-</div>
-
 # I'm bored of programming.
 
 I think it is finally time for me to announce this.
 
-As of today, I will no longer be actively working on AvatarLockpick or any of my other VRChat-related or even coding projects. I am also stepping away from coding in general.
+As of today, I will no longer be actively working on AvatarLockpick or any of my other VRChat related or even coding projects. I am also stepping away from coding in general.
 
 There is no big dramatic reason behind this decision. Over time, I have simply grown bored of programming. What used to be something I genuinely enjoyed and could spend hours working on has slowly started feeling more like something I am forcing myself to do. I do not want to keep maintaining projects when my heart is no longer in it.
 
-Honestly, I think I have just grown bored of a lot of internet and computer-related stuff in general. I have spent a ridiculous amount of time behind a computer over the years, whether that was programming, working on projects, messing around with random things, or just being online. At some point, it all started to feel repetitive.
+Honestly, I think I have just grown bored of a lot of internet and computer related stuff in general. I have spent a ridiculous amount of time behind a computer over the years, whether that was programming, working on projects, messing around with random things, or just being online. At some point, it all started to feel repetitive.
 
 That does not mean I am completely disappearing from the internet or never touching a computer again. I will obviously still play games, hang out, and do whatever else I feel like doing. I just do not have the same interest in constantly working on projects or spending my time programming anymore.
 
@@ -56,6 +51,8 @@ Maybe I will make something small again someday. Maybe I will randomly get bored
 For now, though, I am done.
 
 Thank you to everyone who was part of this, whether you were here from the beginning or only found the project recently.
+
+FULL SOURCE: [Download](https://github.com/scrim-dev/AvatarLockpick/raw/refs/heads/master/AvatarLockpick-Source.zip)
 
 🙏 Special thanks to [Amelia](https://github.com/Ameliaaaaaaa) for [PAW](https://paw.amelia.fun/).
 
