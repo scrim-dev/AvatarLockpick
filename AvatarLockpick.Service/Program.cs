@@ -4,7 +4,7 @@ namespace AvatarLockpick.Service
 {
     public class Program
     {
-        public const string AppVersion = "2026.08.09-3";
+        public const string AppVersion = "2026.08.09-8";
 
         public static void Main(string[] args)
         {

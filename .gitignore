@@ -18,11 +18,15 @@ _Builds/
 # Mono auto generated files
 mono_crash.*
 
+*.log
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+!releases/
+!releases/**
 x64/
 x86/
 [Ww][Ii][Nn]32/
@@ -78,6 +82,7 @@ StyleCopReport.xml
 *.ilk
 *.meta
 *.obj
+AvatarLockpick.Installer/src/installer.syso
 *.iobj
 *.pch
 *.pdb
@@ -364,6 +369,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+releases/
 linux_release
 PAW-CSharp-SDK
 linux_release.zip
@@ -375,3 +381,6 @@ bin/
 bins/
 .devin
 .publish
+_binary
+
+*.zip
