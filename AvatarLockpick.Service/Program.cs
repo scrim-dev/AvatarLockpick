@@ -4,6 +4,8 @@ namespace AvatarLockpick.Service
 {
     public class Program
     {
+        public const string AppVersion = "2026.08.09-3";
+
         public static void Main(string[] args)
         {
             using var mutex = new Mutex(true, "AvatarLockpick.Service", out bool createdNew);

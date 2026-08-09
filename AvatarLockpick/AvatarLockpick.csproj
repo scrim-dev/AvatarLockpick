@@ -13,8 +13,9 @@
     <Authors>Scrim-Dev</Authors>
     <Company>Scrim-Dev</Company>
     <Copyright>Scrimmane</Copyright>
-    <AssemblyVersion>0.0.0.0</AssemblyVersion>
-    <FileVersion>0.0.0.0</FileVersion>
+    <AssemblyVersion>2026.8.9.3</AssemblyVersion>
+    <FileVersion>2026.8.9.3</FileVersion>
+    <InformationalVersion>2026.08.09-3</InformationalVersion>
     <Title>Avatar Lockpick App</Title>
     <ApplicationIcon>unlockicon.ico</ApplicationIcon>
     <UseWindowsForms>False</UseWindowsForms>

@@ -1,91 +1,75 @@
-:: Full Builder
 @echo off
-
-title ALP Builder
+setlocal EnableExtensions
+title AvatarLockpick Builder
 
 set "MAIN_PROJ=AvatarLockpick\AvatarLockpick.csproj"
 set "SVC_PROJ=AvatarLockpick.Service\AvatarLockpick.Service.csproj"
-
-set "OUT_WIN=publish\win-x64"
-set "OUT_SVC=publish\service-win-x64"
-set "OUT_LINUX=publish\linux-x64"
-
-set "LIBS_SRC=AvatarLockpick\libs"
-set "CLEANER_BAT=AvatarLockpick.Cleaner\UI_Cleaner.bat"
-
-set "VERSION=?.?"
-if exist version.txt set /p VERSION=<version.txt
+set "VERSION_TOOL=Tools\VersionManager\VersionManager.csproj"
+set "VERSION_NUGET_CONFIG=Tools\VersionManager\NuGet.Config"
+set "INSTALLER_DIR=AvatarLockpick.Installer"
+set "OUT_ROOT=publish"
+set "OUT_WIN=%OUT_ROOT%\win-x64"
+set "OUT_SVC=%OUT_ROOT%\service-win-x64"
+set "OUT_LINUX=%OUT_ROOT%\linux-x64"
+set "LAYOUT=%OUT_ROOT%\AvatarLockpick-win-x64"
+set "BINARY_DIR=_binary"
 
 echo.
-echo  ALP Builder  v%VERSION%
-echo.
+echo  Updating calendar version...
+dotnet restore "%VERSION_TOOL%" --configfile "%VERSION_NUGET_CONFIG%"
+if errorlevel 1 goto :ERROR
+dotnet run --project "%VERSION_TOOL%" -c Release --no-restore
+if errorlevel 1 goto :ERROR
+set /p VERSION=<version.txt
 
-:: ---------------------------------------------------------------
-echo  ^>^> [1/3] Main App -- Win x64 Release...
 echo.
+echo  [1/4] Publishing AvatarLockpick %VERSION%...
 dotnet publish "%MAIN_PROJ%" -c Release -r win-x64 --no-self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o "%OUT_WIN%"
-if errorlevel 1 (
-    echo.
-    echo  [ERROR] Main App Win x64 build FAILED. See output above.
-    echo.
-    goto DONE
-)
-call :COPY_MAIN_LIBS "%OUT_WIN%"
-call :COPY_CLEANER "%OUT_WIN%"
+if errorlevel 1 goto :ERROR
 
-:: ---------------------------------------------------------------
 echo.
-echo  ^>^> [2/3] Service -- Win x64 Release...
-echo.
+echo  [2/4] Publishing service...
 dotnet publish "%SVC_PROJ%" -c Release -r win-x64 --no-self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o "%OUT_SVC%"
-if errorlevel 1 (
-    echo.
-    echo  [ERROR] Service Win x64 build FAILED. See output above.
-    echo.
-    goto DONE
-)
+if errorlevel 1 goto :ERROR
 
-:: ---------------------------------------------------------------
 echo.
-echo  ^>^> [3/3] Main App -- Linux x64 Release...
+echo  [3/4] Creating distributable package layout...
+if exist "%LAYOUT%" rmdir /s /q "%LAYOUT%"
+mkdir "%LAYOUT%\GUI full tool" "%LAYOUT%\libs" >nul
+xcopy /e /i /y /q "%OUT_WIN%\*" "%LAYOUT%\" >nul
+xcopy /e /i /y /q "%OUT_SVC%\*" "%LAYOUT%\" >nul
+xcopy /e /i /y /q "AvatarLockpick\libs\*" "%LAYOUT%\libs\" >nul
+if exist "AvatarLockpick.Cleaner\UI_Cleaner.bat" copy /y "AvatarLockpick.Cleaner\UI_Cleaner.bat" "%LAYOUT%\GUI full tool\UI_Cleaner.bat" >nul
+copy /y "version.txt" "%LAYOUT%\version.txt" >nul
+if not exist "%BINARY_DIR%" mkdir "%BINARY_DIR%"
+powershell -NoProfile -Command "Compress-Archive -Path '%LAYOUT%\*' -DestinationPath '%BINARY_DIR%\AvatarLockpick-win-x64.zip' -Force"
+if errorlevel 1 goto :ERROR
+copy /y "%BINARY_DIR%\AvatarLockpick-win-x64.zip" "%BINARY_DIR%\AvatarLockpick-%VERSION%-win-x64.zip" >nul
+
 echo.
+echo  [4/4] Building Fyne installer...
+pushd "%INSTALLER_DIR%"
+for /f %%G in ('go env CGO_ENABLED') do set "CGO_ENABLED=%%G"
+if not "%CGO_ENABLED%"=="1" (
+    echo  [ERROR] Fyne's Windows renderer requires CGO and a C compiler. Install MinGW-w64 and set CGO_ENABLED=1.
+    popd
+    goto :ERROR
+)
+go mod tidy
+if errorlevel 1 (popd & goto :ERROR)
+go build -trimpath -ldflags="-s -w" -o "..\%BINARY_DIR%\AvatarLockpick-Installer.exe" .
+if errorlevel 1 (popd & goto :ERROR)
+popd
+
+echo.
+echo  Creating Linux build (non-fatal)...
 dotnet publish "%MAIN_PROJ%" -c Release -r linux-x64 --no-self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o "%OUT_LINUX%"
-if errorlevel 1 (
-    echo.
-    echo  [WARN] Linux x64 build FAILED. See output above.
-    echo.
-)
 
-:DONE
 echo.
-echo  Done.
+echo  Done: %BINARY_DIR%\AvatarLockpick-win-x64.zip
+exit /b 0
+
+:ERROR
 echo.
-pause
-endlocal
-exit /b 0
-
-:: ============================================================
-:COPY_MAIN_LIBS
-:: %~1 = destination publish dir (will create %~1\libs\)
-echo  ^>^> Copying ADB libs to %~1\libs\...
-if not exist "%~1\libs" mkdir "%~1\libs"
-for %%F in (adb.exe AdbWinApi.dll AdbWinUsbApi.dll) do (
-    if exist "%LIBS_SRC%\%%F" (
-        xcopy /y /q "%LIBS_SRC%\%%F" "%~1\libs\" >nul
-    ) else (
-        echo  [WARN] %LIBS_SRC%\%%F not found, skipping.
-    )
-)
-echo  ^>^> ADB libs copied.
-exit /b 0
-
-:: ============================================================
-:COPY_CLEANER
-:: %~1 = destination publish dir
-if exist "%CLEANER_BAT%" (
-    copy /y "%CLEANER_BAT%" "%~1\ALP_UI_Cleaner.bat" >nul
-    echo  ^>^> UI_Cleaner.bat copied to %~1 as ALP_UI_Cleaner.bat.
-) else (
-    echo  [WARN] %CLEANER_BAT% not found, skipping.
-)
-exit /b 0
+echo  Build failed.
+exit /b 1

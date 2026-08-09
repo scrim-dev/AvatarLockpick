@@ -13,6 +13,12 @@
 # AvatarLockpick
 Ever wanted to use a VRChat avatar but it was locked? Well now you can unlock it using AvatarLockpick!
 
+## Windows installation
+
+The installer installs to `%LOCALAPPDATA%\Programs\AvatarLockpick` (normally
+`C:\Users\<username>\AppData\Local\Programs\AvatarLockpick`), always creates a Start Menu
+shortcut, and can create a desktop shortcut on request.
+
 ### What's this all about?
 AvatarLockpick is user friendly tool for unlocking VRChat avatars. It works by scanning through your VRChat cache and editing locally saved avatar config data to unlock avatars. Pretty neat, right?
 
