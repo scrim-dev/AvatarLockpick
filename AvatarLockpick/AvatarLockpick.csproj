@@ -38,6 +38,7 @@
     <PackageReference Include="Pastel" Version="7.0.1" />
     <PackageReference Include="Photino.NET" Version="4.0.16" />
     <PackageReference Include="Sentry" Version="6.6.0" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.53.3" />
   </ItemGroup>
 
   
